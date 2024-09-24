@@ -77,14 +77,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)\include;$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Include</IncludePath>
+    <IncludePath>$(ProjectDir)\src;$(ProjectDir)\include;$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Include</IncludePath>
     <LibraryPath>$(ProjectDir)\libs;$(LibraryPath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Lib\x86</LibraryPath>
     <SourcePath>$(ProjectDir)\src;$(SourcePath)</SourcePath>
     <TargetName>D3D9Hook</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)\include;$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Include</IncludePath>
+    <IncludePath>$(ProjectDir)\src;$(ProjectDir)\include;$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Include</IncludePath>
     <LibraryPath>$(ProjectDir)\libs;$(LibraryPath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Lib\x86</LibraryPath>
     <SourcePath>$(ProjectDir)\src;$(SourcePath)</SourcePath>
     <TargetName>D3D9Hook</TargetName>
@@ -115,6 +115,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +140,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -206,6 +208,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\framework.h" />
+    <ClInclude Include="src\gui\gui.h" />
+    <ClInclude Include="src\gui\imguistyle.h" />
+    <ClInclude Include="src\overlay\dinputhook.h" />
+    <ClInclude Include="src\overlay\dx9hook.h" />
+    <ClInclude Include="src\overlay\overlay.h" />
     <ClInclude Include="src\utils\mem.h" />
     <ClInclude Include="include\ntdll.h" />
     <ClInclude Include="include\ImGui\imconfig.h" />
@@ -226,6 +233,10 @@
     <ClCompile Include="include\ImGui\imgui_tables.cpp" />
     <ClCompile Include="include\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\gui\imguistyle.cpp" />
+    <ClCompile Include="src\overlay\dinputhook.cpp" />
+    <ClCompile Include="src\overlay\dx9hook.cpp" />
+    <ClCompile Include="src\overlay\overlay.cpp" />
     <ClCompile Include="src\utils\mem.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
