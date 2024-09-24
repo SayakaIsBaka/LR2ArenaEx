@@ -41,7 +41,7 @@ LRESULT __stdcall hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 }
 
 void InitImGui(IDirect3DDevice9* pDevice) {
-	std::cout << "[i] Direct3D device address:" << (int*)*(int*)pDevice << std::endl;
+	std::cout << "[i] Direct3D device address: " << (int*)*(int*)pDevice << std::endl;
 	D3DDEVICE_CREATION_PARAMETERS CP;
 	pDevice->GetCreationParameters(&CP);
 	HWND window = CP.hFocusWindow;
@@ -95,13 +95,11 @@ void overlay::dx9hook::HookDX9() {
 	char* d3dPointer = mem::ScanModIn(d3dPattern, d3dMask, d3dName);
 	std::cout << "[i] D3D pointer: " << (int*)d3dPointer << std::endl;
 
-	int d3dDeviceAddr = mem::FindDMAAddy((uintptr_t)d3dPointer + 0x4, { 0x0 });
+	uintptr_t d3dDeviceAddr = mem::FindDMAAddy((uintptr_t)d3dPointer + 0x4, { 0x0 });
 	std::cout << "[i] D3D device pointer: " << (int*)d3dDeviceAddr << std::endl;
 
-	uintptr_t* d3d9Device = new uintptr_t[119];
-	*&d3d9Device = (uintptr_t*)d3dDeviceAddr;
-	oEndScene = (EndScene)mem::TrampHook((char*)d3d9Device[42], (char*)hkEndScene, 7);
-	std::cout << "[i] EndScene pointer: " << (int*)d3d9Device[42] << std::endl;
+	oEndScene = (EndScene)mem::TrampHook(((char**)d3dDeviceAddr)[42], (char*)hkEndScene, 7);
+	std::cout << "[i] EndScene pointer: " << std::hex << ((int*)d3dDeviceAddr)[42] << std::endl;
 
 	mem::HookFn((char*)0x4CBED0, (char*)hkShowCursor, 6); // Hook hide mouse cursor #1
 	mem::HookFn((char*)0x4D0A43, (char*)hkShowCursor, 6); // Hook hide mouse cursor #2
