@@ -3,16 +3,17 @@
 #include <ImGui/imgui_impl_dx9.h>
 #include <utils/mem.h>
 #include <gui/gui.h>
+#include <gui/imguistyle.h>
 #include <windowsx.h>
 
 #include "dx9hook.h"
+#include "overlay.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT __stdcall hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (GetAsyncKeyState(VK_INSERT) & 1) {
 		gui::showMenu = !gui::showMenu;
-		ShowCursor(gui::showMenu);
 	}
 
 	// Fix mouse scaling for non-standard resolutions, taken from https://github.com/tenaibms/LR2OOL/blob/master/src/graphics/gui.cpp
@@ -58,6 +59,7 @@ void InitImGui(IDirect3DDevice9* pDevice) {
 	std::cout << "[i] ImGui_Win32 init success: " << win32_init << std::endl;
 	std::cout << "[i] ImGui_DX9 init success: " << dx9_init << std::endl;
 	overlay::dx9hook::init = true;
+	gui::SetupImGuiStyle();
 	std::cout << "[i] ImGui initialized" << std::endl;
 
 	overlay::dx9hook::oWndProcHandler = (WNDPROC)SetWindowLongPtr(window, GWL_WNDPROC, (LONG)hkWndProc);
@@ -75,8 +77,7 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 
 		if (gui::showMenu)
 		{
-			bool bShow = true;
-			ImGui::ShowDemoWindow(&bShow);
+			gui::Render();
 		}
 
 		ImGui::EndFrame();
@@ -86,9 +87,11 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 	return overlay::dx9hook::oEndScene(pDevice);
 }
 
-// Return -1 to make the game think it worked but do not actually call ShowCursor, handle the logic ourselves
-int __stdcall hkShowCursor(BOOL bShow) {
-	return -1;
+// Courtesy of https://github.com/tenaibms/LR2OOL/blob/master/src/hooks/cursor.cpp
+int __cdecl hkShowCursor(int enabled) {
+	if (gui::showMenu)
+		return overlay::dx9hook::oShowCursor(1);
+	return overlay::dx9hook::oShowCursor(enabled);
 }
 
 void overlay::dx9hook::HookDX9() {
@@ -101,6 +104,5 @@ void overlay::dx9hook::HookDX9() {
 	oEndScene = (EndScene)mem::TrampHook(((char**)d3dDeviceAddr)[42], (char*)hkEndScene, 7);
 	std::cout << "[i] EndScene pointer: " << std::hex << ((int*)d3dDeviceAddr)[42] << std::endl;
 
-	mem::HookFn((char*)0x4CBED0, (char*)hkShowCursor, 6); // Hook hide mouse cursor #1
-	mem::HookFn((char*)0x4D0A43, (char*)hkShowCursor, 6); // Hook hide mouse cursor #2
+	oShowCursor = (ShowCursor)mem::TrampHook((char*)0x4D09E0, (char*)hkShowCursor, 6); // Hook hide mouse cursor
 }

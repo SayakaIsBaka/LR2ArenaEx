@@ -233,6 +233,7 @@
     <ClCompile Include="include\ImGui\imgui_tables.cpp" />
     <ClCompile Include="include\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\gui\gui.cpp" />
     <ClCompile Include="src\gui\imguistyle.cpp" />
     <ClCompile Include="src\overlay\dinputhook.cpp" />
     <ClCompile Include="src\overlay\dx9hook.cpp" />

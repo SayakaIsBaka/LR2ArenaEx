@@ -1,7 +1,7 @@
 #include <ImGui/imgui.h>
 #include "imguistyle.h"
 
-void SetupImGuiStyle()
+void gui::SetupImGuiStyle()
 {
 	// Hazy Dark style by kaitabuchi314 from ImThemes
 	ImGuiStyle& style = ImGui::GetStyle();

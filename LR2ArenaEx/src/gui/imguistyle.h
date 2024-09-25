@@ -1,3 +1,5 @@
 #pragma once
 
-void SetupImGuiStyle();
+namespace gui {
+	void SetupImGuiStyle();
+}

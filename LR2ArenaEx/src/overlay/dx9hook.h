@@ -14,6 +14,9 @@ namespace overlay {
 		inline EndScene oEndScene;
 		inline WNDPROC oWndProcHandler = NULL;
 
+		typedef long(__cdecl* ShowCursor)(int);
+		inline ShowCursor oShowCursor;
+
 		inline std::string d3dName = "d3d9.dll";
 		inline bool init = false;
 
