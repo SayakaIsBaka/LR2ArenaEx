@@ -25,6 +25,9 @@
     <Filter Include="Source Files\overlay">
       <UniqueIdentifier>{9c54fff4-2dc4-4f8f-9b41-7b6e373041fa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\hooks">
+      <UniqueIdentifier>{f719d363-734b-41fa-b15d-8a3bb3e00b1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ImGui\imconfig.h">
@@ -75,6 +78,9 @@
     <ClInclude Include="src\gui\gui.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
+    <ClInclude Include="src\hooks\hooks.h">
+      <Filter>Source Files\hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -118,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="src\gui\gui.cpp">
       <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hooks\hooks.cpp">
+      <Filter>Source Files\hooks</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

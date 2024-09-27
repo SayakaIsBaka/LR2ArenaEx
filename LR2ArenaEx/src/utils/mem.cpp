@@ -175,6 +175,14 @@ char* mem::ScanInternal(char* pattern, char* mask, char* begin, intptr_t size)
 	return match;
 }
 
+void mem::WriteMemory(LPVOID address, LPVOID value, int byteNum)
+{
+	unsigned long OldProtection;
+	VirtualProtect(address, byteNum, PAGE_EXECUTE_READWRITE, &OldProtection);
+	memcpy(address, value, byteNum);
+	VirtualProtect(address, byteNum, OldProtection, &OldProtection);
+}
+
 char* TO_CHAR(wchar_t* string)
 {
 	size_t len = wcslen(string) + 1;

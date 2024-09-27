@@ -210,6 +210,7 @@
     <ClInclude Include="include\framework.h" />
     <ClInclude Include="src\gui\gui.h" />
     <ClInclude Include="src\gui\imguistyle.h" />
+    <ClInclude Include="src\hooks\hooks.h" />
     <ClInclude Include="src\overlay\dinputhook.h" />
     <ClInclude Include="src\overlay\dx9hook.h" />
     <ClInclude Include="src\overlay\overlay.h" />
@@ -235,6 +236,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\gui\gui.cpp" />
     <ClCompile Include="src\gui\imguistyle.cpp" />
+    <ClCompile Include="src\hooks\hooks.cpp" />
     <ClCompile Include="src\overlay\dinputhook.cpp" />
     <ClCompile Include="src\overlay\dx9hook.cpp" />
     <ClCompile Include="src\overlay\overlay.cpp" />

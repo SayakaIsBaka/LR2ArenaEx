@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <utils/mem.h>
+#include <hooks/hooks.h>
 
 #include "overlay.h"
 #include "dx9hook.h"
@@ -24,6 +25,7 @@ DWORD WINAPI overlay::Setup(HMODULE hModule)
 
 	dx9hook::HookDX9();
 	dinputhook::HookDinput(hModule);
+	//hooks::SetupHooks();
 
 #ifdef DEBUG_CONSOLE_ENABLED
 	while (true)
