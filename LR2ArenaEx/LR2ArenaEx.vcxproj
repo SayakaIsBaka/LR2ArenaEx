@@ -225,6 +225,7 @@
     <ClInclude Include="src\overlay\dinputhook.h" />
     <ClInclude Include="src\overlay\dx9hook.h" />
     <ClInclude Include="src\overlay\overlay.h" />
+    <ClInclude Include="src\server\server.h" />
     <ClInclude Include="src\utils\mem.h" />
     <ClInclude Include="include\ntdll.h" />
     <ClInclude Include="include\ImGui\imconfig.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="src\overlay\dinputhook.cpp" />
     <ClCompile Include="src\overlay\dx9hook.cpp" />
     <ClCompile Include="src\overlay\overlay.cpp" />
+    <ClCompile Include="src\server\server.cpp" />
     <ClCompile Include="src\utils\mem.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

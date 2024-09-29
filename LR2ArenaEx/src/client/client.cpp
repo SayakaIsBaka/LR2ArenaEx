@@ -90,49 +90,75 @@ DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
 	ENetEvent event;
 	std::vector<unsigned char> data;
 
-    while (enet_host_service(client, &event, 0) > 0)
+    while (true)
     {
-        switch (event.type)
-        {
-        case ENET_EVENT_TYPE_CONNECT:
-            printf("A new client connected from %x:%u.\n",
-                event.peer->address.host,
-                event.peer->address.port);
+		if (!connected)
+			break;
+		if (enet_host_service(client, &event, 0) > 0) {
+			switch (event.type)
+			{
+			case ENET_EVENT_TYPE_RECEIVE:
+				printf("A packet of length %u containing %s was received from %s on channel %u.\n",
+					event.packet->dataLength,
+					event.packet->data,
+					event.peer->data,
+					event.channelID);
 
-            /* Store any relevant client information here. */
-            event.peer->data = "Client information";
+				data.assign((unsigned char)(event.packet->data), event.packet->dataLength);
+				ParsePacket(data);
+				enet_packet_destroy(event.packet);
 
-            break;
-        case ENET_EVENT_TYPE_RECEIVE:
-            printf("A packet of length %u containing %s was received from %s on channel %u.\n",
-                event.packet->dataLength,
-                event.packet->data,
-                event.peer->data,
-                event.channelID);
-
-			data.assign((unsigned char)(event.packet->data), event.packet->dataLength);
-			ParsePacket(data);
-            /* Clean up the packet now that we're done using it. */
-            enet_packet_destroy(event.packet);
-
-            break;
-        case ENET_EVENT_TYPE_DISCONNECT:
-            printf("%s disconnected.\n", event.peer->data);
-
-            /* Reset the peer's client information. */
-
-            event.peer->data = NULL;
-        }
+				break;
+			case ENET_EVENT_TYPE_DISCONNECT:
+				printf("Disconnected from server.\n");
+			}
+		}
     }
 }
 
-bool client::Init() {
-	if (enet_initialize() != 0) {
-		std::cout << "[!] Error initalizing ENet" << std::endl;
+bool client::Connect(const char* host) {
+	ENetAddress address;
+	ENetEvent event;
+
+	enet_address_set_host(&address, host);
+	address.port = 2222;
+
+	if (connected) { // Reset client if already connected
+		Destroy();
+		Init();
+	}
+	peer = enet_host_connect(client, &address, 2, 0);
+
+	if (peer == NULL)
+	{
+		std::cout << "[!] No available peers for initiating an ENet connection" << std::endl;
 		return false;
 	}
-	atexit(enet_deinitialize);
 
+	if (enet_host_service(client, &event, 5000) > 0 &&
+		event.type == ENET_EVENT_TYPE_CONNECT)
+	{
+		std::cout << "[+] Connected to " << host << std::endl;
+		connected = true;
+
+		DWORD clientReceiverId;
+		clientReceiverHandle = CreateThread(NULL, 0, ListenLoop, NULL, 0, &clientReceiverId);
+		if (clientReceiverHandle == NULL)
+		{
+			std::cout << "[!] run::CreateThread clientListenLoop failed" << std::endl;
+			return false;
+		}
+		return true;
+	}
+	else
+	{
+		enet_peer_reset(peer);
+		std::cout << "[!] Connection to " << host << " failed" << std::endl;
+		return false;
+	}
+}
+
+bool client::Init() {
 	client = enet_host_create(NULL /* create a client host */,
 		1 /* only allow 1 outgoing connection */,
 		2 /* allow up 2 channels to be used, 0 and 1 */,
@@ -144,18 +170,31 @@ bool client::Init() {
 		std::cout << "[!] Error creating ENet client" << std::endl;
 		return false;
 	}
+}
 
-    DWORD clientReceiverId;
-    clientReceiverHandle = CreateThread(NULL, 0, ListenLoop, NULL, 0, &clientReceiverId);
-    if (clientReceiverHandle == NULL)
-    {
-        std::cout << "[!] run::CreateThread clientListenLoop failed" << std::endl;
-        return false;
-    }
+void client::Disconnect() {
+	ENetEvent event;
+
+	enet_peer_disconnect(peer, 0);
+	while (enet_host_service(client, &event, 3000) > 0)
+	{
+		switch (event.type)
+		{
+		case ENET_EVENT_TYPE_RECEIVE:
+			enet_packet_destroy(event.packet);
+			break;
+
+		case ENET_EVENT_TYPE_DISCONNECT:
+			puts("Disconnection succeeded.");
+			return;
+		}
+	}
+	enet_peer_reset(peer);
 }
 
 bool client::Destroy() {
-    TerminateThread(clientReceiverHandle, 0);
+	Disconnect();
+	connected = false;
 	enet_host_destroy(client);
 	return true;
 }

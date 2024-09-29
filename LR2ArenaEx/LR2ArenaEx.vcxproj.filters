@@ -31,6 +31,9 @@
     <Filter Include="Source Files\client">
       <UniqueIdentifier>{59efeaa1-395d-4b93-bd9d-4eb7134f478a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\server">
+      <UniqueIdentifier>{6304f7cf-e5de-4ec3-aa4d-827689c67a7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ImGui\imconfig.h">
@@ -105,6 +108,9 @@
     <ClInclude Include="src\client\client.h">
       <Filter>Source Files\client</Filter>
     </ClInclude>
+    <ClInclude Include="src\server\server.h">
+      <Filter>Source Files\server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -172,6 +178,9 @@
     </ClCompile>
     <ClCompile Include="src\client\client.cpp">
       <Filter>Source Files\client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\server\server.cpp">
+      <Filter>Source Files\server</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
