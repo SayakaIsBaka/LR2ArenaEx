@@ -121,6 +121,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;winmm.lib;enet.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -149,6 +151,8 @@
       </OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;winmm.lib;enet.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -208,9 +212,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\framework.h" />
+    <ClInclude Include="src\client\client.h" />
     <ClInclude Include="src\gui\gui.h" />
     <ClInclude Include="src\gui\imguistyle.h" />
     <ClInclude Include="src\hooks\hooks.h" />
+    <ClInclude Include="src\hooks\loadingdone.h" />
+    <ClInclude Include="src\hooks\pacemaker.h" />
+    <ClInclude Include="src\hooks\random.h" />
+    <ClInclude Include="src\hooks\returnmenu.h" />
+    <ClInclude Include="src\hooks\score.h" />
+    <ClInclude Include="src\hooks\selectbms.h" />
     <ClInclude Include="src\overlay\dinputhook.h" />
     <ClInclude Include="src\overlay\dx9hook.h" />
     <ClInclude Include="src\overlay\overlay.h" />
@@ -233,10 +244,17 @@
     <ClCompile Include="include\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="include\ImGui\imgui_tables.cpp" />
     <ClCompile Include="include\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="src\client\client.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\gui\gui.cpp" />
     <ClCompile Include="src\gui\imguistyle.cpp" />
     <ClCompile Include="src\hooks\hooks.cpp" />
+    <ClCompile Include="src\hooks\loadingdone.cpp" />
+    <ClCompile Include="src\hooks\pacemaker.cpp" />
+    <ClCompile Include="src\hooks\random.cpp" />
+    <ClCompile Include="src\hooks\returnmenu.cpp" />
+    <ClCompile Include="src\hooks\score.cpp" />
+    <ClCompile Include="src\hooks\selectbms.cpp" />
     <ClCompile Include="src\overlay\dinputhook.cpp" />
     <ClCompile Include="src\overlay\dx9hook.cpp" />
     <ClCompile Include="src\overlay\overlay.cpp" />

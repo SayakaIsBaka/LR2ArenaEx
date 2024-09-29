@@ -25,7 +25,7 @@ DWORD WINAPI overlay::Setup(HMODULE hModule)
 
 	dx9hook::HookDX9();
 	dinputhook::HookDinput(hModule);
-	//hooks::SetupHooks();
+	hooks::SetupHooks();
 
 #ifdef DEBUG_CONSOLE_ENABLED
 	while (true)
