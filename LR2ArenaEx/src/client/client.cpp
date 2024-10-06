@@ -10,10 +10,12 @@ void client::Send(unsigned char id, std::vector<unsigned char> data) {
 	data.insert(data.begin(), id);
 	int buffer_length = data.size();
 
-	ENetPacket* packet = enet_packet_create(&data[0], data.size(), ENET_PACKET_FLAG_RELIABLE);
-	if (peer != NULL) {
-		enet_peer_send(peer, 0, packet);
-		enet_host_flush(client);
+	if (client.isOpen() && connected) {
+		if (buffer_length > MAX_TCP) {
+			std::cout << "[!] Packet size is over the defined limit (" << MAX_TCP << "), this shouldn't happen" << std::endl;
+			buffer_length = MAX_TCP;
+		}
+		client.send(&data[0], data.size());
 	}
 }
 
@@ -87,56 +89,33 @@ void ParsePacket(std::vector<unsigned char> data) {
 }
 
 DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
-	ENetEvent event;
 	std::vector<unsigned char> data;
+	char buffer[MAX_TCP];
 
     while (true)
     {
 		if (!connected)
 			break;
-		if (enet_host_service(client, &event, 0) > 0) {
-			switch (event.type)
-			{
-			case ENET_EVENT_TYPE_RECEIVE:
-				printf("A packet of length %u containing %s was received from %s on channel %u.\n",
-					event.packet->dataLength,
-					event.packet->data,
-					event.peer->data,
-					event.channelID);
-
-				data.assign((unsigned char)(event.packet->data), event.packet->dataLength);
-				ParsePacket(data);
-				enet_packet_destroy(event.packet);
-
-				break;
-			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("Disconnected from server.\n");
-			}
-		}
+		client.receive(buffer, MAX_TCP);
+		std::cout << buffer << std::endl;
     }
 }
 
 bool client::Connect(const char* host) {
-	ENetAddress address;
-	ENetEvent event;
-
-	enet_address_set_host(&address, host);
-	address.port = 2222;
 
 	if (connected) { // Reset client if already connected
 		Destroy();
 		Init();
 	}
-	peer = enet_host_connect(client, &address, 2, 0);
 
-	if (peer == NULL)
-	{
-		std::cout << "[!] No available peers for initiating an ENet connection" << std::endl;
-		return false;
-	}
+	Garnet::Address addr;
+	bool success = false;
+	addr.host = host;
+	addr.port = 2222;
 
-	if (enet_host_service(client, &event, 5000) > 0 &&
-		event.type == ENET_EVENT_TYPE_CONNECT)
+	client.connect(addr, &success);
+
+	if (success)
 	{
 		std::cout << "[+] Connected to " << host << std::endl;
 		connected = true;
@@ -152,49 +131,27 @@ bool client::Connect(const char* host) {
 	}
 	else
 	{
-		enet_peer_reset(peer);
 		std::cout << "[!] Connection to " << host << " failed" << std::endl;
 		return false;
 	}
 }
 
 bool client::Init() {
-	client = enet_host_create(NULL /* create a client host */,
-		1 /* only allow 1 outgoing connection */,
-		2 /* allow up 2 channels to be used, 0 and 1 */,
-		0 /* assume any amount of incoming bandwidth */,
-		0 /* assume any amount of outgoing bandwidth */);
-
-	if (client == NULL)
+	bool success = false;
+	client = Garnet::Socket(Garnet::Protocol::TCP, &success);
+	if (!success)
 	{
-		std::cout << "[!] Error creating ENet client" << std::endl;
-		return false;
+		std::cout << "[!] Error creating TCP client" << std::endl;
 	}
+	return success;
 }
 
 void client::Disconnect() {
-	ENetEvent event;
-
-	enet_peer_disconnect(peer, 0);
-	while (enet_host_service(client, &event, 3000) > 0)
-	{
-		switch (event.type)
-		{
-		case ENET_EVENT_TYPE_RECEIVE:
-			enet_packet_destroy(event.packet);
-			break;
-
-		case ENET_EVENT_TYPE_DISCONNECT:
-			puts("Disconnection succeeded.");
-			return;
-		}
-	}
-	enet_peer_reset(peer);
+	client.close();
 }
 
 bool client::Destroy() {
 	Disconnect();
 	connected = false;
-	enet_host_destroy(client);
 	return true;
 }

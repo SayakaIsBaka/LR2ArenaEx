@@ -1,6 +1,6 @@
 #include <iostream>
 #include <framework.h>
-#include <enet/enet.h>
+#include <Garnet.h>
 
 #include "utils/mem.h"
 #include "overlay/overlay.h"
@@ -14,11 +14,11 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	{
 	case DLL_PROCESS_ATTACH:
 	{
-		if (enet_initialize() != 0) {
-			std::cout << "[!] Error initalizing ENet" << std::endl;
+		if (!Garnet::Init(true)) {
+			std::cout << "[!] Error initalizing sockets" << std::endl;
 			return false;
 		}
-		atexit(enet_deinitialize);
+		atexit(Garnet::Terminate);
 
 		auto* hThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)overlay::Setup, hModule, 0, nullptr);
 		if (hThread == nullptr)

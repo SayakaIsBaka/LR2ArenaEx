@@ -1,11 +1,12 @@
 #pragma once
 
 #include <string>
-#include <enet/enet.h>
+#include <Garnet.h>
 
 namespace client {
-	inline ENetHost* client;
-	inline ENetPeer* peer = NULL;
+	constexpr int MAX_TCP = 1448;
+
+	inline Garnet::Socket client;
 	inline HANDLE clientReceiverHandle;
 	inline char host[128];
 	inline char username[128];

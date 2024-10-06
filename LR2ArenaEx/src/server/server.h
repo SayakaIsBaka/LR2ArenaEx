@@ -1,15 +1,17 @@
 #pragma once
 
-#include <enet/enet.h>
+#include <Garnet.h>
 #include <vector>
 
 namespace server {
-	inline ENetHost* server;
-	inline std::vector<ENetPeer*> peers;
+	inline Garnet::ServerTCP* server;
+	//inline std::vector<ENetPeer*> peers;
 	inline bool started = false;
-	inline HANDLE serverReceiverHandle;
 
 	bool Start();
-	DWORD WINAPI ListenLoop(LPVOID lpParam);
 	bool Stop();
+
+	void Receive(void* data, int size, int actualSize, Garnet::Address clientAddr);
+	void ClientConnected(Garnet::Address clientAddr);
+	void ClientDisconnected(Garnet::Address clientAddr);
 }
