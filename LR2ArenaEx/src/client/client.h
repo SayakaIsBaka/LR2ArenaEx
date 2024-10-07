@@ -2,6 +2,7 @@
 
 #include <string>
 #include <Garnet.h>
+#include <network/enums.h>
 
 namespace client {
 	constexpr int MAX_TCP = 1448;
@@ -18,7 +19,7 @@ namespace client {
 	void Disconnect();
 
 	DWORD WINAPI ListenLoop(LPVOID lpParam);
-	void Send(unsigned char id, std::vector<unsigned char> data);
-	void Send(unsigned char id, std::string msg);
-	void SendWithRandom(unsigned char id, std::string msg);
+	void Send(network::ClientToServer id, std::vector<unsigned char> data);
+	void Send(network::ClientToServer id, std::string msg);
+	void SendWithRandom(network::ClientToServer id, std::string msg);
 }

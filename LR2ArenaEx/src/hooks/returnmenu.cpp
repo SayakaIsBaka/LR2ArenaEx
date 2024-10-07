@@ -1,12 +1,13 @@
 #include <utils/mem.h>
 #include <client/client.h>
+#include <network/enums.h>
 
 #include "returnmenu.h"
 
 void hkReturnMenu() {
 	fprintf(stdout, "returning to menu\n");
 	hooks::return_menu::is_returning_to_menu = true;
-	client::Send(3, ""); // send escaped
+	client::Send(network::ClientToServer::SEND_CHART_CANCELLED, ""); // send escaped
 }
 
 DWORD jmp_lr2body_419863 = 0x419863;

@@ -6,8 +6,8 @@
 
 #include "client.h"
 
-void client::Send(unsigned char id, std::vector<unsigned char> data) {
-	data.insert(data.begin(), id);
+void client::Send(network::ClientToServer id, std::vector<unsigned char> data) {
+	data.insert(data.begin(), static_cast<unsigned char>(id));
 	int buffer_length = data.size();
 
 	if (client.isOpen() && connected) {
@@ -19,13 +19,13 @@ void client::Send(unsigned char id, std::vector<unsigned char> data) {
 	}
 }
 
-void client::Send(unsigned char id, std::string msg) {
+void client::Send(network::ClientToServer id, std::string msg) {
 	std::vector<unsigned char> data;
 	data.insert(data.begin(), msg.begin(), msg.end());
 	Send(id, data);
 }
 
-void client::SendWithRandom(unsigned char id, std::string msg) {
+void client::SendWithRandom(network::ClientToServer id, std::string msg) {
 	std::vector<unsigned char> data;
 	data.resize(7 * sizeof(unsigned int));
 	EnterCriticalSection(&hooks::random::RandomCriticalSection);
@@ -90,14 +90,15 @@ void ParsePacket(std::vector<unsigned char> data) {
 
 DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
 	std::vector<unsigned char> data;
-	char buffer[MAX_TCP];
+	data.reserve(MAX_TCP);
 
     while (true)
     {
 		if (!connected)
 			break;
-		client.receive(buffer, MAX_TCP);
-		std::cout << buffer << std::endl;
+		client.receive(&data[0], MAX_TCP);
+		std::cout << &data[0] << std::endl;
+		ParsePacket(data);
     }
 }
 

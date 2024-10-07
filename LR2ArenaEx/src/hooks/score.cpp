@@ -1,6 +1,7 @@
 #include <iostream>
 #include <utils/mem.h>
 #include <client/client.h>
+#include <network/enums.h>
 
 #include "score.h"
 
@@ -19,7 +20,7 @@ DWORD WINAPI ScoreConsumer(LPVOID lpParameter)
 		std::vector<unsigned char> score_data;
 		score_data.resize(sizeof(score_event));
 		std::memcpy(score_data.data(), &score_event, score_data.size());
-		client::Send(2, score_data);
+		client::Send(network::ClientToServer::SEND_PLAYER_SCORE, score_data);
 	}
 }
 

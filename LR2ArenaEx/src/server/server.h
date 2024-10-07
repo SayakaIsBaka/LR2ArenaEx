@@ -4,8 +4,12 @@
 #include <vector>
 
 namespace server {
+	struct Peer {
+		std::string username;
+	};
+
 	inline Garnet::ServerTCP* server;
-	//inline std::vector<ENetPeer*> peers;
+	inline std::vector<Peer> peers;
 	inline bool started = false;
 
 	bool Start();

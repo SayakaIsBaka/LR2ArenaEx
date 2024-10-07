@@ -1,5 +1,6 @@
 #include <utils/mem.h>
 #include <client/client.h>
+#include <network/enums.h>
 
 #include "loadingdone.h"
 #include "random.h"
@@ -7,7 +8,7 @@
 
 void hkLoadingDone() {
 	if (!hooks::return_menu::is_returning_to_menu) {
-		client::Send(4, ""); // player ready, send packet
+		client::Send(network::ClientToServer::SEND_LOADING_COMPLETE, ""); // player ready, send packet
 		fprintf(stdout, "waiting for p2\n");
 		while (!hooks::loading_done::is_p2_ready)
 		{

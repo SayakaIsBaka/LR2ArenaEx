@@ -1,6 +1,7 @@
 #include <iostream>
 #include <utils/mem.h>
 #include <client/client.h>
+#include <network/enums.h>
 
 #include "selectbms.h"
 #include "pacemaker.h"
@@ -24,7 +25,7 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		hooks::random::UpdateRandom();
 	}
 
-	client::SendWithRandom(1, hooks::select_bms::selectedBms);
+	client::SendWithRandom(network::ClientToServer::SEND_BMS_PATH, hooks::select_bms::selectedBms);
 
 	hooks::return_menu::is_returning_to_menu = false;
 }

@@ -34,6 +34,9 @@
     <Filter Include="Source Files\server">
       <UniqueIdentifier>{6304f7cf-e5de-4ec3-aa4d-827689c67a7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\network">
+      <UniqueIdentifier>{88a2fe86-a7ea-465a-99ef-41ee4c5078a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ImGui\imconfig.h">
@@ -110,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="src\server\server.h">
       <Filter>Source Files\server</Filter>
+    </ClInclude>
+    <ClInclude Include="src\network\enums.h">
+      <Filter>Source Files\network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
