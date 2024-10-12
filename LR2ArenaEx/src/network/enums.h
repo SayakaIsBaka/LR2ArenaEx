@@ -2,13 +2,15 @@
 
 namespace network {
 	enum class ClientToServer : unsigned char {
-		SEND_BMS_PATH = 1,
-		SEND_PLAYER_SCORE,
-		SEND_CHART_CANCELLED,
-		SEND_LOADING_COMPLETE,
+		CTS_BMS_PATH = 1,
+		CTS_PLAYER_SCORE,
+		CTS_CHART_CANCELLED,
+		CTS_LOADING_COMPLETE,
 	};
 
 	enum class ServerToClient : unsigned char {
-
+		STC_PLAYERS_SCORE = 1,
+		STC_PLAYERS_READY_UPDATE,
+		STC_RANDOM,
 	};
 }

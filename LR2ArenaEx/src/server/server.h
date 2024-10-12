@@ -18,4 +18,6 @@ namespace server {
 	void Receive(void* data, int size, int actualSize, Garnet::Address clientAddr);
 	void ClientConnected(Garnet::Address clientAddr);
 	void ClientDisconnected(Garnet::Address clientAddr);
+
+	void ParsePacket(std::vector<unsigned char> data);
 }

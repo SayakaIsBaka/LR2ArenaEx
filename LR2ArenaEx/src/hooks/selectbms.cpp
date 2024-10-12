@@ -25,7 +25,7 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		hooks::random::UpdateRandom();
 	}
 
-	client::SendWithRandom(network::ClientToServer::SEND_BMS_PATH, hooks::select_bms::selectedBms);
+	client::SendWithRandom(network::ClientToServer::CTS_BMS_PATH, hooks::select_bms::selectedBms);
 
 	hooks::return_menu::is_returning_to_menu = false;
 }

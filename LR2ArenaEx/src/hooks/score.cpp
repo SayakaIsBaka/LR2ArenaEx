@@ -20,7 +20,7 @@ DWORD WINAPI ScoreConsumer(LPVOID lpParameter)
 		std::vector<unsigned char> score_data;
 		score_data.resize(sizeof(score_event));
 		std::memcpy(score_data.data(), &score_event, score_data.size());
-		client::Send(network::ClientToServer::SEND_PLAYER_SCORE, score_data);
+		client::Send(network::ClientToServer::CTS_PLAYER_SCORE, score_data);
 	}
 }
 

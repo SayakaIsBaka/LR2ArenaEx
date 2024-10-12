@@ -1,22 +1,54 @@
 #include <iostream>
+#include <network/enums.h>
 
 #include "server.h"
 
-void server::Receive(void* data, int size, int actualSize, Garnet::Address clientAddr)
+void server::ParsePacket(std::vector<unsigned char> data) { // TODO: update for multiple players
+	unsigned char id = data.front();
+	data.erase(data.begin());
+	switch ((network::ClientToServer)id)
+	{
+	case network::ClientToServer::CTS_BMS_PATH:
+        std::cout << "[server] received bms path" << std::endl;
+		break;
+	case network::ClientToServer::CTS_PLAYER_SCORE:
+        std::cout << "[server] received player score" << std::endl;
+		break;
+	case network::ClientToServer::CTS_CHART_CANCELLED:
+        std::cout << "[server] received chart cancelled" << std::endl;
+		break;
+	case network::ClientToServer::CTS_LOADING_COMPLETE:
+        std::cout << "[server] received loading complete" << std::endl;
+		break;
+	default:
+        std::cout << "[server] Unknown message received" << std::endl;
+		break;
+	}
+}
+
+void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address clientAddr)
 {
-    std::string msg = "Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + "): " + std::string((char*)data, actualSize);
-    std::cout << msg << "\n";
+    if (actualSize == 0)
+        return;
+    if (actualSize > bufferSize) {
+        std::cout << "[!!!][server] actualSize higher than bufferSize (this shouldn't happen)" << std::endl;
+        delete data;
+        return;
+    }
+    std::vector<unsigned char> dataVector((unsigned char*)data, (unsigned char*)data + actualSize);
+    ParsePacket(dataVector);
+
     for (const Garnet::Address& addr : server->getClientAddresses())
     {
         if (clientAddr == addr) continue;
-        server->send((void*)msg.c_str(), strlen(msg.c_str()), addr);
+        //server->send((void*)msg.c_str(), strlen(msg.c_str()), addr);
     }
     delete data;
 }
 
 void server::ClientConnected(Garnet::Address clientAddr)
 {
-    std::string msg = "Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") connected.";
+    std::string msg = "[server] Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") connected.";
     std::cout << msg << "\n";
     for (const Garnet::Address& addr : server->getClientAddresses())
     {
@@ -27,7 +59,7 @@ void server::ClientConnected(Garnet::Address clientAddr)
 
 void server::ClientDisconnected(Garnet::Address clientAddr)
 {
-    std::string msg = "Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") disconnected.";
+    std::string msg = "[server] Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") disconnected.";
     std::cout << msg << "\n";
     for (const Garnet::Address& addr : server->getClientAddresses())
     {

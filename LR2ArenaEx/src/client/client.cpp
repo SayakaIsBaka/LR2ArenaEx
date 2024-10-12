@@ -35,17 +35,17 @@ void client::SendWithRandom(network::ClientToServer id, std::string msg) {
 	Send(id, data);
 }
 
-void ParsePacket(std::vector<unsigned char> data) {
+void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for multiple players
 	unsigned char id = data.front();
 	data.erase(data.begin());
-	switch (id)
+	switch ((network::ServerToClient)id)
 	{
-	case 1:
+	case network::ServerToClient::STC_PLAYERS_SCORE:
 		if (data.size() <= 0 || data.size() > sizeof(unsigned int)) {
 			break;
 		}
 		fprintf(stdout, "datasize : %u\n", data.size());
-		hooks::pacemaker::p2_score = 0;
+		hooks::pacemaker::p2_score = 0; // TODO: Should instead display highest score from all players (or 2nd if you're currently 1st)
 		memcpy(&hooks::pacemaker::p2_score, &data[0], data.size()); // little-endian, kinda ugly but it works(tm)
 		if (hooks::pacemaker::pacemaker_address)
 			*hooks::pacemaker::pacemaker_address = hooks::pacemaker::p2_score;
@@ -53,11 +53,11 @@ void ParsePacket(std::vector<unsigned char> data) {
 			*hooks::pacemaker::pacemaker_display_address = hooks::pacemaker::p2_score;
 		fprintf(stdout, "p2score : %u\n", hooks::pacemaker::p2_score);
 		break;
-	case 2:
+	case network::ServerToClient::STC_PLAYERS_READY_UPDATE:
 		fprintf(stdout, "p2 ready\n");
-		hooks::loading_done::is_p2_ready = true;
+		hooks::loading_done::is_p2_ready = true; // TODO: Should check for all players
 		break;
-	case 3:
+	case network::ServerToClient::STC_RANDOM:
 		if (data.size() != 7 * 4) {
 			fprintf(stderr, "invalid size random\n");
 			break;
@@ -68,7 +68,8 @@ void ParsePacket(std::vector<unsigned char> data) {
 		memcpy(&hooks::random::current_random, &data[0], data.size());
 		LeaveCriticalSection(&hooks::random::RandomCriticalSection);
 		break;
-	case 4:
+		/*
+	case 4: // no need for a random flip packet type anymore as UI is directly integrated
 		hooks::random::random_flip = data.front() == 1;
 		if (hooks::random::random_flip) {
 			fprintf(stdout, "random flip enabled\n");
@@ -83,14 +84,14 @@ void ParsePacket(std::vector<unsigned char> data) {
 	case 6:
 		fprintf(stdout, "message received\n");
 		break;
+		*/
 	default:
 		break;
 	}
 }
 
 DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
-	std::vector<unsigned char> data;
-	data.reserve(MAX_TCP);
+	std::vector<unsigned char> data(MAX_TCP);
 
     while (true)
     {

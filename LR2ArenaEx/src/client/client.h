@@ -22,4 +22,5 @@ namespace client {
 	void Send(network::ClientToServer id, std::vector<unsigned char> data);
 	void Send(network::ClientToServer id, std::string msg);
 	void SendWithRandom(network::ClientToServer id, std::string msg);
+	void ParsePacket(std::vector<unsigned char> data);
 }
