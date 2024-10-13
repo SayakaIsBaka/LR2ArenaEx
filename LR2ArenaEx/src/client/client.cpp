@@ -25,16 +25,6 @@ void client::Send(network::ClientToServer id, std::string msg) {
 	Send(id, data);
 }
 
-void client::SendWithRandom(network::ClientToServer id, std::string msg) {
-	std::vector<unsigned char> data;
-	data.resize(7 * sizeof(unsigned int));
-	EnterCriticalSection(&hooks::random::RandomCriticalSection);
-	std::memcpy(data.data(), &hooks::random::current_random, 7 * sizeof(unsigned int));
-	LeaveCriticalSection(&hooks::random::RandomCriticalSection);
-	data.insert(data.end(), msg.begin(), msg.end());
-	Send(id, data);
-}
-
 void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for multiple players
 	unsigned char id = data.front();
 	data.erase(data.begin());

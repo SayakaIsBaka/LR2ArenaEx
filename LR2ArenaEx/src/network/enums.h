@@ -2,7 +2,7 @@
 
 namespace network {
 	enum class ClientToServer : unsigned char {
-		CTS_BMS_PATH = 1,
+		CTS_SELECTED_BMS = 1,
 		CTS_PLAYER_SCORE,
 		CTS_CHART_CANCELLED,
 		CTS_LOADING_COMPLETE,

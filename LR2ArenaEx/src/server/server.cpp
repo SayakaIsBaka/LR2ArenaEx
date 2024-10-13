@@ -8,8 +8,8 @@ void server::ParsePacket(std::vector<unsigned char> data) { // TODO: update for 
 	data.erase(data.begin());
 	switch ((network::ClientToServer)id)
 	{
-	case network::ClientToServer::CTS_BMS_PATH:
-        std::cout << "[server] received bms path" << std::endl;
+	case network::ClientToServer::CTS_SELECTED_BMS:
+        std::cout << "[server] received selected bms" << std::endl;
 		break;
 	case network::ClientToServer::CTS_PLAYER_SCORE:
         std::cout << "[server] received player score" << std::endl;

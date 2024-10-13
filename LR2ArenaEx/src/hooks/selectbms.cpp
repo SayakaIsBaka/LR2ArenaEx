@@ -2,30 +2,70 @@
 #include <utils/mem.h>
 #include <client/client.h>
 #include <network/enums.h>
+#include <filesystem>
+#include <sqlite_modern_cpp.h>
 
 #include "selectbms.h"
 #include "pacemaker.h"
 #include "random.h"
 #include "returnmenu.h"
 
+void SendWithRandom(std::string msg) {
+	std::vector<unsigned char> data;
+	data.resize(7 * sizeof(unsigned int));
+	EnterCriticalSection(&hooks::random::RandomCriticalSection);
+	std::memcpy(data.data(), &hooks::random::current_random, 7 * sizeof(unsigned int));
+	LeaveCriticalSection(&hooks::random::RandomCriticalSection);
+	data.insert(data.end(), msg.begin(), msg.end());
+	client::Send(network::ClientToServer::CTS_SELECTED_BMS, data);
+}
+
+std::string GetDatabasePath()
+{
+	WCHAR dllPath[MAX_PATH];
+	GetModuleFileNameW(NULL, dllPath, MAX_PATH);
+	std::filesystem::path wPath(dllPath);
+	wPath.remove_filename();
+	wPath = wPath / "LR2files" / "Database" / "song.db";
+	return wPath.u8string();
+}
+
+void GetBmsInfo(std::string bmsPath) {
+	std::string dbPath = GetDatabasePath();
+
+	sqlite::sqlite_config config;
+	config.flags = sqlite::OpenFlags::READONLY;
+	try {
+		sqlite::database db(dbPath);
+		std::string hash, title, subtitle, artist, subartist;
+		db << "select hash, title, subtitle, artist, subartist from song where path = ?" << bmsPath >> std::tie(hash, title, subtitle, artist, subartist);
+		std::cout << "[+] Hash: " << hash << std::endl;
+		std::cout << "[+] Title: " << title << " " << subtitle << std::endl;
+		std::cout << "[+] Artist: " << artist << " " << subartist << std::endl;
+	}
+	catch (const std::exception& e) {
+		std::cout << "[!] Error: " << e.what() << std::endl;
+		return;
+	}
+}
+
 void hkSelectBms(const char** buffer, unsigned char* memory) {
 	unsigned int selected_option = (unsigned int)*(memory + 0x10);
-	std::string new_selected_bms = std::string(*buffer);
-	if (!new_selected_bms.rfind("LR2files\\Config\\sample_", 0)) {
+	std::string selectedBms = std::string(*buffer);
+	if (!selectedBms.rfind("LR2files\\Config\\sample_", 0)) {
 		fprintf(stdout, "demo BMS loaded, skip\n");
 		return;
 	}
-	hooks::select_bms::selectedBms = new_selected_bms;
 	hooks::pacemaker::p2_score = 0; // it's most likely when you start a song so reset score
 
-	std::cout << "[+] Selected BMS: " << hooks::select_bms::selectedBms << std::endl;
+	std::cout << "[+] Selected BMS: " << selectedBms << std::endl;
 	std::cout << "[+] Selected option: " << selected_option << std::endl;
 
 	if (!hooks::random::received_random) {
 		hooks::random::UpdateRandom();
 	}
 
-	client::SendWithRandom(network::ClientToServer::CTS_BMS_PATH, hooks::select_bms::selectedBms);
+	GetBmsInfo(selectedBms);
 
 	hooks::return_menu::is_returning_to_menu = false;
 }

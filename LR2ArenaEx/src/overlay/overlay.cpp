@@ -15,6 +15,7 @@ DWORD WINAPI overlay::Setup(HMODULE hModule)
 	AllocConsole();
 	FILE* f = nullptr;
 	freopen_s(&f, "CONOUT$", "w", stdout);
+	SetConsoleOutputCP(65001); // Set code page to UTF-8
 
 	std::cout << "--- LR2ArenaEx debugging console ---" << std::endl << std::endl;
 #endif
