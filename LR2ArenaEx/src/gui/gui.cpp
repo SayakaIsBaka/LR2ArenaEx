@@ -12,11 +12,14 @@ void gui::Render() {
             if (ImGui::BeginTabItem("Client"))
             {
                 ImGui::SeparatorText("Settings");
-                static char str1[128] = "";
                 ImGui::InputTextWithHint("##Username", "Username", client::username, IM_ARRAYSIZE(client::username));
                 ImGui::InputTextWithHint("##Server", "Server", client::host, IM_ARRAYSIZE(client::host));
-                if (ImGui::Button("Connect"))
-                    client::Connect(client::host);
+                ImGui::BeginDisabled(strlen(client::host) == 0 || strlen(client::username) == 0);
+                {
+                    if (ImGui::Button("Connect"))
+                        client::Connect(client::host, client::username);
+                    ImGui::EndDisabled();
+                }
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Server"))

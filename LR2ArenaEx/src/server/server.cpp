@@ -3,7 +3,7 @@
 
 #include "server.h"
 
-void server::ParsePacket(std::vector<unsigned char> data) { // TODO: update for multiple players
+void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr) {
 	unsigned char id = data.front();
 	data.erase(data.begin());
 	switch ((network::ClientToServer)id)
@@ -20,6 +20,10 @@ void server::ParsePacket(std::vector<unsigned char> data) { // TODO: update for 
 	case network::ClientToServer::CTS_LOADING_COMPLETE:
         std::cout << "[server] received loading complete" << std::endl;
 		break;
+    case network::ClientToServer::CTS_USERNAME:
+        std::cout << "[server] Username: " << std::string(data.begin(), data.end()) << std::endl;
+        state.peers[clientAddr].username = std::string(data.begin(), data.end());
+        break;
 	default:
         std::cout << "[server] Unknown message received" << std::endl;
 		break;
@@ -36,7 +40,7 @@ void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address
         return;
     }
     std::vector<unsigned char> dataVector((unsigned char*)data, (unsigned char*)data + actualSize);
-    ParsePacket(dataVector);
+    ParsePacket(dataVector, clientAddr);
 
     for (const Garnet::Address& addr : server->getClientAddresses())
     {
@@ -48,24 +52,35 @@ void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address
 
 void server::ClientConnected(Garnet::Address clientAddr)
 {
-    std::string msg = "[server] Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") connected.";
-    std::cout << msg << "\n";
+    std::cout << "[server] Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") connected." << std::endl;
+
+    if (state.peers.size() == 0)
+        state.host = clientAddr;
+    state.peers[clientAddr] = Peer();
+
+    /*
     for (const Garnet::Address& addr : server->getClientAddresses())
     {
         if (clientAddr == addr) continue;
         server->send((void*)msg.c_str(), strlen(msg.c_str()), addr);
     }
+    */
 }
 
 void server::ClientDisconnected(Garnet::Address clientAddr)
 {
-    std::string msg = "[server] Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") disconnected.";
-    std::cout << msg << "\n";
+    std::cout << "[server] Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") disconnected." << std::endl;
+    state.peers.erase(clientAddr);
+    if (clientAddr == state.host && state.peers.size() > 0)
+        state.host = state.peers.begin()->first; // Change host to first peer in the list
+
+    /*
     for (const Garnet::Address& addr : server->getClientAddresses())
     {
         if (clientAddr == addr) continue;
         server->send((void*)msg.c_str(), strlen(msg.c_str()), addr);
     }
+    */
 }
 
 bool server::Start() {

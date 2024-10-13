@@ -93,7 +93,7 @@ DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
     }
 }
 
-bool client::Connect(const char* host) {
+bool client::Connect(const char* host, const char* username) {
 
 	if (connected) { // Reset client if already connected
 		Destroy();
@@ -119,6 +119,7 @@ bool client::Connect(const char* host) {
 			std::cout << "[!] run::CreateThread clientListenLoop failed" << std::endl;
 			return false;
 		}
+		Send(network::ClientToServer::CTS_USERNAME, std::string(username));
 		return true;
 	}
 	else

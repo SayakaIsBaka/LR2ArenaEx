@@ -30,7 +30,7 @@ std::string GetDatabasePath()
 	return wPath.u8string();
 }
 
-void GetBmsInfo(std::string bmsPath) {
+std::string GetBmsInfo(std::string bmsPath) {
 	std::string dbPath = GetDatabasePath();
 
 	sqlite::sqlite_config config;
@@ -42,10 +42,15 @@ void GetBmsInfo(std::string bmsPath) {
 		std::cout << "[+] Hash: " << hash << std::endl;
 		std::cout << "[+] Title: " << title << " " << subtitle << std::endl;
 		std::cout << "[+] Artist: " << artist << " " << subartist << std::endl;
+
+		std::string bmsInfo;
+		std::string delimiter = "\xff"; // use as a string delimiter (guaranteed to not be used in UTF-8)
+		bmsInfo += hash + delimiter + title + " " + subtitle + delimiter + artist + " " + subartist;
+		return bmsInfo;
 	}
 	catch (const std::exception& e) {
 		std::cout << "[!] Error: " << e.what() << std::endl;
-		return;
+		return "";
 	}
 }
 
@@ -65,7 +70,9 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		hooks::random::UpdateRandom();
 	}
 
-	GetBmsInfo(selectedBms);
+	std::string bmsInfo = GetBmsInfo(selectedBms);
+	if (bmsInfo.length() > 0)
+		SendWithRandom(bmsInfo);
 
 	hooks::return_menu::is_returning_to_menu = false;
 }

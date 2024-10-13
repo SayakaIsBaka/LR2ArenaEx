@@ -6,6 +6,7 @@ namespace network {
 		CTS_PLAYER_SCORE,
 		CTS_CHART_CANCELLED,
 		CTS_LOADING_COMPLETE,
+		CTS_USERNAME,
 	};
 
 	enum class ServerToClient : unsigned char {

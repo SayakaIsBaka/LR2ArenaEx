@@ -14,7 +14,7 @@ namespace client {
 	inline bool connected = false;
 
 	bool Init();
-	bool Connect(const char* host);
+	bool Connect(const char* host, const char* username);
 	bool Destroy();
 	void Disconnect();
 
