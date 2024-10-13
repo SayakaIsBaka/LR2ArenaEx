@@ -1,33 +1,82 @@
 #include <iostream>
+#include <sstream>
 #include <network/enums.h>
 
 #include "server.h"
 
-void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr) {
+void ResetState() {
+    for (const auto& [key, value] : server::state.peers)
+    {
+        // Reset state as new chart has been selected
+        server::state.peers[key].ready = false;
+        server::state.peers[key].selectedHash = "";
+        // TODO: also reset other values
+    }
+}
+
+void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAddr) {
+    if (data.size() <= 7 * 4) {
+        std::cout << "[!][server] Invalid packet received" << std::endl;
+        return;
+    }
+    if (clientAddr == server::state.host) {
+        memcpy(&server::state.currentRandom, &data[0], data.size());
+        ResetState();
+    }
+    data.erase(data.begin(), data.begin() + 7 * 4); // Erase random from the payload, continue with processing
+
+    std::stringstream splitter(std::string(data.begin(), data.end()));
+    std::string segment;
+    std::vector<std::string> segList;
+    while (std::getline(splitter, segment, '\xff'))
+        segList.push_back(segment);
+    if (segList.size() != 3) {
+        std::cout << "[!][server] Invalid packet received" << std::endl;
+        return;
+    }
+
+    std::cout << "[server] Received selected bms: " << segList[1] << " / " << segList[2] << std::endl;
+    std::cout << "[server] Hash: " << segList[0] << std::endl;
+
+    server::state.peers[clientAddr].selectedHash = segList[0];
+}
+
+void SetUsername(std::vector<unsigned char> data, Garnet::Address clientAddr) {
+    std::string username(data.begin(), data.end());
+    std::cout << "[server] Username: " << username << std::endl;
+    server::state.peers[clientAddr].username = username;
+}
+
+std::vector<unsigned char> server::ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr) {
 	unsigned char id = data.front();
 	data.erase(data.begin());
+    std::vector<unsigned char> res;
+
 	switch ((network::ClientToServer)id)
 	{
 	case network::ClientToServer::CTS_SELECTED_BMS:
-        std::cout << "[server] received selected bms" << std::endl;
+        ParseSelectedBms(data, clientAddr);
 		break;
 	case network::ClientToServer::CTS_PLAYER_SCORE:
-        std::cout << "[server] received player score" << std::endl;
+        std::cout << "[server] Received player score" << std::endl;
 		break;
 	case network::ClientToServer::CTS_CHART_CANCELLED:
-        std::cout << "[server] received chart cancelled" << std::endl;
+        std::cout << "[server] Received chart cancelled" << std::endl;
 		break;
 	case network::ClientToServer::CTS_LOADING_COMPLETE:
-        std::cout << "[server] received loading complete" << std::endl;
+        std::cout << "[server] Received loading complete from " << clientAddr.host << std::endl;
+        server::state.peers[clientAddr].ready = true;
+        // If all ready and have selected same chart send ready
 		break;
     case network::ClientToServer::CTS_USERNAME:
-        std::cout << "[server] Username: " << std::string(data.begin(), data.end()) << std::endl;
-        state.peers[clientAddr].username = std::string(data.begin(), data.end());
+        SetUsername(data, clientAddr);
         break;
 	default:
         std::cout << "[server] Unknown message received" << std::endl;
 		break;
 	}
+
+    return res;
 }
 
 void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address clientAddr)
@@ -40,12 +89,14 @@ void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address
         return;
     }
     std::vector<unsigned char> dataVector((unsigned char*)data, (unsigned char*)data + actualSize);
-    ParsePacket(dataVector, clientAddr);
+    auto res = ParsePacket(dataVector, clientAddr);
 
-    for (const Garnet::Address& addr : server->getClientAddresses())
-    {
-        if (clientAddr == addr) continue;
-        //server->send((void*)msg.c_str(), strlen(msg.c_str()), addr);
+    if (!res.empty()) {
+        for (const Garnet::Address& addr : server->getClientAddresses())
+        {
+            if (clientAddr == addr) continue;
+            server->send(&res[0], res.size(), addr);
+        }
     }
     delete data;
 }

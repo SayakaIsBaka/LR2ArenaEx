@@ -6,6 +6,8 @@
 namespace server {
 	struct Peer {
 		std::string username;
+		std::string selectedHash;
+		bool ready = false;
 	};
 
 	struct State {
@@ -26,5 +28,5 @@ namespace server {
 	void ClientConnected(Garnet::Address clientAddr);
 	void ClientDisconnected(Garnet::Address clientAddr);
 
-	void ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr);
+	std::vector<unsigned char> ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr);
 }
