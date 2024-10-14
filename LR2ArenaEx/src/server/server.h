@@ -2,19 +2,14 @@
 
 #include <Garnet.h>
 #include <unordered_map>
+#include <network/structs.h>
 
 namespace server {
-	struct Peer {
-		std::string username;
-		std::string selectedHash;
-		bool ready = false;
-	};
-
 	struct State {
 		Garnet::Address host;
 		unsigned int currentRandom[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
-		std::unordered_map<Garnet::Address, Peer> peers;
+		std::unordered_map<Garnet::Address, network::Peer> peers;
 	};
 
 	inline Garnet::ServerTCP* server;

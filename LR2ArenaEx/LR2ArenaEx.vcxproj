@@ -223,6 +223,7 @@
     <ClInclude Include="src\hooks\score.h" />
     <ClInclude Include="src\hooks\selectbms.h" />
     <ClInclude Include="src\network\enums.h" />
+    <ClInclude Include="src\network\structs.h" />
     <ClInclude Include="src\overlay\dinputhook.h" />
     <ClInclude Include="src\overlay\dx9hook.h" />
     <ClInclude Include="src\overlay\overlay.h" />

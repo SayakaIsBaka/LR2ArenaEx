@@ -13,5 +13,6 @@ namespace network {
 		STC_PLAYERS_SCORE = 1,
 		STC_PLAYERS_READY_UPDATE,
 		STC_RANDOM,
+		STC_USERLIST
 	};
 }

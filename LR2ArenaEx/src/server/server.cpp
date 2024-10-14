@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <network/enums.h>
+#include <msgpack/msgpack.hpp>
 
 #include "server.h"
 
@@ -10,7 +11,6 @@ void ResetState() {
         // Reset state as new chart has been selected
         server::state.peers[key].ready = false;
         server::state.peers[key].selectedHash = "";
-        // TODO: also reset other values
     }
 }
 
@@ -56,6 +56,7 @@ std::vector<unsigned char> server::ParsePacket(std::vector<unsigned char> data, 
 	{
 	case network::ClientToServer::CTS_SELECTED_BMS:
         ParseSelectedBms(data, clientAddr);
+        // If not host, send random + hash + received BMS to other clients; otherwise do nothing?
 		break;
 	case network::ClientToServer::CTS_PLAYER_SCORE:
         std::cout << "[server] Received player score" << std::endl;
@@ -66,10 +67,13 @@ std::vector<unsigned char> server::ParsePacket(std::vector<unsigned char> data, 
 	case network::ClientToServer::CTS_LOADING_COMPLETE:
         std::cout << "[server] Received loading complete from " << clientAddr.host << std::endl;
         server::state.peers[clientAddr].ready = true;
-        // If all ready and have selected same chart send ready
+        // Send updated struct to all clients; calculate if should start client-side (useful to show who's ready client-side)
 		break;
     case network::ClientToServer::CTS_USERNAME:
         SetUsername(data, clientAddr);
+        res = msgpack::pack(network::PeerList(state.peers));
+        res.insert(res.begin(), (unsigned char)network::ServerToClient::STC_USERLIST);
+        // TODO: send list of users to all clients
         break;
 	default:
         std::cout << "[server] Unknown message received" << std::endl;
@@ -94,7 +98,7 @@ void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address
     if (!res.empty()) {
         for (const Garnet::Address& addr : server->getClientAddresses())
         {
-            if (clientAddr == addr) continue;
+            //if (clientAddr == addr) continue;
             server->send(&res[0], res.size(), addr);
         }
     }
@@ -107,15 +111,7 @@ void server::ClientConnected(Garnet::Address clientAddr)
 
     if (state.peers.size() == 0)
         state.host = clientAddr;
-    state.peers[clientAddr] = Peer();
-
-    /*
-    for (const Garnet::Address& addr : server->getClientAddresses())
-    {
-        if (clientAddr == addr) continue;
-        server->send((void*)msg.c_str(), strlen(msg.c_str()), addr);
-    }
-    */
+    state.peers[clientAddr] = network::Peer();
 }
 
 void server::ClientDisconnected(Garnet::Address clientAddr)
@@ -125,13 +121,14 @@ void server::ClientDisconnected(Garnet::Address clientAddr)
     if (clientAddr == state.host && state.peers.size() > 0)
         state.host = state.peers.begin()->first; // Change host to first peer in the list
 
-    /*
+    auto res = msgpack::pack(network::PeerList(state.peers));
+    res.insert(res.begin(), (unsigned char)network::ServerToClient::STC_USERLIST);
+
     for (const Garnet::Address& addr : server->getClientAddresses())
     {
         if (clientAddr == addr) continue;
-        server->send((void*)msg.c_str(), strlen(msg.c_str()), addr);
+        server->send(&res[0], res.size(), addr);
     }
-    */
 }
 
 bool server::Start() {

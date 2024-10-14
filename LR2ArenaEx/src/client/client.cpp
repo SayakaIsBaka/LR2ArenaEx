@@ -1,8 +1,10 @@
+#include <msgpack/msgpack.hpp>
 #include <iostream>
 #include <vector>
 #include <hooks/pacemaker.h>
 #include <hooks/loadingdone.h>
 #include <hooks/random.h>
+#include <network/structs.h>
 
 #include "client.h"
 
@@ -23,6 +25,14 @@ void client::Send(network::ClientToServer id, std::string msg) {
 	std::vector<unsigned char> data;
 	data.insert(data.begin(), msg.begin(), msg.end());
 	Send(id, data);
+}
+
+void client::UpdatePeersState(std::vector<unsigned char> data) {
+	auto receivedPeers = msgpack::unpack<network::PeerList>(data);
+	peers = receivedPeers.list;
+	std::cout << "[+] Connected users:" << std::endl;
+	for (const auto& [key, value] : peers)
+		std::cout << "- " << peers[key].username << std::endl;
 }
 
 void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for multiple players
@@ -58,6 +68,9 @@ void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for 
 		memcpy(&hooks::random::current_random, &data[0], data.size());
 		LeaveCriticalSection(&hooks::random::RandomCriticalSection);
 		break;
+	case network::ServerToClient::STC_USERLIST:
+		UpdatePeersState(data);
+		break;
 		/*
 	case 4: // no need for a random flip packet type anymore as UI is directly integrated
 		hooks::random::random_flip = data.front() == 1;
@@ -88,7 +101,6 @@ DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
 		if (!connected)
 			break;
 		client.receive(&data[0], MAX_TCP);
-		std::cout << &data[0] << std::endl;
 		ParsePacket(data);
     }
 }

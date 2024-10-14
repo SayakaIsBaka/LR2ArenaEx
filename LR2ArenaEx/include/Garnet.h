@@ -136,6 +136,11 @@ namespace Garnet
 
         void operator=(const Address& other);
         bool operator==(const Address& other) const;
+
+        template<class T>
+        void pack(T& pack) {
+            pack(host, port);
+        }
     };
 
     /*

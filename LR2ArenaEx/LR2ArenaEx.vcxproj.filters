@@ -117,6 +117,9 @@
     <ClInclude Include="src\network\enums.h">
       <Filter>Source Files\network</Filter>
     </ClInclude>
+    <ClInclude Include="src\network\structs.h">
+      <Filter>Source Files\network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
