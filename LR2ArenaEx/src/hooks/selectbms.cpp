@@ -1,7 +1,9 @@
+#include <msgpack/msgpack.hpp>
 #include <iostream>
 #include <utils/mem.h>
 #include <client/client.h>
 #include <network/enums.h>
+#include <network/structs.h>
 #include <filesystem>
 #include <sqlite_modern_cpp.h>
 
@@ -10,14 +12,14 @@
 #include "random.h"
 #include "returnmenu.h"
 
-void SendWithRandom(std::string msg) {
-	std::vector<unsigned char> data;
-	data.resize(7 * sizeof(unsigned int));
+void SendWithRandom(network::SelectedBmsMessage msg) {
 	EnterCriticalSection(&hooks::random::RandomCriticalSection);
-	std::memcpy(data.data(), &hooks::random::current_random, 7 * sizeof(unsigned int));
+	msg.random = hooks::random::current_random;
 	LeaveCriticalSection(&hooks::random::RandomCriticalSection);
-	data.insert(data.end(), msg.begin(), msg.end());
-	client::Send(network::ClientToServer::CTS_SELECTED_BMS, data);
+
+	auto msgPack = msgpack::pack(msg);
+
+	client::Send(network::ClientToServer::CTS_SELECTED_BMS, msgPack);
 }
 
 std::string GetDatabasePath()
@@ -30,7 +32,7 @@ std::string GetDatabasePath()
 	return wPath.u8string();
 }
 
-std::string GetBmsInfo(std::string bmsPath) {
+network::SelectedBmsMessage GetBmsInfo(std::string bmsPath) {
 	std::string dbPath = GetDatabasePath();
 
 	sqlite::sqlite_config config;
@@ -45,12 +47,15 @@ std::string GetBmsInfo(std::string bmsPath) {
 
 		std::string bmsInfo;
 		std::string delimiter = "\xff"; // use as a string delimiter (guaranteed to not be used in UTF-8)
-		bmsInfo += hash + delimiter + title + " " + subtitle + delimiter + artist + " " + subartist;
-		return bmsInfo;
+		network::SelectedBmsMessage msg;
+		msg.hash = hash;
+		msg.title = title + " " + subtitle;
+		msg.artist = artist + " " + subartist;
+		return msg;
 	}
 	catch (const std::exception& e) {
 		std::cout << "[!] Error: " << e.what() << std::endl;
-		return "";
+		return network::SelectedBmsMessage();
 	}
 }
 
@@ -70,8 +75,8 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		hooks::random::UpdateRandom();
 	}
 
-	std::string bmsInfo = GetBmsInfo(selectedBms);
-	if (bmsInfo.length() > 0)
+	auto bmsInfo = GetBmsInfo(selectedBms);
+	if (bmsInfo.hash.length() > 0)
 		SendWithRandom(bmsInfo);
 
 	hooks::return_menu::is_returning_to_menu = false;

@@ -15,30 +15,21 @@ void ResetState() {
 }
 
 void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAddr) {
-    if (data.size() <= 7 * 4) {
-        std::cout << "[!][server] Invalid packet received" << std::endl;
-        return;
-    }
+    auto selectedBms = msgpack::unpack<network::SelectedBmsMessage>(data);
+
     if (clientAddr == server::state.host) {
-        memcpy(&server::state.currentRandom, &data[0], data.size());
+        server::state.currentRandom = selectedBms.random;
         ResetState();
     }
-    data.erase(data.begin(), data.begin() + 7 * 4); // Erase random from the payload, continue with processing
 
-    std::stringstream splitter(std::string(data.begin(), data.end()));
-    std::string segment;
-    std::vector<std::string> segList;
-    while (std::getline(splitter, segment, '\xff'))
-        segList.push_back(segment);
-    if (segList.size() != 3) {
-        std::cout << "[!][server] Invalid packet received" << std::endl;
-        return;
-    }
+    std::cout << "[server] Received selected bms: " << selectedBms.title << " / " << selectedBms.artist << std::endl;
+    std::cout << "[server] Hash: " << selectedBms.hash << std::endl;
+    std::cout << "[server] Random: " << selectedBms.hash << std::endl;
+    for (const auto e : server::state.currentRandom)
+        std::cout << e << " ";
+    std::cout << std::endl;
 
-    std::cout << "[server] Received selected bms: " << segList[1] << " / " << segList[2] << std::endl;
-    std::cout << "[server] Hash: " << segList[0] << std::endl;
-
-    server::state.peers[clientAddr].selectedHash = segList[0];
+    server::state.peers[clientAddr].selectedHash = selectedBms.hash;
 }
 
 void SetUsername(std::vector<unsigned char> data, Garnet::Address clientAddr) {

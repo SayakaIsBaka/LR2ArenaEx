@@ -1,13 +1,14 @@
 #pragma once
 
 #include <Garnet.h>
+#include <array>
 #include <unordered_map>
 #include <network/structs.h>
 
 namespace server {
 	struct State {
 		Garnet::Address host;
-		unsigned int currentRandom[7] = { 0, 0, 0, 0, 0, 0, 0 };
+		std::array<unsigned int, 7> currentRandom = { 0, 0, 0, 0, 0, 0, 0 };
 
 		std::unordered_map<Garnet::Address, network::Peer> peers;
 	};

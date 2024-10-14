@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <array>
 #include <unordered_map>
 #include <Garnet.h>
 
@@ -28,6 +29,18 @@ namespace network {
 		template<class T>
 		void pack(T& pack) {
 			pack(list);
+		}
+	};
+
+	struct SelectedBmsMessage {
+		std::array<unsigned int, 7> random = { 0, 0, 0, 0, 0, 0, 0 };
+		std::string hash;
+		std::string title;
+		std::string artist;
+
+		template<class T>
+		void pack(T& pack) {
+			pack(random, hash, title, artist);
 		}
 	};
 }

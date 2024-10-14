@@ -65,7 +65,7 @@ void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for 
 		fprintf(stdout, "received random\n");
 		hooks::random::received_random = true;
 		EnterCriticalSection(&hooks::random::RandomCriticalSection);
-		memcpy(&hooks::random::current_random, &data[0], data.size());
+		memcpy(&hooks::random::current_random[0], &data[0], data.size());
 		LeaveCriticalSection(&hooks::random::RandomCriticalSection);
 		break;
 	case network::ServerToClient::STC_USERLIST:
