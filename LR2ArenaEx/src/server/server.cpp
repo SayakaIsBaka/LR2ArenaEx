@@ -38,10 +38,19 @@ void SetUsername(std::vector<unsigned char> data, Garnet::Address clientAddr) {
     server::state.peers[clientAddr].username = username;
 }
 
-std::vector<unsigned char> server::ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr) {
+void server::SendToEveryone(network::ServerToClient id, std::vector<unsigned char> data, Garnet::Address origSenderAddr, bool includeOrigSender) {
+    data.insert(data.begin(), static_cast<unsigned char>(id));
+    for (const Garnet::Address& addr : server->getClientAddresses())
+    {
+       if (origSenderAddr == addr && !includeOrigSender)
+           continue;
+        server->send(&data[0], data.size(), addr);
+    }
+}
+
+void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr) {
 	unsigned char id = data.front();
 	data.erase(data.begin());
-    std::vector<unsigned char> res;
 
 	switch ((network::ClientToServer)id)
 	{
@@ -62,16 +71,12 @@ std::vector<unsigned char> server::ParsePacket(std::vector<unsigned char> data, 
 		break;
     case network::ClientToServer::CTS_USERNAME:
         SetUsername(data, clientAddr);
-        res = msgpack::pack(network::PeerList(state.peers));
-        res.insert(res.begin(), (unsigned char)network::ServerToClient::STC_USERLIST);
-        // TODO: send list of users to all clients
+        SendToEveryone(network::ServerToClient::STC_USERLIST, msgpack::pack(network::PeerList(state.peers)), clientAddr, true);
         break;
 	default:
         std::cout << "[server] Unknown message received" << std::endl;
 		break;
 	}
-
-    return res;
 }
 
 void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address clientAddr)
@@ -84,15 +89,8 @@ void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address
         return;
     }
     std::vector<unsigned char> dataVector((unsigned char*)data, (unsigned char*)data + actualSize);
-    auto res = ParsePacket(dataVector, clientAddr);
+    ParsePacket(dataVector, clientAddr);
 
-    if (!res.empty()) {
-        for (const Garnet::Address& addr : server->getClientAddresses())
-        {
-            //if (clientAddr == addr) continue;
-            server->send(&res[0], res.size(), addr);
-        }
-    }
     delete data;
 }
 
@@ -128,11 +126,12 @@ bool server::Start() {
     addr.host = "0.0.0.0";
     addr.port = 2222;
 
-    server = new Garnet::ServerTCP(addr, &success);
+    // Hopefully this is enough to avoid a memleak because delete on a regular pointer crashes the thing
+    server = std::make_shared<Garnet::ServerTCP>(addr, &success);
 
     if (!success)
     {
-        std::cout << "[!] Error creating ENet server" << std::endl;
+        std::cout << "[!] Error creating server" << std::endl;
         return false;
     }
     started = true;
@@ -148,9 +147,14 @@ bool server::Start() {
 }
 
 bool server::Stop() {
-    server->close();
+    bool success = false;
+    server->close(&success);
+    if (!success) {
+        std::cout << "[!] Error stopping server" << std::endl;
+        return false;
+    }
     started = false;
-	delete server;
+    state = State();
     std::cout << "[+] Stopped server" << std::endl;
     return true;
 }

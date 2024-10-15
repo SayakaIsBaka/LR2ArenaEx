@@ -98,11 +98,17 @@ DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
 
     while (true)
     {
+		data.resize(MAX_TCP);
 		if (!connected)
 			break;
-		client.receive(&data[0], MAX_TCP);
+		auto receivedBytes = client.receive(&data[0], MAX_TCP);
+		if (receivedBytes <= 0) // Probably disconnected or something
+			break;
+		data.resize(receivedBytes);
 		ParsePacket(data);
     }
+
+	return 0;
 }
 
 bool client::Connect(const char* host, const char* username) {

@@ -3,6 +3,7 @@
 #include <Garnet.h>
 #include <array>
 #include <unordered_map>
+#include <network/enums.h>
 #include <network/structs.h>
 
 namespace server {
@@ -13,7 +14,7 @@ namespace server {
 		std::unordered_map<Garnet::Address, network::Peer> peers;
 	};
 
-	inline Garnet::ServerTCP* server;
+	inline std::shared_ptr<Garnet::ServerTCP> server;
 	inline State state;
 	inline bool started = false;
 
@@ -23,6 +24,7 @@ namespace server {
 	void Receive(void* data, int size, int actualSize, Garnet::Address clientAddr);
 	void ClientConnected(Garnet::Address clientAddr);
 	void ClientDisconnected(Garnet::Address clientAddr);
+	void SendToEveryone(network::ServerToClient id, std::vector<unsigned char> data, Garnet::Address origSenderAddr, bool includeOrigSender);
 
-	std::vector<unsigned char> ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr);
+	void ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr);
 }
