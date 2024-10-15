@@ -19,16 +19,18 @@ namespace network {
 
 	struct PeerList { // Only used for networking
 		std::unordered_map<Garnet::Address, network::Peer> list;
+		Garnet::Address host;
 
 		PeerList() {};
 
-		PeerList(std::unordered_map<Garnet::Address, network::Peer> list) {
+		PeerList(std::unordered_map<Garnet::Address, network::Peer> list, Garnet::Address host) {
 			this->list = list;
+			this->host = host;
 		}
 
 		template<class T>
 		void pack(T& pack) {
-			pack(list);
+			pack(list, host);
 		}
 	};
 

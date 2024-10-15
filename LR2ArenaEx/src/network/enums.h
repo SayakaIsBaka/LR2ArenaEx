@@ -12,7 +12,8 @@ namespace network {
 	enum class ServerToClient : unsigned char {
 		STC_PLAYERS_SCORE = 1,
 		STC_PLAYERS_READY_UPDATE,
-		STC_RANDOM,
-		STC_USERLIST
+		STC_SELECTED_CHART_RANDOM,
+		STC_USERLIST,
+		STC_CLIENT_REMOTE_ID,
 	};
 }

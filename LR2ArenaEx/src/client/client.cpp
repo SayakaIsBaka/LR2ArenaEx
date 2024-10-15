@@ -27,24 +27,48 @@ void client::Send(network::ClientToServer id, std::string msg) {
 	Send(id, data);
 }
 
-void client::UpdatePeersState(std::vector<unsigned char> data) {
+void client::UnpackPeerList(std::vector<unsigned char> data) {
 	auto receivedPeers = msgpack::unpack<network::PeerList>(data);
-	peers = receivedPeers.list;
+	state.peers = receivedPeers.list;
+	state.host = receivedPeers.host;
+}
+
+void client::UpdatePeersState(std::vector<unsigned char> data) {
+	UnpackPeerList(data);
+
 	std::cout << "[+] Connected users:" << std::endl;
-	for (const auto& [key, value] : peers)
-		std::cout << "- " << peers[key].username << std::endl;
+	for (const auto& [key, value] : state.peers)
+		std::cout << "- " << state.peers[key].username << std::endl;
 }
 
 bool client::UpdateReadyState(std::vector<unsigned char> data) {
-	auto receivedPeers = msgpack::unpack<network::PeerList>(data);
-	peers = receivedPeers.list;
+	UnpackPeerList(data);
+
 	bool allReady = true;
-	std::string hash = peers.begin()->second.selectedHash; // Take first hash as reference, all players must have the same chart selected anyways so no difference
-	for (const auto& [key, value] : peers) {
-		allReady = peers[key].ready && peers[key].selectedHash == hash;
+	std::string hash = state.peers.begin()->second.selectedHash; // Take first hash as reference, all players must have the same chart selected anyways so no difference
+	for (const auto& [key, value] : state.peers) {
+		allReady = state.peers[key].ready && state.peers[key].selectedHash == hash;
 		if (!allReady) break;
 	}
 	return allReady;
+}
+
+void client::UpdateSelectedSong(std::vector<unsigned char> data) {
+	auto selectedBms = msgpack::unpack<network::SelectedBmsMessage>(data);
+	std::cout << "[+] Received selected song" << std::endl;
+
+	// TODO: store hash + song + title somewhere to display
+
+	if (!(state.host == state.remoteId)) { // If not host (!= is not overloaded!!!)
+		std::cout << "[+] Received random" << std::endl;
+		hooks::random::received_random = true;
+
+		EnterCriticalSection(&hooks::random::RandomCriticalSection);
+		hooks::random::current_random = selectedBms.random;
+		LeaveCriticalSection(&hooks::random::RandomCriticalSection);
+
+		// TODO: do check on DB if not host
+	}
 }
 
 void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for multiple players
@@ -70,19 +94,14 @@ void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for 
 		if (UpdateReadyState(data))
 			hooks::loading_done::isEveryoneReady = true;
 		break;
-	case network::ServerToClient::STC_RANDOM: // TODO: update
-		if (data.size() != 7 * 4) {
-			fprintf(stderr, "invalid size random\n");
-			break;
-		}
-		fprintf(stdout, "received random\n");
-		hooks::random::received_random = true;
-		EnterCriticalSection(&hooks::random::RandomCriticalSection);
-		memcpy(&hooks::random::current_random[0], &data[0], data.size());
-		LeaveCriticalSection(&hooks::random::RandomCriticalSection);
+	case network::ServerToClient::STC_SELECTED_CHART_RANDOM: // TODO: update
+		UpdateSelectedSong(data);
 		break;
 	case network::ServerToClient::STC_USERLIST:
 		UpdatePeersState(data);
+		break;
+	case network::ServerToClient::STC_CLIENT_REMOTE_ID:
+		state.remoteId = msgpack::unpack<Garnet::Address>(data);
 		break;
 		/*
 	case 4: // no need for a random flip packet type anymore as UI is directly integrated
