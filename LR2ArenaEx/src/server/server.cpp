@@ -106,17 +106,19 @@ void server::ClientConnected(Garnet::Address clientAddr)
 void server::ClientDisconnected(Garnet::Address clientAddr)
 {
     std::cout << "[server] Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") disconnected." << std::endl;
-    state.peers.erase(clientAddr);
-    if (clientAddr == state.host && state.peers.size() > 0)
-        state.host = state.peers.begin()->first; // Change host to first peer in the list
+    if (started) {
+        state.peers.erase(clientAddr);
+        if (clientAddr == state.host && state.peers.size() > 0)
+            state.host = state.peers.begin()->first; // Change host to first peer in the list
 
-    auto res = msgpack::pack(network::PeerList(state.peers));
-    res.insert(res.begin(), (unsigned char)network::ServerToClient::STC_USERLIST);
+        auto res = msgpack::pack(network::PeerList(state.peers));
+        res.insert(res.begin(), (unsigned char)network::ServerToClient::STC_USERLIST);
 
-    for (const Garnet::Address& addr : server->getClientAddresses())
-    {
-        if (clientAddr == addr) continue;
-        server->send(&res[0], res.size(), addr);
+        for (const Garnet::Address& addr : server->getClientAddresses())
+        {
+            if (clientAddr == addr) continue;
+            server->send(&res[0], res.size(), addr);
+        }
     }
 }
 
