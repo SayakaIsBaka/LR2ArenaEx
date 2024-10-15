@@ -67,7 +67,7 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
 	case network::ClientToServer::CTS_LOADING_COMPLETE:
         std::cout << "[server] Received loading complete from " << clientAddr.host << std::endl;
         server::state.peers[clientAddr].ready = true;
-        // Send updated struct to all clients; calculate if should start client-side (useful to show who's ready client-side)
+        SendToEveryone(network::ServerToClient::STC_PLAYERS_READY_UPDATE, msgpack::pack(network::PeerList(state.peers)), clientAddr, true);
 		break;
     case network::ClientToServer::CTS_USERNAME:
         SetUsername(data, clientAddr);

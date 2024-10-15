@@ -25,5 +25,7 @@ namespace client {
 	void Send(network::ClientToServer id, std::vector<unsigned char> data);
 	void Send(network::ClientToServer id, std::string msg);
 	void ParsePacket(std::vector<unsigned char> data);
+
 	void UpdatePeersState(std::vector<unsigned char> data);
+	bool UpdateReadyState(std::vector<unsigned char> data);
 }

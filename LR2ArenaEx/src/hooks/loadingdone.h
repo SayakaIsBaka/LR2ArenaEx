@@ -2,7 +2,7 @@
 
 namespace hooks {
 	namespace loading_done {
-		inline bool is_p2_ready = false;
+		inline bool isEveryoneReady = false;
 
 		void Setup();
 	}

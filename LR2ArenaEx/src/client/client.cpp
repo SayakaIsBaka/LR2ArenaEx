@@ -35,12 +35,24 @@ void client::UpdatePeersState(std::vector<unsigned char> data) {
 		std::cout << "- " << peers[key].username << std::endl;
 }
 
+bool client::UpdateReadyState(std::vector<unsigned char> data) {
+	auto receivedPeers = msgpack::unpack<network::PeerList>(data);
+	peers = receivedPeers.list;
+	bool allReady = true;
+	std::string hash = peers.begin()->second.selectedHash; // Take first hash as reference, all players must have the same chart selected anyways so no difference
+	for (const auto& [key, value] : peers) {
+		allReady = peers[key].ready && peers[key].selectedHash == hash;
+		if (!allReady) break;
+	}
+	return allReady;
+}
+
 void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for multiple players
 	unsigned char id = data.front();
 	data.erase(data.begin());
 	switch ((network::ServerToClient)id)
 	{
-	case network::ServerToClient::STC_PLAYERS_SCORE:
+	case network::ServerToClient::STC_PLAYERS_SCORE: // TODO: update
 		if (data.size() <= 0 || data.size() > sizeof(unsigned int)) {
 			break;
 		}
@@ -54,10 +66,11 @@ void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for 
 		fprintf(stdout, "p2score : %u\n", hooks::pacemaker::p2_score);
 		break;
 	case network::ServerToClient::STC_PLAYERS_READY_UPDATE:
-		fprintf(stdout, "p2 ready\n");
-		hooks::loading_done::is_p2_ready = true; // TODO: Should check for all players
+		std::cout << "[+] Got updated ready status" << std::endl;
+		if (UpdateReadyState(data))
+			hooks::loading_done::isEveryoneReady = true;
 		break;
-	case network::ServerToClient::STC_RANDOM:
+	case network::ServerToClient::STC_RANDOM: // TODO: update
 		if (data.size() != 7 * 4) {
 			fprintf(stderr, "invalid size random\n");
 			break;

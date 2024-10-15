@@ -10,11 +10,11 @@ void hkLoadingDone() {
 	if (!hooks::return_menu::is_returning_to_menu) {
 		client::Send(network::ClientToServer::CTS_LOADING_COMPLETE, ""); // player ready, send packet
 		fprintf(stdout, "waiting for p2\n");
-		while (!hooks::loading_done::is_p2_ready)
+		while (!hooks::loading_done::isEveryoneReady)
 		{
 			SleepEx(50, false);
 		}
-		hooks::loading_done::is_p2_ready = false;
+		hooks::loading_done::isEveryoneReady = false;
 		hooks::random::received_random = false;
 		fprintf(stdout, "lock released\n");
 	}
