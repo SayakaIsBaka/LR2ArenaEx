@@ -7,6 +7,7 @@ Requirements:
 - Visual Studio 2019 or newer
 
 Paths for the DirectX SDK have been hardcoded in the project settings; if you chose the default settings it should work fine but you might need to edit them depending on your setup.
+
 ⚠️ **Make sure to set the platform to x86; setting it to anything else will not work**
 
 ## Libraries
