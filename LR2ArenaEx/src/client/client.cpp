@@ -58,7 +58,9 @@ void client::UpdateSelectedSong(std::vector<unsigned char> data) {
 	auto selectedBms = msgpack::unpack<network::SelectedBmsMessage>(data);
 	std::cout << "[+] Received selected song" << std::endl;
 
-	// TODO: store hash + song + title somewhere to display
+	state.selectedSongRemote.hash = selectedBms.hash;
+	state.selectedSongRemote.artist = selectedBms.artist;
+	state.selectedSongRemote.title = selectedBms.title;
 
 	if (!(state.host == state.remoteId)) { // If not host (!= is not overloaded!!!)
 		std::cout << "[+] Received random" << std::endl;

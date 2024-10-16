@@ -9,9 +9,16 @@
 namespace client {
 	constexpr int MAX_TCP = 1448;
 
+	struct SelectedSong {
+		std::string hash;
+		std::string title;
+		std::string artist;
+	};
+
 	struct ClientState {
 		Garnet::Address remoteId;
 		Garnet::Address host;
+		SelectedSong selectedSongRemote;
 		std::unordered_map<Garnet::Address, network::Peer> peers;
 	};
 
