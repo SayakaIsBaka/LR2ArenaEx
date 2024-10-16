@@ -126,6 +126,15 @@
     <ClInclude Include="src\gui\mainwindow.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
+    <ClInclude Include="src\gui\graph.h">
+      <Filter>Source Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\implot.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\implot_internal.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -202,6 +211,15 @@
     </ClCompile>
     <ClCompile Include="src\gui\mainwindow.cpp">
       <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui\graph.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\implot.cpp">
+      <Filter>Header Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\implot_items.cpp">
+      <Filter>Header Files\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

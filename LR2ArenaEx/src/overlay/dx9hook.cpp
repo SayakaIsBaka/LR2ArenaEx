@@ -1,8 +1,10 @@
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_win32.h>
 #include <ImGui/imgui_impl_dx9.h>
+#include <ImGui/implot.h>
 #include <utils/mem.h>
 #include <gui/gui.h>
+#include <gui/graph.h>
 #include <gui/imguistyle.h>
 #include <windowsx.h>
 #include <fonts/noto_medium.hpp>
@@ -17,6 +19,10 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 LRESULT __stdcall hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (GetAsyncKeyState(VK_INSERT) & 1) {
 		gui::showMenu = !gui::showMenu;
+	}
+
+	if (GetAsyncKeyState(VK_PRIOR) & 1) {
+		gui::graph::showGraph = !gui::graph::showGraph;
 	}
 
 	// Fix mouse scaling for non-standard resolutions, taken from https://github.com/tenaibms/LR2OOL/blob/master/src/graphics/gui.cpp
@@ -73,6 +79,7 @@ void InitImGui(IDirect3DDevice9* pDevice) {
 	std::cout << "[i] Window address: " << window << std::endl;
 
 	ImGui::CreateContext();
+	ImPlot::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -102,6 +109,10 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 		if (gui::showMenu)
 		{
 			gui::Render();
+		}
+		if (gui::graph::showGraph)
+		{
+			gui::graph::Render();
 		}
 
 		ImGui::EndFrame();

@@ -19,6 +19,7 @@ LR2ArenaEx uses the following libraries:
 - [SQLite](https://www.sqlite.org)
 - [sqlite_modern_cpp](https://github.com/SqliteModernCpp/sqlite_modern_cpp)
 - [cppack](https://github.com/dacap/cppack)
+- [implot](https://github.com/epezent/implot)
 
 ## Special thanks
 

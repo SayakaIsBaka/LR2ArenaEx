@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <sqlite_modern_cpp.h>
 #include <utils/misc.h>
+#include <gui/graph.h>
 
 #include "selectbms.h"
 #include "pacemaker.h"
@@ -82,6 +83,7 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 	if (bmsInfo.hash.length() > 0)
 		SendWithRandom(bmsInfo);
 
+	gui::graph::showGraph = true; // Show graph on song select
 	hooks::return_menu::is_returning_to_menu = false;
 }
 

@@ -212,7 +212,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\framework.h" />
+    <ClInclude Include="include\ImGui\implot.h" />
+    <ClInclude Include="include\ImGui\implot_internal.h" />
     <ClInclude Include="src\client\client.h" />
+    <ClInclude Include="src\gui\graph.h" />
     <ClInclude Include="src\gui\gui.h" />
     <ClInclude Include="src\gui\imguistyle.h" />
     <ClInclude Include="src\gui\mainwindow.h" />
@@ -249,8 +252,11 @@
     <ClCompile Include="include\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="include\ImGui\imgui_tables.cpp" />
     <ClCompile Include="include\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="include\ImGui\implot.cpp" />
+    <ClCompile Include="include\ImGui\implot_items.cpp" />
     <ClCompile Include="src\client\client.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\gui\graph.cpp" />
     <ClCompile Include="src\gui\gui.cpp" />
     <ClCompile Include="src\gui\imguistyle.cpp" />
     <ClCompile Include="src\gui\mainwindow.cpp" />
