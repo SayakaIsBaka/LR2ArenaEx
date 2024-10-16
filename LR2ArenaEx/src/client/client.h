@@ -36,4 +36,5 @@ namespace client {
 	void UpdatePeersState(std::vector<unsigned char> data);
 	bool UpdateReadyState(std::vector<unsigned char> data);
 	void UpdateSelectedSong(std::vector<unsigned char> data);
+	void UpdateScore(std::vector<unsigned char> data);
 }

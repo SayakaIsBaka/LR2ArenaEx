@@ -5,6 +5,7 @@
 #include <hooks/loadingdone.h>
 #include <hooks/random.h>
 #include <network/structs.h>
+#include <utils/misc.h>
 
 #include "client.h"
 
@@ -71,30 +72,44 @@ void client::UpdateSelectedSong(std::vector<unsigned char> data) {
 	}
 }
 
+unsigned int CalculatePacemakerDisplayScore(std::unordered_map<Garnet::Address, network::Peer> peers) {
+	if (peers.size() == 1)
+		return utils::CalculateExScore(peers[client::state.remoteId].score); // Return own score if alone in lobby
+	unsigned int maxScore = 0;
+	for (const auto& [key, value] : peers) {
+		if (key == client::state.remoteId) continue; // Skip own score
+		unsigned int playerScore = utils::CalculateExScore(value.score);
+		maxScore = playerScore > maxScore ? playerScore : maxScore;
+	}
+	return maxScore;
+}
+
+void client::UpdateScore(std::vector<unsigned char> data) {
+	auto scoreMsg = msgpack::unpack<network::ScoreMessage>(data);
+	state.peers[scoreMsg.player].score = scoreMsg.score;
+
+	hooks::pacemaker::displayed_score = CalculatePacemakerDisplayScore(state.peers);
+	if (hooks::pacemaker::pacemaker_address)
+		*hooks::pacemaker::pacemaker_address = hooks::pacemaker::displayed_score;
+	if (hooks::pacemaker::pacemaker_display_address)
+		*hooks::pacemaker::pacemaker_display_address = hooks::pacemaker::displayed_score;
+	std::cout << "Max score: " << hooks::pacemaker::displayed_score << std::endl;
+}
+
 void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for multiple players
 	unsigned char id = data.front();
 	data.erase(data.begin());
 	switch ((network::ServerToClient)id)
 	{
-	case network::ServerToClient::STC_PLAYERS_SCORE: // TODO: update
-		if (data.size() <= 0 || data.size() > sizeof(unsigned int)) {
-			break;
-		}
-		fprintf(stdout, "datasize : %u\n", data.size());
-		hooks::pacemaker::p2_score = 0; // TODO: Should instead display highest score from all players (or 2nd if you're currently 1st)
-		memcpy(&hooks::pacemaker::p2_score, &data[0], data.size()); // little-endian, kinda ugly but it works(tm)
-		if (hooks::pacemaker::pacemaker_address)
-			*hooks::pacemaker::pacemaker_address = hooks::pacemaker::p2_score;
-		if (hooks::pacemaker::pacemaker_display_address)
-			*hooks::pacemaker::pacemaker_display_address = hooks::pacemaker::p2_score;
-		fprintf(stdout, "p2score : %u\n", hooks::pacemaker::p2_score);
+	case network::ServerToClient::STC_PLAYERS_SCORE:
+		UpdateScore(data);
 		break;
 	case network::ServerToClient::STC_PLAYERS_READY_UPDATE:
 		std::cout << "[+] Got updated ready status" << std::endl;
 		if (UpdateReadyState(data))
 			hooks::loading_done::isEveryoneReady = true;
 		break;
-	case network::ServerToClient::STC_SELECTED_CHART_RANDOM: // TODO: update
+	case network::ServerToClient::STC_SELECTED_CHART_RANDOM:
 		UpdateSelectedSong(data);
 		break;
 	case network::ServerToClient::STC_USERLIST:

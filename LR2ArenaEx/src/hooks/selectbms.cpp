@@ -66,7 +66,7 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		fprintf(stdout, "demo BMS loaded, skip\n");
 		return;
 	}
-	hooks::pacemaker::p2_score = 0; // it's most likely when you start a song so reset score
+	hooks::pacemaker::displayed_score = 0; // it's most likely when you start a song so reset score
 
 	std::cout << "[+] Selected BMS: " << selectedBms << std::endl;
 	std::cout << "[+] Selected option: " << selected_option << std::endl;

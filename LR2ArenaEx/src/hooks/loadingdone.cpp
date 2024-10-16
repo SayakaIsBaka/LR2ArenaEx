@@ -9,7 +9,7 @@
 void hkLoadingDone() {
 	if (!hooks::return_menu::is_returning_to_menu) {
 		client::Send(network::ClientToServer::CTS_LOADING_COMPLETE, ""); // player ready, send packet
-		fprintf(stdout, "waiting for p2\n");
+		fprintf(stdout, "waiting for all players\n");
 		while (!hooks::loading_done::isEveryoneReady)
 		{
 			SleepEx(50, false);

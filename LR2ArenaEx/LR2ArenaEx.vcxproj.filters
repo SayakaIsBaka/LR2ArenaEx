@@ -120,6 +120,9 @@
     <ClInclude Include="src\network\structs.h">
       <Filter>Source Files\network</Filter>
     </ClInclude>
+    <ClInclude Include="src\utils\misc.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -190,6 +193,9 @@
     </ClCompile>
     <ClCompile Include="src\server\server.cpp">
       <Filter>Source Files\server</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\misc.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

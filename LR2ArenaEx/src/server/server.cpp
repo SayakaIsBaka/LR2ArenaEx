@@ -11,6 +11,7 @@ void ResetState() {
         // Reset state as new chart has been selected
         server::state.peers[key].ready = false;
         server::state.peers[key].selectedHash = "";
+        server::state.peers[key].score = network::Score();
     }
 }
 
@@ -30,6 +31,11 @@ void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAdd
     std::cout << std::endl;
 
     server::state.peers[clientAddr].selectedHash = selectedBms.hash;
+}
+
+void ParseScore(std::vector<unsigned char> data, Garnet::Address clientAddr) {
+    auto score = msgpack::unpack<network::Score>(data);
+    server::state.peers[clientAddr].score = score;
 }
 
 void SetUsername(std::vector<unsigned char> data, Garnet::Address clientAddr) { // Performing state update here to avoid race condition
@@ -71,9 +77,12 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
 		break;
 	case network::ClientToServer::CTS_PLAYER_SCORE:
         std::cout << "[server] Received player score" << std::endl;
+        ParseScore(data, clientAddr);
+        SendToEveryone(network::ServerToClient::STC_PLAYERS_SCORE, msgpack::pack(network::ScoreMessage(state.peers[clientAddr].score, clientAddr)), clientAddr, true);
 		break;
 	case network::ClientToServer::CTS_CHART_CANCELLED:
         std::cout << "[server] Received chart cancelled" << std::endl;
+        // TODO: reset ready, score and selected hash for user and send update to everyone
 		break;
 	case network::ClientToServer::CTS_LOADING_COMPLETE:
         std::cout << "[server] Received loading complete from " << clientAddr.host << std::endl;

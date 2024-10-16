@@ -6,10 +6,26 @@
 #include <Garnet.h>
 
 namespace network {
+	struct Score {
+		int poor;
+		int bad;
+		int good;
+		int great;
+		int p_great;
+		int max_combo;
+		int score;
+
+		template<class T>
+		void pack(T& pack) {
+			pack(poor, bad, good, great, p_great, max_combo, score);
+		}
+	};
+
 	struct Peer {
 		std::string username;
 		std::string selectedHash;
 		bool ready = false;
+		Score score = Score();
 
 		template<class T>
 		void pack(T& pack) {
@@ -43,6 +59,23 @@ namespace network {
 		template<class T>
 		void pack(T& pack) {
 			pack(random, hash, title, artist);
+		}
+	};
+
+	struct ScoreMessage { // Used from server to clients
+		Score score = Score();
+		Garnet::Address player;
+
+		ScoreMessage() {};
+
+		ScoreMessage(Score score, Garnet::Address player) {
+			this->score = score;
+			this->player = player;
+		}
+
+		template<class T>
+		void pack(T& pack) {
+			pack(score, player);
 		}
 	};
 }

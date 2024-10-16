@@ -1,3 +1,4 @@
+#include <msgpack/msgpack.hpp>
 #include <iostream>
 #include <utils/mem.h>
 #include <client/client.h>
@@ -9,7 +10,7 @@ DWORD WINAPI ScoreConsumer(LPVOID lpParameter)
 {
 	std::cout << "[i] Started ScoreConsumer thread" << std::endl;
 	while (true) {
-		hooks::score::ScoreEvent score_event;
+		network::Score score_event;
 		hooks::score::score_queue.wait_dequeue(score_event);
 
 		fprintf(stdout, "poor:%d bad:%d good:%d great:%d p_great:%d max_combo:%d score:%d\n",
@@ -17,9 +18,7 @@ DWORD WINAPI ScoreConsumer(LPVOID lpParameter)
 			score_event.max_combo, score_event.score
 		);
 
-		std::vector<unsigned char> score_data;
-		score_data.resize(sizeof(score_event));
-		std::memcpy(score_data.data(), &score_event, score_data.size());
+		auto score_data = msgpack::pack(score_event);
 		client::Send(network::ClientToServer::CTS_PLAYER_SCORE, score_data);
 	}
 }
@@ -38,7 +37,7 @@ void hkScore(unsigned char* memory) {
 	//int score1 = ptr[46];
 	//fprintf(stdout, "max_combo:%d\n", max_combo);
 
-	hooks::score::ScoreEvent score_event{
+	network::Score score_event{
 		poor,
 		bad,
 		good,

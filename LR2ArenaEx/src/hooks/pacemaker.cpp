@@ -5,7 +5,7 @@
 void hkPacemaker(unsigned char* memory) {
 	memory += 0x4C;
 	if (!hooks::pacemaker::pacemaker_address) {
-		*(unsigned int*)memory = hooks::pacemaker::p2_score;
+		*(unsigned int*)memory = hooks::pacemaker::displayed_score;
 		hooks::pacemaker::pacemaker_address = (unsigned int*)memory;
 	}
 }
@@ -13,7 +13,7 @@ void hkPacemaker(unsigned char* memory) {
 void hkPacemakerDisplay(unsigned char* memory) {
 	memory += 0xD8;
 	if (!hooks::pacemaker::pacemaker_display_address) {
-		*(unsigned int*)memory = hooks::pacemaker::p2_score;
+		*(unsigned int*)memory = hooks::pacemaker::displayed_score;
 		hooks::pacemaker::pacemaker_display_address = (unsigned int*)memory;
 	}
 }

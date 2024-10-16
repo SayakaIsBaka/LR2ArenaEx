@@ -238,6 +238,7 @@
     <ClInclude Include="include\ImGui\imstb_rectpack.h" />
     <ClInclude Include="include\ImGui\imstb_textedit.h" />
     <ClInclude Include="include\ImGui\imstb_truetype.h" />
+    <ClInclude Include="src\utils\misc.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp" />
@@ -263,6 +264,7 @@
     <ClCompile Include="src\overlay\overlay.cpp" />
     <ClCompile Include="src\server\server.cpp" />
     <ClCompile Include="src\utils\mem.cpp" />
+    <ClCompile Include="src\utils\misc.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
