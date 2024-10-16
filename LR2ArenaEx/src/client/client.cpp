@@ -63,6 +63,9 @@ void client::UpdateSelectedSong(std::vector<unsigned char> data) {
 	state.selectedSongRemote.artist = selectedBms.artist;
 	state.selectedSongRemote.title = selectedBms.title;
 
+	gui::main_window::AddToLog("[#] Selected song: " + selectedBms.title + " / " + selectedBms.artist);
+	gui::main_window::AddToLog("[#] Hash: " + selectedBms.hash);
+
 	if (!(state.host == state.remoteId)) { // If not host (!= is not overloaded!!!)
 		std::cout << "[+] Received random" << std::endl;
 		hooks::random::received_random = true;
