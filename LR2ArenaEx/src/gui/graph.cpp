@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-void gui::graph::Render() { // TODO: different color per bar, set scale
+void gui::graph::Render() { // TODO: different color per bar, set scale, display more details about each player?
 	if (ImGui::Begin("Graph", &showGraph, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus))
 	{
         std::vector<unsigned int> values;
@@ -25,8 +25,9 @@ void gui::graph::Render() { // TODO: different color per bar, set scale
             }
 
             if (ImPlot::BeginPlot("##GraphPlot", ImVec2(-1, 400), ImPlotFlags_NoFrame | ImPlotFlags_NoInputs | ImPlotFlags_NoTitle | ImPlotFlags_NoLegend)) {
-                ImPlot::SetupAxes("Players", "Score", ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoLabel, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoLabel);
+                ImPlot::SetupAxes("Players", "Score", ImPlotAxisFlags_NoLabel, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoLabel);
                 ImPlot::SetupAxisTicks(ImAxis_X1, positions.data(), labels.size(), labels.data());
+                ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 10000, ImPlotCond_Always);
                 ImPlot::PlotBars("", values.data(), values.size(), 0.67f, 0, 0);
                 ImPlot::EndPlot();
             }
