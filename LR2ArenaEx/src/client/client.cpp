@@ -98,7 +98,7 @@ void client::UpdateScore(std::vector<unsigned char> data) {
 	std::cout << "Max score: " << hooks::pacemaker::displayed_score << std::endl;
 }
 
-void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for multiple players
+void client::ParsePacket(std::vector<unsigned char> data) {
 	unsigned char id = data.front();
 	data.erase(data.begin());
 	switch ((network::ServerToClient)id)
@@ -120,15 +120,6 @@ void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for 
 		state.remoteId = msgpack::unpack<Garnet::Address>(data);
 		break;
 		/*
-	case 4: // no need for a random flip packet type anymore as UI is directly integrated
-		hooks::random::random_flip = data.front() == 1;
-		if (hooks::random::random_flip) {
-			fprintf(stdout, "random flip enabled\n");
-		}
-		else {
-			fprintf(stdout, "random flip disabled\n");
-		}
-		break;
 	case 5:
 		fprintf(stdout, "P2 does not have the selected chart, please go back to the main menu!\n");
 		break;
@@ -150,8 +141,10 @@ DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
 		if (!connected)
 			break;
 		auto receivedBytes = client.receive(&data[0], MAX_TCP);
-		if (receivedBytes <= 0) // Probably disconnected or something
+		if (receivedBytes <= 0) { // Probably disconnected or something
+			connected = false;
 			break;
+		}
 		data.resize(receivedBytes);
 		ParsePacket(data);
     }

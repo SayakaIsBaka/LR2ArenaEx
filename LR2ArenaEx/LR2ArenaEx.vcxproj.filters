@@ -123,6 +123,9 @@
     <ClInclude Include="src\utils\misc.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\gui\mainwindow.h">
+      <Filter>Source Files\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -196,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="src\utils\misc.cpp">
       <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui\mainwindow.cpp">
+      <Filter>Source Files\gui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

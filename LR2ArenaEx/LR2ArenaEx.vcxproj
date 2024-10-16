@@ -215,6 +215,7 @@
     <ClInclude Include="src\client\client.h" />
     <ClInclude Include="src\gui\gui.h" />
     <ClInclude Include="src\gui\imguistyle.h" />
+    <ClInclude Include="src\gui\mainwindow.h" />
     <ClInclude Include="src\hooks\hooks.h" />
     <ClInclude Include="src\hooks\loadingdone.h" />
     <ClInclude Include="src\hooks\pacemaker.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\gui\gui.cpp" />
     <ClCompile Include="src\gui\imguistyle.cpp" />
+    <ClCompile Include="src\gui\mainwindow.cpp" />
     <ClCompile Include="src\hooks\hooks.cpp" />
     <ClCompile Include="src\hooks\loadingdone.cpp" />
     <ClCompile Include="src\hooks\pacemaker.cpp" />

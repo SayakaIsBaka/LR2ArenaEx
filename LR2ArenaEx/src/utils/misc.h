@@ -4,4 +4,5 @@
 
 namespace utils {
 	unsigned int CalculateExScore(network::Score score);
+	void StrTrim(char* s);
 }

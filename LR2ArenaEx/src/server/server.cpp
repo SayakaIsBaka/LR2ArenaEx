@@ -29,7 +29,7 @@ void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAdd
 
     std::cout << "[server] Received selected bms: " << selectedBms.title << " / " << selectedBms.artist << std::endl;
     std::cout << "[server] Hash: " << selectedBms.hash << std::endl;
-    std::cout << "[server] Random: " << selectedBms.hash << std::endl;
+    std::cout << "[server] Random: ";
     for (const auto e : server::state.currentRandom)
         std::cout << e << " ";
     std::cout << std::endl;
