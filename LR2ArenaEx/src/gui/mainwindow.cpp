@@ -6,9 +6,22 @@
 #include <fonts/IconsFontAwesome6.h>
 
 #include "mainwindow.h"
+#include "gui.h"
 
 void SendMsg(std::string s) {
     client::Send(network::ClientToServer::CTS_MESSAGE, s);
+}
+
+void HelpMarker(const char* desc)
+{
+    ImGui::TextDisabled(ICON_FA_CIRCLE_INFO);
+    if (ImGui::BeginItemTooltip())
+    {
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
 }
 
 void gui::main_window::AddToLogWithUser(std::string s, Garnet::Address id) {
@@ -110,6 +123,8 @@ void gui::main_window::Render() {
             if (ImGui::BeginTabItem("Settings"))
             {
                 ImGui::Checkbox("Enable random flip", &hooks::random::random_flip);
+                ImGui::Checkbox("Disable game inputs when overlay is shown", &gui::muteGameInputs);
+                ImGui::SameLine(); HelpMarker("Does not affect the graph display in-game");
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();

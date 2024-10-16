@@ -6,7 +6,7 @@
 
 HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPVOID lpvData) {
 	HRESULT result = overlay::dinputhook::oGetDeviceState(pThis, cbData, lpvData);
-	if (result == DI_OK && gui::showMenu) { // TODO: need a way to differenciate main menu (where we may want to disable inputs) and everything else
+	if (result == DI_OK && gui::showMenu && gui::muteGameInputs) {
 		if (cbData == sizeof(DIMOUSESTATE2)) { // Mouse device
 			((LPDIMOUSESTATE2)lpvData)->rgbButtons[0] = 0;
 			((LPDIMOUSESTATE2)lpvData)->rgbButtons[1] = 0;
