@@ -45,7 +45,12 @@ void gui::main_window::Render() {
     ImGui::SameLine();
     {
         ImGui::BeginGroup();
-        ImGui::BeginChild("item view", ImVec2(300, 300), ImGuiChildFlags_AutoResizeX);
+        ImGui::BeginChild("Main view", ImVec2(300, 400), ImGuiChildFlags_AutoResizeX);
+
+        ImGui::InputText("Hash", (char*)client::state.selectedSongRemote.hash.c_str(), client::state.selectedSongRemote.hash.size(), ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputText("Title", (char*)client::state.selectedSongRemote.title.c_str(), client::state.selectedSongRemote.title.size(), ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputText("Artist", (char*)client::state.selectedSongRemote.artist.c_str(), client::state.selectedSongRemote.artist.size(), ImGuiInputTextFlags_ReadOnly);
+
         ImGui::Separator();
         if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
         {
