@@ -80,14 +80,14 @@
     <IncludePath>$(ProjectDir)\src;$(ProjectDir)\include;$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Include</IncludePath>
     <LibraryPath>$(ProjectDir)\libs;$(LibraryPath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Lib\x86</LibraryPath>
     <SourcePath>$(ProjectDir)\src;$(SourcePath)</SourcePath>
-    <TargetName>D3D9Hook</TargetName>
+    <TargetName>LR2ArenaEx</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)\src;$(ProjectDir)\include;$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Include</IncludePath>
     <LibraryPath>$(ProjectDir)\libs;$(LibraryPath);C:\Program Files (x86)\Microsoft DirectX SDK (August 2007)\Lib\x86</LibraryPath>
     <SourcePath>$(ProjectDir)\src;$(SourcePath)</SourcePath>
-    <TargetName>D3D9Hook</TargetName>
+    <TargetName>LR2ArenaEx</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

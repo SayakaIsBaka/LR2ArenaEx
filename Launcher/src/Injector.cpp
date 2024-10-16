@@ -43,7 +43,7 @@ static std::wstring GetExecutableDir()
 
 int Injector()
 {
-	constexpr const WCHAR* dllName = L"D3D9Hook.dll";
+	constexpr const WCHAR* dllName = L"LR2ArenaEx.dll";
 	constexpr const char* procName = "LRHbody.exe";
 	std::wstring dllPath = GetExecutableDir().append(dllName);
 	DWORD procId = 0;
