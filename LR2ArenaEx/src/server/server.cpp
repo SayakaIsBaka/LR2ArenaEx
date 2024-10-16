@@ -5,13 +5,17 @@
 
 #include "server.h"
 
-void ResetState() {
+void ResetState(Garnet::Address player) {
+    server::state.peers[player].ready = false;
+    server::state.peers[player].selectedHash = "";
+    server::state.peers[player].score = network::Score();
+}
+
+void ResetStateEveryone() {
     for (const auto& [key, value] : server::state.peers)
     {
         // Reset state as new chart has been selected
-        server::state.peers[key].ready = false;
-        server::state.peers[key].selectedHash = "";
-        server::state.peers[key].score = network::Score();
+        ResetState(key);
     }
 }
 
@@ -20,7 +24,7 @@ void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAdd
 
     if (clientAddr == server::state.host) {
         server::state.currentRandom = selectedBms.random;
-        ResetState();
+        ResetStateEveryone();
     }
 
     std::cout << "[server] Received selected bms: " << selectedBms.title << " / " << selectedBms.artist << std::endl;
@@ -82,7 +86,8 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
 		break;
 	case network::ClientToServer::CTS_CHART_CANCELLED:
         std::cout << "[server] Received chart cancelled" << std::endl;
-        // TODO: reset ready, score and selected hash for user and send update to everyone
+        ResetState(clientAddr);
+        SendToEveryone(network::ServerToClient::STC_PLAYERS_READY_UPDATE, msgpack::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
 		break;
 	case network::ClientToServer::CTS_LOADING_COMPLETE:
         std::cout << "[server] Received loading complete from " << clientAddr.host << std::endl;

@@ -106,8 +106,7 @@ void client::ParsePacket(std::vector<unsigned char> data) { // TODO: update for 
 		break;
 	case network::ServerToClient::STC_PLAYERS_READY_UPDATE:
 		std::cout << "[+] Got updated ready status" << std::endl;
-		if (UpdateReadyState(data))
-			hooks::loading_done::isEveryoneReady = true;
+		hooks::loading_done::isEveryoneReady = UpdateReadyState(data);
 		break;
 	case network::ServerToClient::STC_SELECTED_CHART_RANDOM:
 		UpdateSelectedSong(data);
