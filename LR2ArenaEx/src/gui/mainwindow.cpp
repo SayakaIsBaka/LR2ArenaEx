@@ -3,6 +3,7 @@
 #include <hooks/random.h>
 #include <cstdio>
 #include <utils/misc.h>
+#include <fonts/IconsFontAwesome6.h>
 
 #include "mainwindow.h"
 
@@ -35,8 +36,9 @@ void gui::main_window::Render() {
     {
         ImGui::BeginChild("Users", ImVec2(150, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
         for (const auto& [key, value] : client::state.peers) {
-            if (key == client::state.host)
-                ImGui::Selectable(("👑 " + value.username).c_str());
+            if (key == client::state.host) {
+                ImGui::Selectable((ICON_FA_CROWN + std::string(" ") + value.username).c_str());
+            }
             else
                 ImGui::Selectable(value.username.c_str());
         }

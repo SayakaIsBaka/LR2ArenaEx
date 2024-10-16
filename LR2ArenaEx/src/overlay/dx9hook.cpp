@@ -5,6 +5,9 @@
 #include <gui/gui.h>
 #include <gui/imguistyle.h>
 #include <windowsx.h>
+#include <fonts/noto_medium.hpp>
+#include <fonts/fa_solid_900.hpp>
+#include <fonts/IconsFontAwesome6.h>
 
 #include "dx9hook.h"
 #include "overlay.h"
@@ -41,6 +44,27 @@ LRESULT __stdcall hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	return CallWindowProc(overlay::dx9hook::oWndProcHandler, hWnd, uMsg, wParam, lParam);
 }
 
+void SetupFonts(ImGuiIO& io, int fontSize) {
+	float mainFontSize = (float)fontSize;
+	float iconFontSize = mainFontSize * 2.0f / 3.0f;
+
+	ImVector<ImWchar> ranges;
+	ImFontGlyphRangesBuilder builder;
+	builder.AddText(u8"©¨ª«");
+	builder.AddRanges(io.Fonts->GetGlyphRangesJapanese());
+	builder.BuildRanges(&ranges);
+	io.Fonts->AddFontFromMemoryCompressedTTF(noto_compressed_data, noto_compressed_size, mainFontSize, 0, ranges.Data);
+
+	static const ImWchar iconsRanges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+	ImFontConfig iconsConfig;
+	iconsConfig.MergeMode = true;
+	iconsConfig.PixelSnapH = true;
+	iconsConfig.GlyphMinAdvanceX = iconFontSize;
+	io.Fonts->AddFontFromMemoryCompressedTTF(fa_solid_900_compressed_data, fa_solid_900_compressed_size, iconFontSize, &iconsConfig, iconsRanges);
+
+	io.Fonts->Build();
+}
+
 void InitImGui(IDirect3DDevice9* pDevice) {
 	std::cout << "[i] Direct3D device address: " << (int*)*(int*)pDevice << std::endl;
 	D3DDEVICE_CREATION_PARAMETERS CP;
@@ -52,7 +76,7 @@ void InitImGui(IDirect3DDevice9* pDevice) {
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.Fonts->AddFontDefault();
+	SetupFonts(io, 16);
 
 	bool win32_init = ImGui_ImplWin32_Init(window);
 	bool dx9_init = ImGui_ImplDX9_Init(pDevice);

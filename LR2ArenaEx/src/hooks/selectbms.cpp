@@ -6,6 +6,7 @@
 #include <network/structs.h>
 #include <filesystem>
 #include <sqlite_modern_cpp.h>
+#include <utils/misc.h>
 
 #include "selectbms.h"
 #include "pacemaker.h"
@@ -68,14 +69,16 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 	}
 	hooks::pacemaker::displayed_score = 0; // it's most likely when you start a song so reset score
 
-	std::cout << "[+] Selected BMS: " << selectedBms << std::endl;
+	std::string selectedBmsUtf8 = utils::SJISToUTF8(selectedBms);
+
+	std::cout << "[+] Selected BMS: " << selectedBmsUtf8 << std::endl;
 	std::cout << "[+] Selected option: " << selected_option << std::endl;
 
 	if (!hooks::random::received_random) {
 		hooks::random::UpdateRandom();
 	}
 
-	auto bmsInfo = GetBmsInfo(selectedBms);
+	auto bmsInfo = GetBmsInfo(selectedBmsUtf8);
 	if (bmsInfo.hash.length() > 0)
 		SendWithRandom(bmsInfo);
 
