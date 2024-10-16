@@ -99,6 +99,10 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
         SendTo(network::ServerToClient::STC_CLIENT_REMOTE_ID, msgpack::pack(clientAddr), clientAddr); // Send remote address to sender (use as ID)
         SendToEveryone(network::ServerToClient::STC_USERLIST, msgpack::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
         break;
+    case network::ClientToServer::CTS_MESSAGE:
+        std::cout << "[server] Received message" << std::endl;
+        SendToEveryone(network::ServerToClient::STC_MESSAGE, msgpack::pack(network::Message(std::string(data.begin(), data.end()), clientAddr)), clientAddr, false);
+        break;
 	default:
         std::cout << "[server] Unknown message received" << std::endl;
 		break;

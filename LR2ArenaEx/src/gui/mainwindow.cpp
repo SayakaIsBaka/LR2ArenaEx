@@ -6,6 +6,10 @@
 
 #include "mainwindow.h"
 
+void SendMsg(std::string s) {
+    client::Send(network::ClientToServer::CTS_MESSAGE, s);
+}
+
 void gui::main_window::AddToLogWithUser(std::string s, Garnet::Address id) {
     auto username = client::state.peers[id].username;
     lines.push_back(username + ": " + s);
@@ -20,13 +24,14 @@ void gui::main_window::ProcessInput() {
     utils::StrTrim(s);
     if (s[0]) {
         AddToLogWithUser(s, client::state.remoteId);
-        //ExecCommand(s);
+        SendMsg(s);
     }
     strncpy(s, "", IM_ARRAYSIZE(inputBuf));
 }
 
+// Mostly taken from the Console and Simple layout ImGui demos
 void gui::main_window::Render() {
-    ImGui::SeparatorText("Users");
+    ImGui::SeparatorText("Lobby");
     {
         ImGui::BeginChild("Users", ImVec2(150, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
         for (const auto& [key, value] : client::state.peers) {
@@ -40,7 +45,7 @@ void gui::main_window::Render() {
     ImGui::SameLine();
     {
         ImGui::BeginGroup();
-        ImGui::BeginChild("item view", ImVec2(300, 300), ImGuiChildFlags_AutoResizeX); // Leave room for 1 line below us
+        ImGui::BeginChild("item view", ImVec2(300, 300), ImGuiChildFlags_AutoResizeX);
         ImGui::Separator();
         if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
         {
@@ -49,7 +54,7 @@ void gui::main_window::Render() {
                 const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
                 if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar))
                 {
-                    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
+                    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
                     ImGuiListClipper clipper;
                     clipper.Begin(lines.size());
                     while (clipper.Step()) {
@@ -65,14 +70,12 @@ void gui::main_window::Render() {
 
                             if (has_color)
                                 ImGui::PushStyleColor(ImGuiCol_Text, color);
-                            ImGui::TextUnformatted(item.c_str());
+                            ImGui::TextWrapped("%s\n", item.c_str());
                             if (has_color)
                                 ImGui::PopStyleColor();
                         }
                     }
 
-                    // Keep up at the bottom of the scroll region if we were already at the bottom at the beginning of the frame.
-                    // Using a scrollbar or mouse-wheel will take away from the bottom edge.
                     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
                         ImGui::SetScrollHereY(1.0f);
 
@@ -81,12 +84,8 @@ void gui::main_window::Render() {
                 ImGui::EndChild();
                 ImGui::Separator();
 
-                // Command-line
                 bool reclaim_focus = false;
-                bool sendMessage = ImGui::InputText("##Input", inputBuf, IM_ARRAYSIZE(inputBuf), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll);
-                ImGui::SameLine();
-                sendMessage |= ImGui::Button("Send");
-                if (sendMessage) {
+                if (ImGui::InputText("##Input", inputBuf, IM_ARRAYSIZE(inputBuf), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll)) {
                     ProcessInput();
                     reclaim_focus = true;
                 }
@@ -94,6 +93,10 @@ void gui::main_window::Render() {
                 ImGui::SetItemDefaultFocus();
                 if (reclaim_focus)
                     ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+
+                ImGui::SameLine();
+                if (ImGui::Button("Send") && !reclaim_focus) // Prevent double send if pressing Enter and clicking the button on the same frame (unlikely)
+                    ProcessInput();
 
                 ImGui::EndTabItem();
             }

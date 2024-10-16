@@ -6,6 +6,7 @@
 #include <hooks/random.h>
 #include <network/structs.h>
 #include <utils/misc.h>
+#include <gui/mainwindow.h>
 
 #include "client.h"
 
@@ -88,6 +89,10 @@ unsigned int CalculatePacemakerDisplayScore(std::unordered_map<Garnet::Address, 
 
 void client::UpdateScore(std::vector<unsigned char> data) {
 	auto scoreMsg = msgpack::unpack<network::ScoreMessage>(data);
+	if (state.peers.find(scoreMsg.player) == state.peers.end()) {
+		std::cout << "[!] Player not found for score update" << std::endl;
+		return;
+	}
 	state.peers[scoreMsg.player].score = scoreMsg.score;
 
 	hooks::pacemaker::displayed_score = CalculatePacemakerDisplayScore(state.peers);
@@ -96,6 +101,15 @@ void client::UpdateScore(std::vector<unsigned char> data) {
 	if (hooks::pacemaker::pacemaker_display_address)
 		*hooks::pacemaker::pacemaker_display_address = hooks::pacemaker::displayed_score;
 	std::cout << "Max score: " << hooks::pacemaker::displayed_score << std::endl;
+}
+
+void client::UpdateMessage(std::vector<unsigned char> data) {
+	auto msg = msgpack::unpack<network::Message>(data);
+	if (state.peers.find(msg.player) == state.peers.end()) {
+		std::cout << "[!] Player not found for message" << std::endl;
+		return;
+	}
+	gui::main_window::AddToLogWithUser(msg.message, msg.player);
 }
 
 void client::ParsePacket(std::vector<unsigned char> data) {
@@ -119,12 +133,12 @@ void client::ParsePacket(std::vector<unsigned char> data) {
 	case network::ServerToClient::STC_CLIENT_REMOTE_ID:
 		state.remoteId = msgpack::unpack<Garnet::Address>(data);
 		break;
+	case network::ServerToClient::STC_MESSAGE:
+		UpdateMessage(data);
+		break;
 		/*
 	case 5:
 		fprintf(stdout, "P2 does not have the selected chart, please go back to the main menu!\n");
-		break;
-	case 6:
-		fprintf(stdout, "message received\n");
 		break;
 		*/
 	default:

@@ -44,4 +44,5 @@ namespace client {
 	bool UpdateReadyState(std::vector<unsigned char> data);
 	void UpdateSelectedSong(std::vector<unsigned char> data);
 	void UpdateScore(std::vector<unsigned char> data);
+	void UpdateMessage(std::vector<unsigned char> data);
 }

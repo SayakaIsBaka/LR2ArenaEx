@@ -7,6 +7,7 @@ namespace network {
 		CTS_CHART_CANCELLED,
 		CTS_LOADING_COMPLETE,
 		CTS_USERNAME,
+		CTS_MESSAGE,
 	};
 
 	enum class ServerToClient : unsigned char {
@@ -15,5 +16,6 @@ namespace network {
 		STC_SELECTED_CHART_RANDOM,
 		STC_USERLIST,
 		STC_CLIENT_REMOTE_ID,
+		STC_MESSAGE,
 	};
 }

@@ -78,4 +78,21 @@ namespace network {
 			pack(score, player);
 		}
 	};
+
+	struct Message { // Used from server to clients
+		std::string message;
+		Garnet::Address player;
+
+		Message() {};
+
+		Message(std::string message, Garnet::Address player) {
+			this->message = message;
+			this->player = player;
+		}
+
+		template<class T>
+		void pack(T& pack) {
+			pack(message, player);
+		}
+	};
 }
