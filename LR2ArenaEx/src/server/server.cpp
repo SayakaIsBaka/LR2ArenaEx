@@ -101,7 +101,11 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
         break;
     case network::ClientToServer::CTS_MESSAGE:
         std::cout << "[server] Received message" << std::endl;
-        SendToEveryone(network::ServerToClient::STC_MESSAGE, msgpack::pack(network::Message(std::string(data.begin(), data.end()), clientAddr)), clientAddr, false);
+        SendToEveryone(network::ServerToClient::STC_MESSAGE, msgpack::pack(network::Message(std::string(data.begin(), data.end()), clientAddr, false)), clientAddr, false);
+        break;
+    case network::ClientToServer::CTS_MISSING_CHART:
+        std::cout << "[server] Received missing chart" << std::endl;
+        SendToEveryone(network::ServerToClient::STC_MESSAGE, msgpack::pack(network::Message("[!] " + state.peers[clientAddr].username + " is missing the selected chart!", clientAddr, true)), clientAddr, false);
         break;
 	default:
         std::cout << "[server] Unknown message received" << std::endl;

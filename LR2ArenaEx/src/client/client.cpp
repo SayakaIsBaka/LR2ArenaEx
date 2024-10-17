@@ -76,7 +76,7 @@ void client::UpdateSelectedSong(std::vector<unsigned char> data) {
 
 		if (!utils::CheckIfChartExists(selectedBms.hash)) {
 			gui::main_window::AddToLog("[!] You do not have this chart!");
-			// TODO: notify other players (and maybe add third state => turn ready into enum?)
+			Send(network::ClientToServer::CTS_MISSING_CHART, "");
 		}
 	}
 }
@@ -111,11 +111,16 @@ void client::UpdateScore(std::vector<unsigned char> data) {
 
 void client::UpdateMessage(std::vector<unsigned char> data) {
 	auto msg = msgpack::unpack<network::Message>(data);
-	if (state.peers.find(msg.player) == state.peers.end()) {
-		std::cout << "[!] Player not found for message" << std::endl;
-		return;
+	if (msg.systemMessage) {
+		gui::main_window::AddToLog(msg.message);
 	}
-	gui::main_window::AddToLogWithUser(msg.message, msg.player);
+	else {
+		if (state.peers.find(msg.player) == state.peers.end()) {
+			std::cout << "[!] Player not found for message" << std::endl;
+			return;
+		}
+		gui::main_window::AddToLogWithUser(msg.message, msg.player);
+	}
 }
 
 void client::ParsePacket(std::vector<unsigned char> data) {
@@ -142,11 +147,6 @@ void client::ParsePacket(std::vector<unsigned char> data) {
 	case network::ServerToClient::STC_MESSAGE:
 		UpdateMessage(data);
 		break;
-		/*
-	case 5:
-		fprintf(stdout, "P2 does not have the selected chart, please go back to the main menu!\n");
-		break;
-		*/
 	default:
 		break;
 	}

@@ -8,6 +8,7 @@ namespace network {
 		CTS_LOADING_COMPLETE,
 		CTS_USERNAME,
 		CTS_MESSAGE,
+		CTS_MISSING_CHART,
 	};
 
 	enum class ServerToClient : unsigned char {
@@ -17,5 +18,6 @@ namespace network {
 		STC_USERLIST,
 		STC_CLIENT_REMOTE_ID,
 		STC_MESSAGE,
+		STC_MISSING_CHART,
 	};
 }

@@ -82,17 +82,19 @@ namespace network {
 	struct Message { // Used from server to clients
 		std::string message;
 		Garnet::Address player;
+		bool systemMessage;
 
 		Message() {};
 
-		Message(std::string message, Garnet::Address player) {
+		Message(std::string message, Garnet::Address player, bool systemMessage) {
 			this->message = message;
 			this->player = player;
+			this->systemMessage = systemMessage;
 		}
 
 		template<class T>
 		void pack(T& pack) {
-			pack(message, player);
+			pack(message, player, systemMessage);
 		}
 	};
 }
