@@ -42,7 +42,7 @@ LRESULT __stdcall hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		imgui_lParam = MAKELPARAM(mouse_pos.x, mouse_pos.y);
 	}
 
-	if (gui::showMenu)
+	if (gui::showMenu || gui::graph::showGraph)
 	{
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, imgui_lParam);
 		return true;
@@ -124,7 +124,7 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 
 // Courtesy of https://github.com/tenaibms/LR2OOL/blob/master/src/hooks/cursor.cpp
 int __cdecl hkShowCursor(int enabled) {
-	if (gui::showMenu)
+	if (gui::showMenu || gui::graph::showGraph)
 		return overlay::dx9hook::oShowCursor(1);
 	return overlay::dx9hook::oShowCursor(enabled);
 }
