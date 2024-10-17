@@ -23,13 +23,23 @@ void HelpMarker(const char* desc)
     }
 }
 
+// Weird tricks where we regroup all consecutive user messages into a blob to reduce processing
 void gui::main_window::AddToLogWithUser(std::string s, Garnet::Address id) {
     auto username = client::state.peers[id].username;
-    lines.push_back(username + ": " + s);
+    LogMessage msg;
+    msg.msg = username + ": " + s + "\n";
+    msg.isSystemMsg = false;
+    if (lines.size() == 0 || lines[lines.size() - 1].isSystemMsg)
+        lines.push_back(msg);
+    else
+        lines[lines.size() - 1].msg.append(msg.msg);
 }
 
-void gui::main_window::AddToLog(std::string s) {
-    lines.push_back(s);
+void gui::main_window::AddToLog(std::string s) { // AddToLog is basically only called for system messages
+    LogMessage msg;
+    msg.msg = s;
+    msg.isSystemMsg = true;
+    lines.push_back(msg);
 }
 
 void gui::main_window::ProcessInput() {
@@ -40,6 +50,7 @@ void gui::main_window::ProcessInput() {
         SendMsg(s);
     }
     strncpy(s, "", IM_ARRAYSIZE(inputBuf));
+    scrollToBottom = true;
 }
 
 // Mostly taken from the Console and Simple layout ImGui demos
@@ -76,33 +87,33 @@ void gui::main_window::Render() {
                 if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar))
                 {
                     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
-                    ImGuiListClipper clipper;
-                    clipper.Begin(lines.size());
-                    while (clipper.Step()) {
-                        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
-                        {
-                            auto item = lines[i];
-                            ImVec4 color;
-                            bool has_color = false;
-                            if (item.rfind("[#] ", 0) == 0) {
-                                color = ImVec4(1.0f, 0.8f, 0.6f, 1.0f);
-                                has_color = true;
-                            }
-                            else if (item.rfind("[!] ", 0) == 0) {
-                                color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
-                                has_color = true;
-                            }
-
-                            if (has_color)
-                                ImGui::PushStyleColor(ImGuiCol_Text, color);
-                            ImGui::TextWrapped("%s\n", item.c_str());
-                            if (has_color)
-                                ImGui::PopStyleColor();
+                    ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + mainViewDim[overlay::lr2type].x - 20);
+                    for (const auto item : lines)
+                    {
+                        if (item.msg.empty())
+                            continue;
+                        ImVec4 color;
+                        bool has_color = false;
+                        if (item.msg.rfind("[#] ", 0) == 0) {
+                            color = ImVec4(1.0f, 0.8f, 0.6f, 1.0f);
+                            has_color = true;
                         }
-                    }
+                        else if (item.msg.rfind("[!] ", 0) == 0) {
+                            color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+                            has_color = true;
+                        }
 
-                    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+                        if (has_color)
+                            ImGui::PushStyleColor(ImGuiCol_Text, color);
+                        ImGui::TextUnformatted(item.msg.c_str(), item.msg.c_str() + item.msg.size());
+                        if (has_color)
+                            ImGui::PopStyleColor();
+                    }
+                    ImGui::PopTextWrapPos();
+
+                    if (scrollToBottom || (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
                         ImGui::SetScrollHereY(1.0f);
+                    scrollToBottom = false;
 
                     ImGui::PopStyleVar();
                 }

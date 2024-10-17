@@ -9,8 +9,15 @@
 
 namespace gui {
 	namespace main_window {
-		inline std::vector<std::string> lines;
+		struct LogMessage {
+			std::string msg;
+			bool isSystemMsg;
+		};
+
+		inline std::vector<LogMessage> lines;
 		inline char inputBuf[256];
+		inline bool scrollToBottom = false;
+
 		inline std::unordered_map<overlay::LR2_TYPE, ImVec2> userListDim = {
 			{overlay::LR2_TYPE::LR2_HD, ImVec2(150, 0)},
 			{overlay::LR2_TYPE::LR2_SD, ImVec2(60, 0)},
