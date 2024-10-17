@@ -135,6 +135,9 @@
     <ClInclude Include="include\ImGui\implot_internal.h">
       <Filter>Header Files\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\hooks\maxscore.h">
+      <Filter>Source Files\hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -220,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="include\ImGui\implot_items.cpp">
       <Filter>Header Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hooks\maxscore.cpp">
+      <Filter>Source Files\hooks</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

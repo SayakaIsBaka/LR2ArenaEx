@@ -8,6 +8,7 @@
 #include "random.h"
 #include "loadingdone.h"
 #include "returnmenu.h"
+#include "maxscore.h"
 
 bool hooks::SetupHooks() {
 	client::Init();
@@ -18,6 +19,7 @@ bool hooks::SetupHooks() {
 	hooks::random::Setup();
 	hooks::loading_done::Setup();
 	hooks::return_menu::Setup();
+	hooks::max_score::Setup();
 
 	return true;
 }
