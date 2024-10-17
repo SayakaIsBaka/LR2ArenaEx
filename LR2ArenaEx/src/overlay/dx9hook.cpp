@@ -45,7 +45,8 @@ LRESULT __stdcall hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	if (gui::showMenu || gui::graph::showGraph)
 	{
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, imgui_lParam);
-		return true;
+		if (gui::showMenu && gui::muteGameInputs)
+			return true;
 	}
 	return CallWindowProc(overlay::dx9hook::oWndProcHandler, hWnd, uMsg, wParam, lParam);
 }
