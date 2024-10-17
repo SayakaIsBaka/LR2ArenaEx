@@ -8,12 +8,15 @@
 #include <vector>
 #include <string>
 
-void gui::graph::Render() { // TODO: different color per bar, display more details about each player? set ticks to A / AA / AAA ?
+void gui::graph::Render() { // TODO: different color per bar, display more details about each player?
 	if (ImGui::Begin("Graph", &showGraph, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus))
 	{
         std::vector<unsigned int> values;
         std::vector<const char*> labels;
         std::vector<double> positions;
+
+        std::vector<double> rankPos;
+        const char* rankLabels[] = {"A", "AA", "AAA"};
 
         int i = 0;
 
@@ -25,9 +28,12 @@ void gui::graph::Render() { // TODO: different color per bar, display more detai
                 i++;
             }
 
+            rankPos = { std::ceil(hooks::max_score::maxScore * 0.666), std::ceil(hooks::max_score::maxScore * 0.777), std::ceil(hooks::max_score::maxScore * 0.888) };
+
             if (ImPlot::BeginPlot("##GraphPlot", ImVec2(-1, 400), ImPlotFlags_NoFrame | ImPlotFlags_NoInputs | ImPlotFlags_NoTitle | ImPlotFlags_NoLegend)) {
                 ImPlot::SetupAxes("Players", "Score", ImPlotAxisFlags_NoLabel, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoLabel);
                 ImPlot::SetupAxisTicks(ImAxis_X1, positions.data(), labels.size(), labels.data());
+                ImPlot::SetupAxisTicks(ImAxis_Y1, rankPos.data(), rankPos.size(), rankLabels);
                 ImPlot::SetupAxisLimits(ImAxis_Y1, 0, hooks::max_score::maxScore, ImPlotCond_Always);
                 ImPlot::PlotBars("", values.data(), values.size(), 0.67f, 0, 0);
                 ImPlot::EndPlot();

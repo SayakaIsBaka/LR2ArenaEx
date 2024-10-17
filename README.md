@@ -29,7 +29,7 @@ LR2ArenaEx uses the following libraries:
 
 ## TODO
 
-- Better graph (different colors, maybe A / AA / AAA as labels? etc)
+- Better graph (different colors, more details about players?)
 - Add database check on chart receive
 - Lobby management (change host, etc)
 - Do cleanup on exit (or at least do something *slightly* cleaner than right now)
