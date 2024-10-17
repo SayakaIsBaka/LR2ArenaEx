@@ -74,7 +74,10 @@ void client::UpdateSelectedSong(std::vector<unsigned char> data) {
 		hooks::random::current_random = selectedBms.random;
 		LeaveCriticalSection(&hooks::random::RandomCriticalSection);
 
-		// TODO: do check on DB if not host
+		if (!utils::CheckIfChartExists(selectedBms.hash)) {
+			gui::main_window::AddToLog("[!] You do not have this chart!");
+			// TODO: notify other players (and maybe add third state => turn ready into enum?)
+		}
 	}
 }
 

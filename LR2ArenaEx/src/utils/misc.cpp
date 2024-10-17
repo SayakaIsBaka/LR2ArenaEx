@@ -1,3 +1,6 @@
+#include <filesystem>
+#include <sqlite_modern_cpp.h>
+
 #include "misc.h"
 
 unsigned int utils::CalculateExScore(network::Score score) {
@@ -34,4 +37,30 @@ std::string utils::SJISToUTF8(const std::string& sjis) {
 		delete pUTF16;
 	}
 	return utf8_string;
+}
+
+std::string utils::GetDatabasePath() {
+	WCHAR dllPath[MAX_PATH];
+	GetModuleFileNameW(NULL, dllPath, MAX_PATH);
+	std::filesystem::path wPath(dllPath);
+	wPath.remove_filename();
+	wPath = wPath / "LR2files" / "Database" / "song.db";
+	return wPath.u8string();
+}
+
+bool utils::CheckIfChartExists(std::string hash) {
+	auto dbPath = GetDatabasePath();
+
+	sqlite::sqlite_config config;
+	config.flags = sqlite::OpenFlags::READONLY;
+	try {
+		sqlite::database db(dbPath);
+		int count = 0;
+		db << "select count(*) from song where hash = ?" << hash >> count;
+		return count > 0;
+	}
+	catch (const std::exception& e) {
+		std::cout << "[!] Error: " << e.what() << std::endl;
+		return false;
+	}
 }

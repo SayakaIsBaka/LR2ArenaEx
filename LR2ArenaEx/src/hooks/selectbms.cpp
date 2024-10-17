@@ -3,8 +3,6 @@
 #include <utils/mem.h>
 #include <client/client.h>
 #include <network/enums.h>
-#include <network/structs.h>
-#include <filesystem>
 #include <sqlite_modern_cpp.h>
 #include <utils/misc.h>
 #include <gui/graph.h>
@@ -24,18 +22,8 @@ void SendWithRandom(network::SelectedBmsMessage msg) {
 	client::Send(network::ClientToServer::CTS_SELECTED_BMS, msgPack);
 }
 
-std::string GetDatabasePath()
-{
-	WCHAR dllPath[MAX_PATH];
-	GetModuleFileNameW(NULL, dllPath, MAX_PATH);
-	std::filesystem::path wPath(dllPath);
-	wPath.remove_filename();
-	wPath = wPath / "LR2files" / "Database" / "song.db";
-	return wPath.u8string();
-}
-
 network::SelectedBmsMessage GetBmsInfo(std::string bmsPath) {
-	std::string dbPath = GetDatabasePath();
+	std::string dbPath = utils::GetDatabasePath();
 
 	sqlite::sqlite_config config;
 	config.flags = sqlite::OpenFlags::READONLY;
@@ -47,8 +35,6 @@ network::SelectedBmsMessage GetBmsInfo(std::string bmsPath) {
 		std::cout << "[+] Title: " << title << " " << subtitle << std::endl;
 		std::cout << "[+] Artist: " << artist << " " << subartist << std::endl;
 
-		std::string bmsInfo;
-		std::string delimiter = "\xff"; // use as a string delimiter (guaranteed to not be used in UTF-8)
 		network::SelectedBmsMessage msg;
 		msg.hash = hash;
 		msg.title = title + " " + subtitle;
