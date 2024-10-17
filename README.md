@@ -29,7 +29,6 @@ LR2ArenaEx uses the following libraries:
 
 ## TODO
 
-- Better graph (different colors)
 - Add database check on chart receive
 - Lobby management (change host, etc)
 - Do cleanup on exit (or at least do something *slightly* cleaner than right now)
