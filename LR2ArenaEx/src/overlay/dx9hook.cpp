@@ -83,7 +83,8 @@ void InitImGui(IDirect3DDevice9* pDevice) {
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	SetupFonts(io, 16);
+	int fontSize = overlay::lr2type == overlay::LR2_TYPE::LR2_HD ? 16 : 12;
+	SetupFonts(io, fontSize);
 
 	bool win32_init = ImGui_ImplWin32_Init(window);
 	bool dx9_init = ImGui_ImplDX9_Init(pDevice);

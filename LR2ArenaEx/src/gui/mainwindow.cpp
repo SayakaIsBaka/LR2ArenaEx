@@ -1,5 +1,4 @@
-﻿#include <ImGui/imgui.h>
-#include <client/client.h>
+﻿#include <client/client.h>
 #include <hooks/random.h>
 #include <cstdio>
 #include <utils/misc.h>
@@ -47,7 +46,7 @@ void gui::main_window::ProcessInput() {
 void gui::main_window::Render() {
     ImGui::SeparatorText("Lobby");
     {
-        ImGui::BeginChild("Users", ImVec2(150, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
+        ImGui::BeginChild("Users", userListDim[overlay::lr2type], ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
         for (const auto& [key, value] : client::state.peers) {
             if (key == client::state.host) {
                 ImGui::Selectable((ICON_FA_CROWN + std::string(" ") + value.username).c_str());
@@ -60,11 +59,13 @@ void gui::main_window::Render() {
     ImGui::SameLine();
     {
         ImGui::BeginGroup();
-        ImGui::BeginChild("Main view", ImVec2(300, 400), ImGuiChildFlags_AutoResizeX);
+        ImGui::BeginChild("Main view", mainViewDim[overlay::lr2type], ImGuiChildFlags_AutoResizeX);
 
+        ImGui::PushItemWidth(mainViewDim[overlay::lr2type].x - (ImGui::GetFontSize() * 3));
         ImGui::InputText("Hash", (char*)client::state.selectedSongRemote.hash.c_str(), client::state.selectedSongRemote.hash.size(), ImGuiInputTextFlags_ReadOnly);
         ImGui::InputText("Title", (char*)client::state.selectedSongRemote.title.c_str(), client::state.selectedSongRemote.title.size(), ImGuiInputTextFlags_ReadOnly);
         ImGui::InputText("Artist", (char*)client::state.selectedSongRemote.artist.c_str(), client::state.selectedSongRemote.artist.size(), ImGuiInputTextFlags_ReadOnly);
+        ImGui::PopItemWidth();
 
         ImGui::Separator();
         if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
@@ -109,10 +110,12 @@ void gui::main_window::Render() {
                 ImGui::Separator();
 
                 bool reclaim_focus = false;
+                ImGui::PushItemWidth(mainViewDim[overlay::lr2type].x - (ImGui::GetFontSize() * 3));
                 if (ImGui::InputText("##Input", inputBuf, IM_ARRAYSIZE(inputBuf), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll)) {
                     ProcessInput();
                     reclaim_focus = true;
                 }
+                ImGui::PopItemWidth();
 
                 ImGui::SetItemDefaultFocus();
                 if (reclaim_focus)

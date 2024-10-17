@@ -2,12 +2,24 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include <Garnet.h>
+#include <overlay/overlay.h>
+#include <ImGui/imgui.h>
 
 namespace gui {
 	namespace main_window {
 		inline std::vector<std::string> lines;
 		inline char inputBuf[256];
+		inline std::unordered_map<overlay::LR2_TYPE, ImVec2> userListDim = {
+			{overlay::LR2_TYPE::LR2_HD, ImVec2(150, 0)},
+			{overlay::LR2_TYPE::LR2_SD, ImVec2(90, 0)},
+		};
+
+		inline std::unordered_map<overlay::LR2_TYPE, ImVec2> mainViewDim = {
+			{overlay::LR2_TYPE::LR2_HD, ImVec2(300, 400)},
+			{overlay::LR2_TYPE::LR2_SD, ImVec2(200, 200)},
+		};
 
 		void Render();
 		void ProcessInput();

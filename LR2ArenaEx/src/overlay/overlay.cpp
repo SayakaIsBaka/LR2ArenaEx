@@ -22,6 +22,7 @@ DWORD WINAPI overlay::Setup(HMODULE hModule)
 	if ((moduleBase = (uintptr_t)GetModuleHandle("LRHbody.exe")) == 0)
 	{
 		moduleBase = (uintptr_t)GetModuleHandle("LR2body.exe");
+		lr2type = LR2_TYPE::LR2_SD;
 	}
 
 	dx9hook::HookDX9();
