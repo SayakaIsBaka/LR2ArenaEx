@@ -1,13 +1,19 @@
 #include <utils/mem.h>
 #include <client/client.h>
 #include <network/enums.h>
+#include <iostream>
 
 #include "returnmenu.h"
+#include "maxscore.h"
 
 void hkReturnMenu() {
-	fprintf(stdout, "returning to menu\n");
-	hooks::return_menu::is_returning_to_menu = true;
-	client::Send(network::ClientToServer::CTS_CHART_CANCELLED, ""); // send escaped
+	std::cout << "[+] Returning to menu" << std::endl;
+	auto score = client::state.peers[client::state.remoteId].score;
+	// Do not send cancelled if pressing escape at the end of the chart (to show results faster)
+	if ((score.p_great + score.great + score.good + score.bad + score.poor) * 2 < hooks::max_score::maxScore && client::state.peers[client::state.remoteId].ready) {
+		hooks::return_menu::is_returning_to_menu = true;
+		client::Send(network::ClientToServer::CTS_CHART_CANCELLED, ""); // send escaped
+	}
 }
 
 DWORD jmp_lr2body_419863 = 0x419863;
