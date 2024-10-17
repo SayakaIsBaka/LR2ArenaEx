@@ -8,10 +8,10 @@
 #include <vector>
 #include <string>
 
-void gui::graph::Render() { // TODO: different color per bar
+void gui::graph::Render() {
 	if (ImGui::Begin("Graph", &showGraph, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus))
 	{
-        std::vector<unsigned int> values;
+        std::vector<unsigned int> values; // It's basically a diagonal matrix because I'm abusing PlotBarGroups to show different colors
         std::vector<const char*> labels;
         std::vector<double> positions;
 
@@ -22,7 +22,11 @@ void gui::graph::Render() { // TODO: different color per bar
 
         if (client::state.peers.size() > 0) {
             for (const auto& [key, value] : client::state.peers) {
+                for (int j = 0; j < i; j++)
+                    values.push_back(0);
                 values.push_back(utils::CalculateExScore(value.score));
+                for (int j = i; j < client::state.peers.size(); j++)
+                    values.push_back(0);
                 labels.push_back(value.username.c_str());
                 positions.push_back(i);
                 i++;
@@ -37,7 +41,7 @@ void gui::graph::Render() { // TODO: different color per bar
                     ImPlot::SetupAxisTicks(ImAxis_X1, positions.data(), labels.size(), labels.data());
                     ImPlot::SetupAxisTicks(ImAxis_Y1, rankPos.data(), rankPos.size(), rankLabels);
                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, hooks::max_score::maxScore, ImPlotCond_Always);
-                    ImPlot::PlotBars("", values.data(), values.size(), 0.67f, 0, 0);
+                    ImPlot::PlotBarGroups(labels.data(), values.data(), labels.size(), labels.size(), 0.67f, 0, ImPlotBarGroupsFlags_Stacked);
                     ImPlot::EndPlot();
                 }
                 ImGui::EndChild();
