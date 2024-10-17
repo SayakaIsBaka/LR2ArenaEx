@@ -12,16 +12,17 @@ void gui::Render() {
         {
             if (ImGui::BeginTabItem("Client"))
             {
-                ImGui::SeparatorText("Connect");
-                ImGui::InputTextWithHint("##Username", "Username", client::username, IM_ARRAYSIZE(client::username));
-                ImGui::InputTextWithHint("##Server", "Server", client::host, IM_ARRAYSIZE(client::host));
-                ImGui::BeginDisabled(strlen(client::host) == 0 || strlen(client::username) == 0);
-                {
-                    if (ImGui::Button("Connect")) {
-                        client::Connect(client::host, client::username);
-                        main_window::lines.clear();
+                if (ImGui::CollapsingHeader("Connect", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    ImGui::InputTextWithHint("##Username", "Username", client::username, IM_ARRAYSIZE(client::username));
+                    ImGui::InputTextWithHint("##Server", "Server", client::host, IM_ARRAYSIZE(client::host));
+                    ImGui::BeginDisabled(strlen(client::host) == 0 || strlen(client::username) == 0);
+                    {
+                        if (ImGui::Button("Connect##Button")) {
+                            client::Connect(client::host, client::username);
+                            main_window::lines.clear();
+                        }
+                        ImGui::EndDisabled();
                     }
-                    ImGui::EndDisabled();
                 }
                 ImGui::EndTabItem();
                 if (client::connected) {
