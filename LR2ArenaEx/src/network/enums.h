@@ -10,6 +10,7 @@ namespace network {
 		CTS_MESSAGE,
 		CTS_MISSING_CHART,
 		CTS_SET_HOST,
+		CTS_KICK_USER,
 	};
 
 	enum class ServerToClient : unsigned char {

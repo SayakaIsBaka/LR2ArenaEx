@@ -162,7 +162,8 @@ DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
 			break;
 		auto receivedBytes = client.receive(&data[0], MAX_TCP);
 		if (receivedBytes <= 0) { // Probably disconnected or something
-			connected = false;
+			Destroy();
+			Init();
 			break;
 		}
 		data.resize(receivedBytes);

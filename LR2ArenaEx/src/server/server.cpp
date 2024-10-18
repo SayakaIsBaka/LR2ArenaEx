@@ -126,6 +126,15 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
             std::cout << "[!][server] Sender is not the host!" << std::endl;
         }
         break;
+    case network::ClientToServer::CTS_KICK_USER:
+        std::cout << "[server] Received kick user" << std::endl;
+        if (state.host == clientAddr) {
+            server->getClientAcceptedSocket(msgpack::unpack<Garnet::Address>(data)).close();
+        }
+        else {
+            std::cout << "[!][server] Sender is not the host!" << std::endl;
+        }
+        break;
 	default:
         std::cout << "[server] Unknown message received" << std::endl;
 		break;
@@ -160,13 +169,15 @@ void server::ClientDisconnected(Garnet::Address clientAddr)
         if (clientAddr == state.host && state.peers.size() > 0)
             state.host = state.peers.begin()->first; // Change host to first peer in the list
 
-        auto res = msgpack::pack(network::PeerList(state.peers, state.host));
-        res.insert(res.begin(), (unsigned char)network::ServerToClient::STC_USERLIST);
-
-        for (const Garnet::Address& addr : server->getClientAddresses())
-        {
-            if (clientAddr == addr) continue;
-            server->send(&res[0], res.size(), addr);
+        if (state.peers.size() > 0) {
+            auto res = msgpack::pack(network::PeerList(state.peers, state.host));
+            res.insert(res.begin(), (unsigned char)network::ServerToClient::STC_USERLIST);
+        
+            for (const Garnet::Address& addr : server->getClientAddresses())
+            {
+                if (clientAddr == addr) continue;
+                server->send(&res[0], res.size(), addr);
+            }
         }
     }
 }

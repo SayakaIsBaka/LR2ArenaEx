@@ -73,7 +73,8 @@ void gui::main_window::Render() {
                     client::Send(network::ClientToServer::CTS_SET_HOST, msgpack::pack(userId));
                 }
                 if (ImGui::MenuItem("Kick")) {
-
+                    Garnet::Address userId = key;
+                    client::Send(network::ClientToServer::CTS_KICK_USER, msgpack::pack(userId));
                 }
                 ImGui::EndPopup();
             }

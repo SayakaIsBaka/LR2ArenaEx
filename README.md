@@ -29,5 +29,4 @@ LR2ArenaEx uses the following libraries:
 
 ## TODO
 
-- Lobby management (change host, etc)
 - Do cleanup on exit (or at least do something *slightly* cleaner than right now)
