@@ -23,6 +23,15 @@ void gui::Render() {
                         }
                         ImGui::EndDisabled();
                     }
+                    ImGui::SameLine();
+                    ImGui::BeginDisabled(!client::connected);
+                    {
+                        if (ImGui::Button("Disconnect")) {
+                            client::Destroy();
+                            client::Init();
+                        }
+                        ImGui::EndDisabled();
+                    }
                 }
                 ImGui::EndTabItem();
                 if (client::connected) {
