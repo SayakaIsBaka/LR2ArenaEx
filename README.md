@@ -27,6 +27,7 @@ LR2ArenaEx uses the following libraries:
 - All people credited in the original [LR2Arena](https://github.com/SayakaIsBaka/LR2Arena) project
 - [MatVeiQaaa](https://github.com/MatVeiQaaa) for providing the base for the DirectX 9 hook
 - [tenaibms](https://github.com/tenaibms) for their [LR2OOL](https://github.com/tenaibms/LR2OOL) project which gave me a few leads on how to fix some issues (especially regarding cursor / mouse input management)
+- AYhaz and Shalink for helping with testing
 
 ## TODO
 
