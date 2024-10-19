@@ -3,7 +3,7 @@
 ## Build
 
 Requirements:
-- Microsoft DirectX SDK **(August 2006 version)**: https://archive.org/details/dxsdk_aug2006 (might work with older versions but it has been untested)
+- Microsoft DirectX SDK **(August 2007 version)**: https://archive.org/details/dxsdk_aug2007 (might work with older versions but it has been untested)
 - Visual Studio 2019 or newer
 
 Paths for the DirectX SDK have been hardcoded in the project settings; if you chose the default settings it should work fine but you might need to edit them depending on your setup.
