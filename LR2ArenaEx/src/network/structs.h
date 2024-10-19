@@ -29,7 +29,7 @@ namespace network {
 
 		template<class T>
 		void pack(T& pack) {
-			pack(username, selectedHash, ready);
+			pack(username, selectedHash, ready, score);
 		}
 	};
 

@@ -95,7 +95,8 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
 		break;
 	case network::ClientToServer::CTS_CHART_CANCELLED:
         std::cout << "[server] Received chart cancelled" << std::endl;
-        ResetState(clientAddr);
+        server::state.peers[clientAddr].ready = false;
+        server::state.peers[clientAddr].selectedHash = "";
         SendToEveryone(network::ServerToClient::STC_PLAYERS_READY_UPDATE, msgpack::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
 		break;
 	case network::ClientToServer::CTS_LOADING_COMPLETE:
