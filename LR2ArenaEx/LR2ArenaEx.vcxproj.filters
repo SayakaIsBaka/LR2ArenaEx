@@ -138,6 +138,9 @@
     <ClInclude Include="src\hooks\maxscore.h">
       <Filter>Source Files\hooks</Filter>
     </ClInclude>
+    <ClInclude Include="include\ImGui\ImGuiNotify.hpp">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">

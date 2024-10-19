@@ -1,7 +1,8 @@
-#include <ImGui/imgui.h>
+﻿#include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_win32.h>
 #include <ImGui/imgui_impl_dx9.h>
 #include <ImGui/implot.h>
+#include <ImGui/ImGuiNotify.hpp>
 #include <utils/mem.h>
 #include <gui/gui.h>
 #include <gui/graph.h>
@@ -57,7 +58,7 @@ void SetupFonts(ImGuiIO& io, int fontSize) {
 
 	ImVector<ImWchar> ranges;
 	ImFontGlyphRangesBuilder builder;
-	builder.AddText(u8"��������");
+	builder.AddText(u8"←→↑↓");
 	builder.AddRanges(io.Fonts->GetGlyphRangesJapanese());
 	builder.BuildRanges(&ranges);
 	io.Fonts->AddFontFromMemoryCompressedTTF(noto_compressed_data, noto_compressed_size, mainFontSize, 0, ranges.Data);
@@ -111,6 +112,23 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 		if (gui::showMenu)
 		{
 			gui::Render();
+		}
+		else {
+			// Notifications style setup
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f); // Disable round borders
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f); // Disable borders
+
+			// Notifications color setup
+			ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.10f, 0.10f, 0.10f, 1.00f)); // Background color
+
+			// Main rendering function
+			ImGui::RenderNotifications();
+
+			//——————————————————————————————— WARNING ———————————————————————————————
+			// Argument MUST match the amount of ImGui::PushStyleVar() calls 
+			ImGui::PopStyleVar(2);
+			// Argument MUST match the amount of ImGui::PushStyleColor() calls 
+			ImGui::PopStyleColor(1);
 		}
 		if (gui::graph::showGraph)
 		{

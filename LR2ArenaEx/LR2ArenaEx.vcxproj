@@ -212,6 +212,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\framework.h" />
+    <ClInclude Include="include\ImGui\ImGuiNotify.hpp" />
     <ClInclude Include="include\ImGui\implot.h" />
     <ClInclude Include="include\ImGui\implot_internal.h" />
     <ClInclude Include="src\client\client.h" />
