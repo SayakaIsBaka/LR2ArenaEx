@@ -17,6 +17,7 @@ namespace server {
 	inline std::shared_ptr<Garnet::ServerTCP> server;
 	inline State state;
 	inline bool started = false;
+	inline bool autoRotateHost = false;
 
 	bool Start();
 	bool Stop();

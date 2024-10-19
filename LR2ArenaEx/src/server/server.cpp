@@ -61,6 +61,35 @@ void SetHost(std::vector<unsigned char> data) {
     server::state.host = newHost;
 }
 
+bool IsEveryoneReady() {
+    bool allReady = true;
+    std::string hash = server::state.peers.begin()->second.selectedHash; // Take first hash as reference, all players must have the same chart selected anyways so no difference
+    for (const auto& [key, value] : server::state.peers) {
+        allReady = server::state.peers[key].ready && server::state.peers[key].selectedHash == hash;
+        if (!allReady) break;
+    }
+    return allReady;
+}
+
+void AutoRotateHost() {
+    auto currentHost = server::state.host;
+    bool isNext = false;
+    Garnet::Address first;
+    for (const auto [key, value] : server::state.peers) {
+        if (first.host.empty())
+            first = key;
+        if (isNext) {
+            isNext = false;
+            server::state.host = key;
+            break;
+        }
+        if (key == currentHost)
+            isNext = true;
+    }
+    if (isNext)
+        server::state.host = first;
+}
+
 void server::SendToEveryone(network::ServerToClient id, std::vector<unsigned char> data, Garnet::Address origSenderAddr, bool includeOrigSender) {
     data.insert(data.begin(), static_cast<unsigned char>(id));
     for (const Garnet::Address& addr : server->getClientAddresses())
@@ -102,6 +131,8 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
 	case network::ClientToServer::CTS_LOADING_COMPLETE:
         std::cout << "[server] Received loading complete from " << clientAddr.host << std::endl;
         server::state.peers[clientAddr].ready = true;
+        if (autoRotateHost && IsEveryoneReady())
+            AutoRotateHost();
         SendToEveryone(network::ServerToClient::STC_PLAYERS_READY_UPDATE, msgpack::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
 		break;
     case network::ClientToServer::CTS_USERNAME:

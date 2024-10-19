@@ -54,6 +54,7 @@ void gui::Render() {
                         server::Stop();
                     ImGui::EndDisabled();
                 }
+                ImGui::Checkbox("Auto-rotate host after each song", &server::autoRotateHost);
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
