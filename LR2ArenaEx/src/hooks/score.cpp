@@ -24,29 +24,31 @@ DWORD WINAPI ScoreConsumer(LPVOID lpParameter)
 }
 
 void hkScore(unsigned char* memory) {
-	memory += 0x979A4;
-	int* ptr = (int*)memory;
+	if (client::connected) {
+		memory += 0x979A4;
+		int* ptr = (int*)memory;
 
-	int max_combo = ptr[-3];
-	int poor = ptr[1];
-	int bad = ptr[2];
-	int good = ptr[3];
-	int great = ptr[4];
-	int p_great = ptr[5];
-	int score = ptr[45];
-	//int score1 = ptr[46];
-	//fprintf(stdout, "max_combo:%d\n", max_combo);
+		int max_combo = ptr[-3];
+		int poor = ptr[1];
+		int bad = ptr[2];
+		int good = ptr[3];
+		int great = ptr[4];
+		int p_great = ptr[5];
+		int score = ptr[45];
+		//int score1 = ptr[46];
+		//fprintf(stdout, "max_combo:%d\n", max_combo);
 
-	network::Score score_event{
-		poor,
-		bad,
-		good,
-		great,
-		p_great,
-		max_combo,
-		score
-	};
-	hooks::score::score_queue.enqueue(score_event);
+		network::Score score_event{
+			poor,
+			bad,
+			good,
+			great,
+			p_great,
+			max_combo,
+			score
+		};
+		hooks::score::score_queue.enqueue(score_event);
+	}
 }
 
 DWORD jmp_lr2body_406226 = 0x406226;

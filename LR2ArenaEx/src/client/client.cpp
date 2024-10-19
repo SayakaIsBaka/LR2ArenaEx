@@ -199,6 +199,7 @@ bool client::Connect(const char* host, const char* username) {
 	{
 		std::cout << "[+] Connected to " << host << std::endl;
 		connected = true;
+		hooks::pacemaker::Setup(); // Hook pacemaker
 
 		DWORD clientReceiverId;
 		clientReceiverHandle = CreateThread(NULL, 0, ListenLoop, NULL, 0, &clientReceiverId);
@@ -235,5 +236,6 @@ bool client::Destroy() {
 	Disconnect();
 	connected = false;
 	state = ClientState(); // Reset state
+	hooks::pacemaker::Destroy(); // Restore original bytes for pacemaker
 	return true;
 }

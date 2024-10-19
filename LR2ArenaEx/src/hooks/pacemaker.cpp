@@ -59,3 +59,9 @@ void hooks::pacemaker::Setup() {
 	mem::HookFn((char*)0x4A9F01, (char*)trampPacemakerDisplay, 6);
 	mem::WriteMemory((LPVOID)0x4A9F7B, (char*)"\x90\x90\x90\x90\x90\x90", 6); // nop pacemaker display update at the end
 }
+
+void hooks::pacemaker::Destroy() { // Restore original bytes
+	mem::WriteMemory((LPVOID)0x4A8802, (char*)"\x89\x41\x4C\xB8\x01\x00\x00\x00", 8); // mov[ecx + 4Ch], eax; mov eax, 1
+	mem::WriteMemory((LPVOID)0x4A9F01, (char*)"\x89\x86\xD8\x00\x00\x00", 6); // mov [esi+0D8h], eax
+	mem::WriteMemory((LPVOID)0x4A9F7B, (char*)"\x89\x96\xD8\x00\x00\x00", 6); // mov [esi+0D8h], edx
+}

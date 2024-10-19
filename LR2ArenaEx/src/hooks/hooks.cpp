@@ -10,12 +10,11 @@
 #include "returnmenu.h"
 #include "maxscore.h"
 
-bool hooks::SetupHooks() {
+bool hooks::SetupHooks() { // Pacemaker hook is missing from here as we only hook when connecting
 	client::Init();
 
 	hooks::select_bms::Setup();
 	hooks::score::Setup();
-	hooks::pacemaker::Setup();
 	hooks::random::Setup();
 	hooks::loading_done::Setup();
 	hooks::return_menu::Setup();

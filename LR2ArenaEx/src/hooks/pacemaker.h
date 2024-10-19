@@ -7,5 +7,6 @@ namespace hooks {
 		inline unsigned int displayed_score = 0;
 
 		void Setup();
+		void Destroy();
 	}
 }
