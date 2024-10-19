@@ -19,7 +19,7 @@ void gui::graph::Render() {
 
         int i = 0;
 
-        if (client::state.peers.size() > 0) {
+        if (client::connected && client::state.peers.size() > 0) {
             for (const auto& [key, value] : client::state.peers) {
                 for (int j = 0; j < i; j++)
                     values.push_back(0);
