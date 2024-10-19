@@ -234,5 +234,6 @@ void client::Disconnect() {
 bool client::Destroy() {
 	Disconnect();
 	connected = false;
+	state = ClientState(); // Reset state
 	return true;
 }

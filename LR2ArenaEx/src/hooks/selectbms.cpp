@@ -48,29 +48,31 @@ network::SelectedBmsMessage GetBmsInfo(std::string bmsPath) {
 }
 
 void hkSelectBms(const char** buffer, unsigned char* memory) {
-	unsigned int selected_option = (unsigned int)*(memory + 0x10);
-	std::string selectedBms = std::string(*buffer);
-	if (!selectedBms.rfind("LR2files\\Config\\sample_", 0)) {
-		fprintf(stdout, "demo BMS loaded, skip\n");
-		return;
+	if (client::connected) {
+		unsigned int selected_option = (unsigned int)*(memory + 0x10);
+		std::string selectedBms = std::string(*buffer);
+		if (!selectedBms.rfind("LR2files\\Config\\sample_", 0)) {
+			fprintf(stdout, "demo BMS loaded, skip\n");
+			return;
+		}
+		hooks::pacemaker::displayed_score = 0; // it's most likely when you start a song so reset score
+
+		std::string selectedBmsUtf8 = utils::SJISToUTF8(selectedBms);
+
+		std::cout << "[+] Selected BMS: " << selectedBmsUtf8 << std::endl;
+		std::cout << "[+] Selected option: " << selected_option << std::endl;
+
+		if (!hooks::random::received_random) {
+			hooks::random::UpdateRandom();
+		}
+
+		auto bmsInfo = GetBmsInfo(selectedBmsUtf8);
+		if (bmsInfo.hash.length() > 0)
+			SendWithRandom(bmsInfo);
+
+		gui::graph::showGraph = true; // Show graph on song select
+		hooks::return_menu::is_returning_to_menu = false;
 	}
-	hooks::pacemaker::displayed_score = 0; // it's most likely when you start a song so reset score
-
-	std::string selectedBmsUtf8 = utils::SJISToUTF8(selectedBms);
-
-	std::cout << "[+] Selected BMS: " << selectedBmsUtf8 << std::endl;
-	std::cout << "[+] Selected option: " << selected_option << std::endl;
-
-	if (!hooks::random::received_random) {
-		hooks::random::UpdateRandom();
-	}
-
-	auto bmsInfo = GetBmsInfo(selectedBmsUtf8);
-	if (bmsInfo.hash.length() > 0)
-		SendWithRandom(bmsInfo);
-
-	gui::graph::showGraph = true; // Show graph on song select
-	hooks::return_menu::is_returning_to_menu = false;
 }
 
 DWORD fsopen_addr = 0x715DA0;

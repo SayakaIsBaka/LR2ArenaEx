@@ -7,19 +7,21 @@
 #include "returnmenu.h"
 
 void hkLoadingDone() {
-	if (!hooks::return_menu::is_returning_to_menu) {
-		client::Send(network::ClientToServer::CTS_LOADING_COMPLETE, ""); // player ready, send packet
-		fprintf(stdout, "waiting for all players\n");
-		while (!hooks::loading_done::isEveryoneReady)
-		{
-			SleepEx(50, false);
+	if (client::connected) {
+		if (!hooks::return_menu::is_returning_to_menu) {
+			client::Send(network::ClientToServer::CTS_LOADING_COMPLETE, ""); // player ready, send packet
+			fprintf(stdout, "waiting for all players\n");
+			while (!hooks::loading_done::isEveryoneReady)
+			{
+				SleepEx(50, false);
+			}
+			hooks::loading_done::isEveryoneReady = false;
+			hooks::random::received_random = false;
+			fprintf(stdout, "lock released\n");
 		}
-		hooks::loading_done::isEveryoneReady = false;
-		hooks::random::received_random = false;
-		fprintf(stdout, "lock released\n");
-	}
-	else {
-		hooks::return_menu::is_returning_to_menu = false; // might not be needed because of reset in select_bms but keeping it just in case
+		else {
+			hooks::return_menu::is_returning_to_menu = false; // might not be needed because of reset in select_bms but keeping it just in case
+		}
 	}
 }
 
