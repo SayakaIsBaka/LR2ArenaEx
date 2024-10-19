@@ -13,6 +13,7 @@ namespace client {
 		std::string hash;
 		std::string title;
 		std::string artist;
+		std::string path;
 	};
 
 	struct ClientState {

@@ -7,5 +7,5 @@ namespace utils {
 	void StrTrim(char* s);
 	std::string SJISToUTF8(const std::string& sjis);
 	std::string GetDatabasePath();
-	bool CheckIfChartExists(std::string hash);
+	std::string GetChartPath(std::string hash);
 }

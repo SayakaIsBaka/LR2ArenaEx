@@ -7,6 +7,7 @@
 #include <network/structs.h>
 #include <utils/misc.h>
 #include <gui/mainwindow.h>
+#include <filesystem>
 
 #include "client.h"
 
@@ -73,11 +74,18 @@ void client::UpdateSelectedSong(std::vector<unsigned char> data) {
 		EnterCriticalSection(&hooks::random::RandomCriticalSection);
 		hooks::random::current_random = selectedBms.random;
 		LeaveCriticalSection(&hooks::random::RandomCriticalSection);
+	}
 
-		if (!utils::CheckIfChartExists(selectedBms.hash)) {
-			gui::main_window::AddToLog("[!] You do not have this chart!");
-			Send(network::ClientToServer::CTS_MISSING_CHART, "");
-		}
+	std::string path = utils::GetChartPath(selectedBms.hash);
+	if (path.empty()) {
+		state.selectedSongRemote.path = "";
+		gui::main_window::AddToLog("[!] You do not have this chart!");
+		Send(network::ClientToServer::CTS_MISSING_CHART, "");
+	}
+	else {
+		auto p = std::filesystem::u8path(path);
+		std::filesystem::path relativePath = p.parent_path().filename() / p.filename();
+		state.selectedSongRemote.path = relativePath.u8string();
 	}
 }
 

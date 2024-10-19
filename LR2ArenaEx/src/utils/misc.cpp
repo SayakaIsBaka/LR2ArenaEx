@@ -48,19 +48,22 @@ std::string utils::GetDatabasePath() {
 	return wPath.u8string();
 }
 
-bool utils::CheckIfChartExists(std::string hash) {
+std::string utils::GetChartPath(std::string hash) {
 	auto dbPath = GetDatabasePath();
 
 	sqlite::sqlite_config config;
 	config.flags = sqlite::OpenFlags::READONLY;
 	try {
 		sqlite::database db(dbPath);
-		int count = 0;
-		db << "select count(*) from song where hash = ?" << hash >> count;
-		return count > 0;
+		std::string path;
+		db << "select path from song where hash = ? limit 1" << hash >> path;
+		return path;
+	}
+	catch (const sqlite::errors::no_rows& e) { // Chart not found
+		return "";
 	}
 	catch (const std::exception& e) {
 		std::cout << "[!] Error: " << e.what() << std::endl;
-		return false;
+		return "";
 	}
 }

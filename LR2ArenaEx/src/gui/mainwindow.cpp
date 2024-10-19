@@ -103,9 +103,9 @@ void gui::main_window::Render() {
         ImGui::BeginChild("Main view", mainViewDim[overlay::lr2type], ImGuiChildFlags_AutoResizeX);
 
         ImGui::PushItemWidth(mainViewDim[overlay::lr2type].x - (ImGui::GetFontSize() * 3));
-        ImGui::InputText("Hash", (char*)client::state.selectedSongRemote.hash.c_str(), client::state.selectedSongRemote.hash.size(), ImGuiInputTextFlags_ReadOnly);
         ImGui::InputText("Title", (char*)client::state.selectedSongRemote.title.c_str(), client::state.selectedSongRemote.title.size(), ImGuiInputTextFlags_ReadOnly);
         ImGui::InputText("Artist", (char*)client::state.selectedSongRemote.artist.c_str(), client::state.selectedSongRemote.artist.size(), ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputText("Path", (char*)client::state.selectedSongRemote.path.c_str(), client::state.selectedSongRemote.path.size(), ImGuiInputTextFlags_ReadOnly);
         ImGui::PopItemWidth();
 
         ImGui::Separator();
