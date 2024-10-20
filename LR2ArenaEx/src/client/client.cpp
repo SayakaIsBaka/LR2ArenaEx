@@ -8,6 +8,7 @@
 #include <utils/misc.h>
 #include <gui/mainwindow.h>
 #include <filesystem>
+#include <ImGui/ImGuiNotify.hpp>
 
 #include "client.h"
 
@@ -209,11 +210,15 @@ bool client::Connect(const char* host, const char* username) {
 			return false;
 		}
 		Send(network::ClientToServer::CTS_USERNAME, std::string(username));
+
+		ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "Successfully connected to %s", host });
+
 		return true;
 	}
 	else
 	{
 		std::cout << "[!] Connection to " << host << " failed" << std::endl;
+		ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "Connection to %s failed", host });
 		return false;
 	}
 }
@@ -234,8 +239,11 @@ void client::Disconnect() {
 
 bool client::Destroy() {
 	Disconnect();
-	connected = false;
-	state = ClientState(); // Reset state
-	hooks::pacemaker::Destroy(); // Restore original bytes for pacemaker
+	if (connected == true) {
+		connected = false;
+		state = ClientState(); // Reset state
+		hooks::pacemaker::Destroy(); // Restore original bytes for pacemaker
+		ImGui::InsertNotification({ ImGuiToastType::Info, 3000, "Disconnected from the server" });
+	}
 	return true;
 }

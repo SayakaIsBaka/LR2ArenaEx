@@ -36,10 +36,12 @@ void gui::main_window::AddToLogWithUser(std::string s, Garnet::Address id) {
     else
         lines[lines.size() - 1].msg.append(msg.msg);
 
-    ImGuiToast toast(ImGuiToastType::Info, 3000);
-    toast.setTitle("%s", username.c_str());
-    toast.setContent("%s", s.c_str());
-    ImGui::InsertNotification(toast);
+    if (!gui::showMenu) { // Show notification if main menu is not shown
+        ImGuiToast toast(ImGuiToastType::Info, 3000);
+        toast.setTitle("%s", username.c_str());
+        toast.setContent("%s", s.c_str());
+        ImGui::InsertNotification(toast);
+    }
 }
 
 void gui::main_window::AddToLog(std::string s) { // AddToLog is basically only called for system messages
@@ -48,14 +50,16 @@ void gui::main_window::AddToLog(std::string s) { // AddToLog is basically only c
     msg.isSystemMsg = true;
     lines.push_back(msg);
 
-    std::string notifText = msg.msg;
-    notifText.erase(0, 4);
+    if (!gui::showMenu) { // Show notification if main menu is not shown
+        std::string notifText = msg.msg;
+        notifText.erase(0, 4);
 
-    if (msg.msg.rfind("[#] ", 0) == 0) {
-        ImGui::InsertNotification({ ImGuiToastType::Info, 3000, "%s", notifText.c_str() });
-    }
-    else if (msg.msg.rfind("[!] ", 0) == 0) {
-        ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "%s", notifText.c_str() });
+        if (msg.msg.rfind("[#] ", 0) == 0) {
+            ImGui::InsertNotification({ ImGuiToastType::Info, 3000, "%s", notifText.c_str() });
+        }
+        else if (msg.msg.rfind("[!] ", 0) == 0) {
+            ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "%s", notifText.c_str() });
+        }
     }
 }
 

@@ -6,6 +6,7 @@
 #include <sqlite_modern_cpp.h>
 #include <utils/misc.h>
 #include <gui/graph.h>
+#include <gui/mainwindow.h>
 
 #include "selectbms.h"
 #include "pacemaker.h"
@@ -69,6 +70,9 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		auto bmsInfo = GetBmsInfo(selectedBmsUtf8);
 		if (bmsInfo.hash.length() > 0)
 			SendWithRandom(bmsInfo);
+
+		if (!(client::state.host == client::state.remoteId) && bmsInfo.hash != client::state.selectedSongRemote.hash)
+			gui::main_window::AddToLog("[!] You are not the host; please go back to the main menu and select the same song as the host!");
 
 		gui::graph::showGraph = true; // Show graph on song select
 		hooks::return_menu::is_returning_to_menu = false;

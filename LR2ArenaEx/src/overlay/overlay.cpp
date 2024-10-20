@@ -2,6 +2,7 @@
 #include <iostream>
 #include <utils/mem.h>
 #include <hooks/hooks.h>
+#include <ImGui/ImGuiNotify.hpp>
 
 #include "overlay.h"
 #include "dx9hook.h"
@@ -28,6 +29,8 @@ DWORD WINAPI overlay::Setup(HMODULE hModule)
 	dx9hook::HookDX9();
 	dinputhook::HookDinput(hModule);
 	hooks::SetupHooks();
+
+	ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "LR2ArenaEx successfully loaded; press [Ins] to show the overlay!" });
 
 #ifdef DEBUG_CONSOLE_ENABLED
 	while (true)

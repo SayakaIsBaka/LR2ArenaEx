@@ -101,6 +101,17 @@ void InitImGui(IDirect3DDevice9* pDevice) {
 	return;
 }
 
+void RenderNotifications() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.10f, 0.10f, 0.10f, 1.00f));
+
+	ImGui::RenderNotifications();
+
+	ImGui::PopStyleVar(2);
+	ImGui::PopStyleColor(1);
+}
+
 HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 	if (!overlay::dx9hook::init) InitImGui(pDevice);
 	else {
@@ -113,27 +124,11 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 		{
 			gui::Render();
 		}
-		else {
-			// Notifications style setup
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f); // Disable round borders
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f); // Disable borders
-
-			// Notifications color setup
-			ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.10f, 0.10f, 0.10f, 1.00f)); // Background color
-
-			// Main rendering function
-			ImGui::RenderNotifications();
-
-			//——————————————————————————————— WARNING ———————————————————————————————
-			// Argument MUST match the amount of ImGui::PushStyleVar() calls 
-			ImGui::PopStyleVar(2);
-			// Argument MUST match the amount of ImGui::PushStyleColor() calls 
-			ImGui::PopStyleColor(1);
-		}
 		if (gui::graph::showGraph)
 		{
 			gui::graph::Render();
 		}
+		RenderNotifications();
 
 		ImGui::EndFrame();
 		ImGui::Render();
