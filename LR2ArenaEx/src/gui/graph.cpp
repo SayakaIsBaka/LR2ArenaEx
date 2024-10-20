@@ -34,7 +34,7 @@ void gui::graph::Render() {
             rankPos = { std::ceil(hooks::max_score::maxScore * 0.666), std::ceil(hooks::max_score::maxScore * 0.777), std::ceil(hooks::max_score::maxScore * 0.888) };
             auto adjGraphDim = graphDim[overlay::lr2type];
             if (client::state.peers.size() > 2)
-                adjGraphDim.x *= (client::state.peers.size() * 0.75);
+                adjGraphDim.x *= (client::state.peers.size() * 0.5);
 
             ImGui::BeginChild("GraphDisp", ImVec2(0, 0), ImGuiChildFlags_ResizeX | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
             {
