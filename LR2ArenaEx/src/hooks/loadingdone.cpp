@@ -1,6 +1,7 @@
 #include <utils/mem.h>
 #include <client/client.h>
 #include <network/enums.h>
+#include <ImGui/ImGuiNotify.hpp>
 
 #include "loadingdone.h"
 #include "random.h"
@@ -10,6 +11,7 @@ void hkLoadingDone() {
 	if (client::connected) {
 		if (!hooks::return_menu::is_returning_to_menu) {
 			client::Send(network::ClientToServer::CTS_LOADING_COMPLETE, ""); // player ready, send packet
+			ImGui::InsertNotification({ ImGuiToastType::Info, 3000, "Loading complete, waiting for all players..." });
 			fprintf(stdout, "waiting for all players\n");
 			while (!hooks::loading_done::isEveryoneReady)
 			{
