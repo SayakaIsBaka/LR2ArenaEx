@@ -87,3 +87,8 @@ std::string utils::GetOptionName(unsigned int option) {
 		return "";
 	}
 }
+
+float utils::CalculateRate(network::Score score, unsigned int maxScore) {
+	auto percentage (((float)CalculateExScore(score) / (float)maxScore) * 100.0f);
+	return floorf(percentage * 100) / 100; // Round down
+}

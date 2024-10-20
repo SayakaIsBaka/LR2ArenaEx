@@ -9,4 +9,5 @@ namespace utils {
 	std::string GetDatabasePath();
 	std::string GetChartPath(std::string hash);
 	std::string GetOptionName(unsigned int opt);
+	float CalculateRate(network::Score score, unsigned int maxScore);
 }

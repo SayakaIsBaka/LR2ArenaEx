@@ -54,7 +54,7 @@ void gui::graph::Render() {
                 for (const auto& [key, value] : client::state.peers) {
                     ImGui::BulletText("%s: ", value.username.c_str());
                     ImGui::SameLine();
-                    ImGui::Text("%d", utils::CalculateExScore(value.score));
+                    ImGui::Text("%d (%.2f%%)", utils::CalculateExScore(value.score), utils::CalculateRate(value.score, hooks::max_score::maxScore));
 
                     auto opt = utils::GetOptionName(value.option);
                     if (!opt.empty()) {
