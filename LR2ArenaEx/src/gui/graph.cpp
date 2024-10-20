@@ -55,6 +55,16 @@ void gui::graph::Render() {
                     ImGui::BulletText("%s: ", value.username.c_str());
                     ImGui::SameLine();
                     ImGui::Text("%d", utils::CalculateExScore(value.score));
+
+                    auto opt = utils::GetOptionName(value.option);
+                    if (!opt.empty()) {
+                        opt = "[" + opt + "]";
+                        auto windowWidth = ImGui::GetWindowSize().x;
+                        auto textWidth = ImGui::CalcTextSize(opt.c_str()).x;
+                        ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+                        ImGui::TextDisabled("%s", opt.c_str());
+                    }
+
                     if (ImGui::BeginTable((key.host + std::to_string(key.port)).c_str(), 5))
                     {
                         ImGui::TableNextRow();
