@@ -137,6 +137,13 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 	return overlay::dx9hook::oEndScene(pDevice);
 }
 
+HRESULT __stdcall hkResetScene(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pParams) {
+	ImGui_ImplDX9_InvalidateDeviceObjects();
+	auto res = overlay::dx9hook::oResetScene(pDevice, pParams);
+	ImGui_ImplDX9_CreateDeviceObjects();
+	return res;
+}
+
 // Courtesy of https://github.com/tenaibms/LR2OOL/blob/master/src/hooks/cursor.cpp
 int __cdecl hkShowCursor(int enabled) {
 	if (gui::showMenu || gui::graph::showGraph)
@@ -153,6 +160,9 @@ void overlay::dx9hook::HookDX9() {
 
 	oEndScene = (EndScene)mem::TrampHook(((char**)d3dDeviceAddr)[42], (char*)hkEndScene, 7);
 	std::cout << "[i] EndScene pointer: " << std::hex << ((int*)d3dDeviceAddr)[42] << std::endl;
+
+	oResetScene = (ResetScene)mem::TrampHook(((char**)d3dDeviceAddr)[16], (char*)hkResetScene, 7);
+	std::cout << "[i] ResetScene pointer: " << std::hex << ((int*)d3dDeviceAddr)[16] << std::endl;
 
 	oShowCursor = (ShowCursor)mem::TrampHook((char*)0x4D09E0, (char*)hkShowCursor, 6); // Hook hide mouse cursor
 }
