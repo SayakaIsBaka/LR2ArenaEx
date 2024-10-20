@@ -22,4 +22,13 @@ namespace network {
 		STC_MESSAGE,
 		STC_MISSING_CHART,
 	};
+
+	enum class SelectedOption : unsigned int {
+		NONRAN = 0,
+		MIRROR,
+		RANDOM,
+		SRAN,
+		HRAN,
+		ALLSCR
+	};
 }

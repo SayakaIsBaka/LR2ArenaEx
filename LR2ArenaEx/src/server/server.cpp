@@ -35,6 +35,7 @@ void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAdd
     std::cout << std::endl;
 
     server::state.peers[clientAddr].selectedHash = selectedBms.hash;
+    server::state.peers[clientAddr].option = selectedBms.option;
 }
 
 void ParseScore(std::vector<unsigned char> data, Garnet::Address clientAddr) {

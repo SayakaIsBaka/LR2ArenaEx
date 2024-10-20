@@ -68,6 +68,7 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		}
 
 		auto bmsInfo = GetBmsInfo(selectedBmsUtf8);
+		bmsInfo.option = selected_option;
 		if (bmsInfo.hash.length() > 0)
 			SendWithRandom(bmsInfo);
 

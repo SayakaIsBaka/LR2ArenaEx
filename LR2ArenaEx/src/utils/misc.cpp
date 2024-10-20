@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <sqlite_modern_cpp.h>
+#include <network/enums.h>
 
 #include "misc.h"
 
@@ -64,6 +65,25 @@ std::string utils::GetChartPath(std::string hash) {
 	}
 	catch (const std::exception& e) {
 		std::cout << "[!] Error: " << e.what() << std::endl;
+		return "";
+	}
+}
+
+std::string utils::GetOptionName(unsigned int option) {
+	auto opt = static_cast<network::SelectedOption>(option);
+	switch (opt) {
+	case network::SelectedOption::MIRROR:
+		return "MIRROR";
+	case network::SelectedOption::RANDOM:
+		return "RANDOM";
+	case network::SelectedOption::SRAN:
+		return "S-RAN";
+	case network::SelectedOption::HRAN:
+		return "H-RAN";
+	case network::SelectedOption::ALLSCR:
+		return "ALLSCR";
+	case network::SelectedOption::NONRAN:
+	default:
 		return "";
 	}
 }

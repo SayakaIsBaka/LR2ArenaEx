@@ -52,9 +52,9 @@ void gui::graph::Render() {
             ImGui::BeginChild("ScoreDetails", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
             {
                 for (const auto& [key, value] : client::state.peers) {
-                    ImGui::BulletText((value.username + ": ").c_str());
+                    ImGui::BulletText("%s: ", value.username.c_str());
                     ImGui::SameLine();
-                    ImGui::Text(std::to_string(utils::CalculateExScore(value.score)).c_str());
+                    ImGui::Text("%d", utils::CalculateExScore(value.score));
                     if (ImGui::BeginTable((key.host + std::to_string(key.port)).c_str(), 5))
                     {
                         ImGui::TableNextRow();
@@ -71,15 +71,15 @@ void gui::graph::Render() {
 
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
-                        ImGui::TextColored(ImVec4(0.765f, 0.976f, 0.824f, 1.0f), (std::to_string(value.score.p_great)).c_str());
+                        ImGui::TextColored(ImVec4(0.765f, 0.976f, 0.824f, 1.0f), "%d", value.score.p_great);
                         ImGui::TableNextColumn();
-                        ImGui::TextColored(ImVec4(1, 0.824f, 0, 1.0f), (std::to_string(value.score.great)).c_str());
+                        ImGui::TextColored(ImVec4(1, 0.824f, 0, 1.0f), "%d", value.score.great);
                         ImGui::TableNextColumn();
-                        ImGui::TextColored(ImVec4(1, 0.659f, 0, 1.0f), (std::to_string(value.score.good)).c_str());
+                        ImGui::TextColored(ImVec4(1, 0.659f, 0, 1.0f), "%d", value.score.good);
                         ImGui::TableNextColumn();
-                        ImGui::TextColored(ImVec4(1, 0.412f, 0, 1.0f), (std::to_string(value.score.bad)).c_str());
+                        ImGui::TextColored(ImVec4(1, 0.412f, 0, 1.0f), "%d", value.score.bad);
                         ImGui::TableNextColumn();
-                        ImGui::TextColored(ImVec4(1, 0.129f, 0, 1.0f), (std::to_string(value.score.poor)).c_str());
+                        ImGui::TextColored(ImVec4(1, 0.129f, 0, 1.0f), "%d", value.score.poor);
 
                         ImGui::EndTable();
                     }
