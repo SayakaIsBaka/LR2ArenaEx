@@ -21,6 +21,7 @@ LR2ArenaEx uses the following libraries:
 - [cppack](https://github.com/dacap/cppack)
 - [implot](https://github.com/epezent/implot)
 - [ImGuiNotify](https://github.com/TyomaVader/ImGuiNotify)
+- [mINI](https://github.com/metayeti/mINI)
 
 ## Special thanks
 

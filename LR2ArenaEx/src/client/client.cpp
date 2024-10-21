@@ -9,6 +9,7 @@
 #include <gui/mainwindow.h>
 #include <filesystem>
 #include <ImGui/ImGuiNotify.hpp>
+#include <config/config.h>
 
 #include "client.h"
 
@@ -211,6 +212,9 @@ bool client::Connect(const char* host, const char* username) {
 		}
 		Send(network::ClientToServer::CTS_USERNAME, std::string(username));
 
+		config::ini["config"]["username"] = username;
+		config::ini["config"]["host"] = host;
+		config::SaveConfig();
 		ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "Successfully connected to %s", host });
 
 		return true;

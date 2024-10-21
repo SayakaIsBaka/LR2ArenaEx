@@ -49,6 +49,19 @@ std::string utils::GetDatabasePath() {
 	return wPath.u8string();
 }
 
+std::string utils::GetConfigPath() {
+	WCHAR dllPath[MAX_PATH];
+	HMODULE hm = NULL;
+
+	if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCSTR)&GetDatabasePath, &hm) == 0)
+		return ""; // Error
+	GetModuleFileNameW(hm, dllPath, MAX_PATH);
+	std::filesystem::path wPath(dllPath);
+	wPath.remove_filename();
+	wPath = wPath / "config.ini";
+	return wPath.u8string();
+}
+
 std::string utils::GetChartPath(std::string hash) {
 	auto dbPath = GetDatabasePath();
 

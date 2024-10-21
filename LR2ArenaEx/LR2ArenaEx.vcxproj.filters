@@ -37,6 +37,9 @@
     <Filter Include="Source Files\network">
       <UniqueIdentifier>{88a2fe86-a7ea-465a-99ef-41ee4c5078a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\config">
+      <UniqueIdentifier>{89bd635e-0e14-4146-bcaa-b48701d6ce4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ImGui\imconfig.h">
@@ -141,6 +144,9 @@
     <ClInclude Include="include\ImGui\ImGuiNotify.hpp">
       <Filter>Header Files\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\config\config.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -229,6 +235,9 @@
     </ClCompile>
     <ClCompile Include="src\hooks\maxscore.cpp">
       <Filter>Source Files\hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\config\config.cpp">
+      <Filter>Source Files\config</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

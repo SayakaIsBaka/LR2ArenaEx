@@ -216,6 +216,7 @@
     <ClInclude Include="include\ImGui\implot.h" />
     <ClInclude Include="include\ImGui\implot_internal.h" />
     <ClInclude Include="src\client\client.h" />
+    <ClInclude Include="src\config\config.h" />
     <ClInclude Include="src\gui\graph.h" />
     <ClInclude Include="src\gui\gui.h" />
     <ClInclude Include="src\gui\imguistyle.h" />
@@ -257,6 +258,7 @@
     <ClCompile Include="include\ImGui\implot.cpp" />
     <ClCompile Include="include\ImGui\implot_items.cpp" />
     <ClCompile Include="src\client\client.cpp" />
+    <ClCompile Include="src\config\config.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\gui\graph.cpp" />
     <ClCompile Include="src\gui\gui.cpp" />
