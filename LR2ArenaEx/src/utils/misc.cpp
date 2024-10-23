@@ -101,6 +101,26 @@ std::string utils::GetOptionName(unsigned int option) {
 	}
 }
 
+std::string utils::GetGaugeName(unsigned int gauge) {
+	auto g = static_cast<network::SelectedGauge>(gauge);
+	switch (g) {
+	case network::SelectedGauge::GROOVE:
+		return "GROOVE";
+	case network::SelectedGauge::HARD:
+		return "HARD";
+	case network::SelectedGauge::HAZARD:
+		return "HAZARD";
+	case network::SelectedGauge::EASY:
+		return "EASY";
+	case network::SelectedGauge::PATTACK:
+		return "P-ATTACK";
+	case network::SelectedGauge::GATTACK:
+		return "G-ATTACK";
+	default:
+		return "";
+	}
+}
+
 float utils::CalculateRate(network::Score score, unsigned int maxScore) {
 	auto percentage (((float)CalculateExScore(score) / (float)maxScore) * 100.0f);
 	return floorf(percentage * 100) / 100; // Round down

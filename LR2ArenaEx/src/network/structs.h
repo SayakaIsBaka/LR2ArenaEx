@@ -27,10 +27,11 @@ namespace network {
 		bool ready = false;
 		Score score = Score();
 		unsigned int option;
+		unsigned int gauge;
 
 		template<class T>
 		void pack(T& pack) {
-			pack(username, selectedHash, ready, score, option);
+			pack(username, selectedHash, ready, score, option, gauge);
 		}
 	};
 
@@ -57,10 +58,11 @@ namespace network {
 		std::string title;
 		std::string artist;
 		unsigned int option;
+		unsigned int gauge;
 
 		template<class T>
 		void pack(T& pack) {
-			pack(random, hash, title, artist, option);
+			pack(random, hash, title, artist, option, gauge);
 		}
 	};
 

@@ -10,5 +10,6 @@ namespace utils {
 	std::string GetConfigPath();
 	std::string GetChartPath(std::string hash);
 	std::string GetOptionName(unsigned int opt);
+	std::string GetGaugeName(unsigned int gauge);
 	float CalculateRate(network::Score score, unsigned int maxScore);
 }

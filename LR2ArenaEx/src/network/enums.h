@@ -31,4 +31,13 @@ namespace network {
 		HRAN,
 		ALLSCR
 	};
+
+	enum class SelectedGauge : unsigned int {
+		GROOVE = 0,
+		HARD,
+		HAZARD,
+		EASY,
+		PATTACK,
+		GATTACK
+	};
 }

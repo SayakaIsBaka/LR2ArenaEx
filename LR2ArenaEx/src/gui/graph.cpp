@@ -105,13 +105,17 @@ void gui::graph::Render() {
                     ImGui::Text("%d (%.2f%%)", utils::CalculateExScore(value.score), utils::CalculateRate(value.score, hooks::max_score::maxScore));
 
                     auto opt = utils::GetOptionName(value.option);
+                    auto gauge = utils::GetGaugeName(value.gauge);
+
+                    auto str = "[" + gauge + "]";
                     if (!opt.empty()) {
-                        opt = "[" + opt + "]";
-                        auto windowWidth = ImGui::GetWindowSize().x;
-                        auto textWidth = ImGui::CalcTextSize(opt.c_str()).x;
-                        ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
-                        ImGui::TextDisabled("%s", opt.c_str());
+                        str += " [" + opt + "]";
                     }
+
+                    auto windowWidth = ImGui::GetWindowSize().x;
+                    auto textWidth = ImGui::CalcTextSize(str.c_str()).x;
+                    ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+                    ImGui::TextDisabled("%s", str.c_str());
 
                     if (ImGui::BeginTable((key.host + std::to_string(key.port)).c_str(), 5))
                     {

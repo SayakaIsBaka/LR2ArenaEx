@@ -51,6 +51,7 @@ network::SelectedBmsMessage GetBmsInfo(std::string bmsPath) {
 void hkSelectBms(const char** buffer, unsigned char* memory) {
 	if (client::connected) {
 		unsigned int selected_option = (unsigned int)*(memory + 0x10);
+		unsigned int selected_gauge = *(uintptr_t*)hooks::select_bms::selectedGaugeAddr;
 		std::string selectedBms = std::string(*buffer);
 		if (!selectedBms.rfind("LR2files\\Config\\sample_", 0)) {
 			fprintf(stdout, "demo BMS loaded, skip\n");
@@ -62,6 +63,7 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 
 		std::cout << "[+] Selected BMS: " << selectedBmsUtf8 << std::endl;
 		std::cout << "[+] Selected option: " << selected_option << std::endl;
+		std::cout << "[+] Selected gauge: " << selected_gauge << std::endl;
 
 		if (!hooks::random::received_random) {
 			hooks::random::UpdateRandom();
@@ -69,6 +71,8 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 
 		auto bmsInfo = GetBmsInfo(selectedBmsUtf8);
 		bmsInfo.option = selected_option;
+		bmsInfo.gauge = selected_gauge;
+
 		if (bmsInfo.hash.length() > 0)
 			SendWithRandom(bmsInfo);
 
