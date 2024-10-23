@@ -80,11 +80,14 @@ void gui::main_window::Render() {
     {
         ImGui::BeginChild("Users", userListDim[overlay::lr2type], ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
         for (const auto& [key, value] : client::state.peers) {
+            std::string username = value.username;
             if (key == client::state.host) {
-                ImGui::Selectable((ICON_FA_CROWN + std::string(" ") + value.username).c_str());
+                username = ICON_FA_CROWN " " + username;
             }
-            else
-                ImGui::Selectable(value.username.c_str());
+            if (value.ready && client::state.peers[client::state.host].selectedHash == value.selectedHash) {
+                username = ICON_FA_CIRCLE_CHECK " " + username;
+            }
+            ImGui::Selectable(username.c_str());
             if (client::state.host == client::state.remoteId && ImGui::BeginPopupContextItem())
             {
                 ImGui::TextDisabled("Selected user: %s", value.username.c_str());
