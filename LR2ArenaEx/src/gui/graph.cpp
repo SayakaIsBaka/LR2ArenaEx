@@ -60,6 +60,9 @@ void DisplayGraph(std::vector<unsigned int>& values, std::vector<const char*>& l
             ImPlot::SetupAxisTicks(ImAxis_Y1, rankPos.data(), rankPos.size(), rankLabels);
             ImPlot::SetupAxisLimits(ImAxis_Y1, 0, hooks::max_score::maxScore, ImPlotCond_Always);
         }
+        else if (type == gui::graph::graphType::MAX_COMBO) {
+            ImPlot::SetupAxisLimits(ImAxis_Y1, 0, hooks::max_score::maxScore / 2, ImPlotCond_Always);
+        }
         ImPlot::PlotBarGroups(labels.data(), values.data(), labels.size(), labels.size(), 0.67f, 0, ImPlotBarGroupsFlags_Stacked);
         ImPlot::EndPlot();
     }
