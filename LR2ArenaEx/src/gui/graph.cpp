@@ -7,44 +7,92 @@
 #include <vector>
 #include <string>
 
+void PrepareData(std::vector<unsigned int> &values, std::vector<const char*> &labels, std::vector<double> &positions, gui::graph::graphType type) {
+    int i = 0;
+
+    for (const auto& [key, value] : client::state.peers) {
+        for (int j = 0; j < i; j++)
+            values.push_back(0);
+        if (type == gui::graph::graphType::SCORE) {
+            values.push_back(utils::CalculateExScore(value.score));
+        }
+        else if (type == gui::graph::graphType::BP) {
+            values.push_back(value.score.bad + value.score.poor);
+        }
+        else if (type == gui::graph::graphType::MAX_COMBO) {
+            values.push_back(value.score.max_combo);
+        }
+        for (int j = i + 1; j < client::state.peers.size(); j++)
+            values.push_back(0);
+        labels.push_back(value.username.c_str());
+        positions.push_back(i);
+        i++;
+    }
+}
+
+void DisplayGraph(std::vector<unsigned int>& values, std::vector<const char*>& labels, std::vector<double>& positions, gui::graph::graphType type) {
+    auto adjGraphDim = gui::graph::graphDim[overlay::lr2type];
+    if (client::state.peers.size() > 2)
+        adjGraphDim.x *= (client::state.peers.size() * 0.5);
+
+    std::string yLabel = "";
+
+    switch (type) {
+    case gui::graph::graphType::SCORE:
+        yLabel = "Score";
+        break;
+    case gui::graph::graphType::BP:
+        yLabel = "BP";
+        break;
+    case gui::graph::graphType::MAX_COMBO:
+        yLabel = "Max combo";
+        break;
+    }
+
+    if (ImPlot::BeginPlot("##GraphPlot", adjGraphDim, ImPlotFlags_NoFrame | ImPlotFlags_NoInputs | ImPlotFlags_NoTitle | ImPlotFlags_NoLegend)) {
+        ImPlot::SetupAxes("Players", yLabel.c_str(), ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoLabel, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoLabel);
+        ImPlot::SetupAxisTicks(ImAxis_X1, positions.data(), labels.size(), labels.data());
+        if (type == gui::graph::graphType::SCORE) {
+            std::vector<double> rankPos;
+            const char* rankLabels[] = { "A", "AA", "AAA" };
+
+            rankPos = { std::ceil(hooks::max_score::maxScore * 0.666), std::ceil(hooks::max_score::maxScore * 0.777), std::ceil(hooks::max_score::maxScore * 0.888) };
+            ImPlot::SetupAxisTicks(ImAxis_Y1, rankPos.data(), rankPos.size(), rankLabels);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, 0, hooks::max_score::maxScore, ImPlotCond_Always);
+        }
+        ImPlot::PlotBarGroups(labels.data(), values.data(), labels.size(), labels.size(), 0.67f, 0, ImPlotBarGroupsFlags_Stacked);
+        ImPlot::EndPlot();
+    }
+}
+
 void gui::graph::Render() {
 	if (ImGui::Begin("Graph", &showGraph, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus))
 	{
-        std::vector<unsigned int> values; // It's basically a diagonal matrix because I'm abusing PlotBarGroups to show different colors
-        std::vector<const char*> labels;
-        std::vector<double> positions;
-
-        std::vector<double> rankPos;
-        const char* rankLabels[] = {"A", "AA", "AAA"};
-
-        int i = 0;
-
         if (client::connected && client::state.peers.size() > 0) {
-            for (const auto& [key, value] : client::state.peers) {
-                for (int j = 0; j < i; j++)
-                    values.push_back(0);
-                values.push_back(utils::CalculateExScore(value.score));
-                for (int j = i + 1; j < client::state.peers.size(); j++)
-                    values.push_back(0);
-                labels.push_back(value.username.c_str());
-                positions.push_back(i);
-                i++;
-            }
-
-            rankPos = { std::ceil(hooks::max_score::maxScore * 0.666), std::ceil(hooks::max_score::maxScore * 0.777), std::ceil(hooks::max_score::maxScore * 0.888) };
-            auto adjGraphDim = graphDim[overlay::lr2type];
-            if (client::state.peers.size() > 2)
-                adjGraphDim.x *= (client::state.peers.size() * 0.5);
-
             ImGui::BeginChild("GraphDisp", ImVec2(0, 0), ImGuiChildFlags_ResizeX | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
             {
-                if (ImPlot::BeginPlot("##GraphPlot", adjGraphDim, ImPlotFlags_NoFrame | ImPlotFlags_NoInputs | ImPlotFlags_NoTitle | ImPlotFlags_NoLegend)) {
-                    ImPlot::SetupAxes("Players", "Score", ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoLabel, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_NoLabel);
-                    ImPlot::SetupAxisTicks(ImAxis_X1, positions.data(), labels.size(), labels.data());
-                    ImPlot::SetupAxisTicks(ImAxis_Y1, rankPos.data(), rankPos.size(), rankLabels);
-                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, hooks::max_score::maxScore, ImPlotCond_Always);
-                    ImPlot::PlotBarGroups(labels.data(), values.data(), labels.size(), labels.size(), 0.67f, 0, ImPlotBarGroupsFlags_Stacked);
-                    ImPlot::EndPlot();
+                std::vector<unsigned int> values; // It's basically a diagonal matrix because I'm abusing PlotBarGroups to show different colors
+                std::vector<const char*> labels;
+                std::vector<double> positions;
+
+                if (ImGui::BeginTabBar("##TabsGraph", ImGuiTabBarFlags_None))
+                {
+                    if (ImGui::BeginTabItem("Score")) {
+                        PrepareData(values, labels, positions, graphType::SCORE);
+                        DisplayGraph(values, labels, positions, graphType::SCORE);
+                        ImGui::EndTabItem();
+                    }
+                    if (ImGui::BeginTabItem("BP")) {
+                        PrepareData(values, labels, positions, graphType::BP);
+                        DisplayGraph(values, labels, positions, graphType::BP);
+                        ImGui::EndTabItem();
+                    }
+                    if (ImGui::BeginTabItem("Max combo")) {
+                        PrepareData(values, labels, positions, graphType::MAX_COMBO);
+                        DisplayGraph(values, labels, positions, graphType::MAX_COMBO);
+                        ImGui::EndTabItem();
+                    }
+                    ImGui::EndTabBar();
                 }
                 ImGui::EndChild();
             }

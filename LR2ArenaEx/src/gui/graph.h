@@ -6,6 +6,12 @@
 
 namespace gui {
 	namespace graph {
+		enum class graphType {
+			SCORE,
+			BP,
+			MAX_COMBO
+		};
+
 		inline bool showGraph = false;
 		inline std::unordered_map<overlay::LR2_TYPE, ImVec2> graphDim = {
 			{overlay::LR2_TYPE::LR2_HD, ImVec2(150, 400)},
