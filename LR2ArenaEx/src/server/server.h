@@ -19,7 +19,7 @@ namespace server {
 	inline bool started = false;
 	inline bool autoRotateHost = false;
 
-	bool Start();
+	bool Start(const char* host = "0.0.0.0", ushort port = 2222);
 	bool Stop();
 
 	void Receive(void* data, int size, int actualSize, Garnet::Address clientAddr);

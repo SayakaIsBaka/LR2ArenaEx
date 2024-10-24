@@ -216,11 +216,11 @@ void server::ClientDisconnected(Garnet::Address clientAddr)
     }
 }
 
-bool server::Start() {
+bool server::Start(const char* host, ushort port) {
     Garnet::Address addr;
     bool success = false;
-    addr.host = "0.0.0.0";
-    addr.port = 2222;
+    addr.host = host;
+    addr.port = port;
 
     // Hopefully this is enough to avoid a memleak because delete on a regular pointer crashes the thing
     server = std::make_shared<Garnet::ServerTCP>(addr, &success);
