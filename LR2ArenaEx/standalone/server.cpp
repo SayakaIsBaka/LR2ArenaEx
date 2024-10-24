@@ -36,10 +36,12 @@ int main(int argc, char *argv[]) {
 
     program.add_argument("-a", "--address")
         .help("address to listen to")
+        .metavar("ADDRESS")
         .default_value(std::string("0.0.0.0"));
 
     program.add_argument("-p", "--port")
         .help("port to listen to")
+        .metavar("PORT")
         .scan<'u', ushort>()
         .default_value(ushort(2222));
 
