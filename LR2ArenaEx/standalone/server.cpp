@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 #else
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
-    action.sa_handler = term;
+    action.sa_handler = sighandler;
     sigaction(SIGTERM, &action, NULL);
     sigaction(SIGINT, &action, NULL);
 #endif
