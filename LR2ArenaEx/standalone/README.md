@@ -4,14 +4,14 @@ A cross-platform standalone server for LR2ArenaEx; it's effectively just a simpl
 
 ## Build
 
-This project uses Cmake (3.14 or newer required).
+This project uses CMake (3.14 or newer required).
 ```bash
 mkdir build
 cd build
 cmake ..
 make
 ```
-Alternatively, use the Cmake extension in VS Code which does most of the work for you.
+Alternatively, use the CMake extension in VS Code which does most of the work for you.
 
 ## Libraries
 
