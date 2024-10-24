@@ -3,7 +3,7 @@
 #include <string>
 #include <array>
 #include <unordered_map>
-#include <Garnet.h>
+#include <Garnet/Garnet.h>
 
 namespace network {
 	struct Score {

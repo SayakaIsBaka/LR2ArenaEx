@@ -1,6 +1,6 @@
 #include <iostream>
 #include <framework.h>
-#include <Garnet.h>
+#include <Garnet/Garnet.h>
 
 #include "utils/mem.h"
 #include "overlay/overlay.h"

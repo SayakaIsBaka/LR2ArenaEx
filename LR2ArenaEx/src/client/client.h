@@ -2,7 +2,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <Garnet.h>
+#include <Garnet/Garnet.h>
 #include <network/enums.h>
 #include <network/structs.h>
 

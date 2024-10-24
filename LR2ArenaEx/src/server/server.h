@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Garnet.h>
+#include <Garnet/Garnet.h>
 #include <array>
 #include <unordered_map>
 #include <network/enums.h>

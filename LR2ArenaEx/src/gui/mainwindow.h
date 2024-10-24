@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <Garnet.h>
+#include <Garnet/Garnet.h>
 #include <overlay/overlay.h>
 #include <ImGui/imgui.h>
 
