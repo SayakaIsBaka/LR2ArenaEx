@@ -13,9 +13,7 @@ void SendMsg(std::string s) {
     client::Send(network::ClientToServer::CTS_MESSAGE, s);
 }
 
-void HelpMarker(const char* desc)
-{
-    ImGui::TextDisabled(ICON_FA_CIRCLE_INFO);
+void Tooltip(const char* desc) {
     if (ImGui::BeginItemTooltip())
     {
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
@@ -23,6 +21,12 @@ void HelpMarker(const char* desc)
         ImGui::PopTextWrapPos();
         ImGui::EndTooltip();
     }
+}
+
+void HelpMarker(const char* desc)
+{
+    ImGui::TextDisabled(ICON_FA_CIRCLE_INFO);
+    Tooltip(desc);
 }
 
 // Weird tricks where we regroup all consecutive user messages into a blob to reduce processing
@@ -109,8 +113,22 @@ void gui::main_window::Render() {
         ImGui::BeginGroup();
         ImGui::BeginChild("Main view", mainViewDim[overlay::lr2type], ImGuiChildFlags_AutoResizeX);
 
-        ImGui::PushItemWidth(mainViewDim[overlay::lr2type].x - (ImGui::GetFontSize() * 3));
+        if (ImGui::Button(ICON_FA_LINK)) {
+            ImGui::SetClipboardText(("www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + client::state.selectedSongRemote.hash).c_str());
+            ImGui::InsertNotification({ ImGuiToastType::Info, 3000, "Copied LR2IR link to clipboard!" });
+        }
+        Tooltip("Copy LR2IR link to clipboard");
+
+        auto buttonWidth = ImGui::CalcTextSize(ICON_FA_LINK).x + ImGui::GetStyle().FramePadding.x * 2;
+        auto fontSize = ImGui::GetFontSize();
+        auto gapSize = fontSize / 2.0F;
+
+        ImGui::SameLine(0.0F, gapSize);
+        ImGui::PushItemWidth(mainViewDim[overlay::lr2type].x - (fontSize * 3) - buttonWidth - gapSize);
         ImGui::InputText("Title", (char*)client::state.selectedSongRemote.title.c_str(), client::state.selectedSongRemote.title.size(), ImGuiInputTextFlags_ReadOnly);
+        ImGui::PopItemWidth();
+
+        ImGui::PushItemWidth(mainViewDim[overlay::lr2type].x - (fontSize * 3));
         ImGui::InputText("Artist", (char*)client::state.selectedSongRemote.artist.c_str(), client::state.selectedSongRemote.artist.size(), ImGuiInputTextFlags_ReadOnly);
         ImGui::InputText("Path", (char*)client::state.selectedSongRemote.path.c_str(), client::state.selectedSongRemote.path.size(), ImGuiInputTextFlags_ReadOnly);
         ImGui::PopItemWidth();
