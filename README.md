@@ -38,6 +38,10 @@ LR2ArenaEx uses the following libraries:
 
 A small wrapper around LR2ArenaEx's embedded server is available, allowing to run it as a cross-platform standalone executable. Instructions and code are available [here](https://github.com/SayakaIsBaka/LR2ArenaEx/tree/master/LR2ArenaEx/standalone).
 
+## Planned features
+
+- Add an item / "ojama" mode similar to pop'n music battle mode
+
 ## Special thanks
 
 - All people credited in the original [LR2Arena](https://github.com/SayakaIsBaka/LR2Arena) project
