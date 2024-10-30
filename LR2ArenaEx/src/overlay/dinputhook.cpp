@@ -4,13 +4,12 @@
 #include <utils/mem.h>
 #include <utils/keys.h>
 #include <gui/gui.h>
-#include <gui/mainwindow.h>
 #include <hooks/maniac.h>
 
 HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPVOID lpvData) {
 	HRESULT result = overlay::dinputhook::oGetDeviceState(pThis, cbData, lpvData);
 	if (result == DI_OK) {
-		if (gui::main_window::waitingForKeyPress) {
+		if (gui::waitingForKeyPress) {
 			utils::keys::DeviceType type = utils::keys::DeviceType::NONE;
 			if (cbData == sizeof(DIJOYSTATE)) // Controller device
 				type = utils::keys::DeviceType::CONTROLLER;
@@ -20,7 +19,7 @@ HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPV
 				auto parsedKey = utils::keys::ParseKey(cbData, lpvData, type);
 				if (parsedKey.type != utils::keys::DeviceType::NONE) {
 					hooks::maniac::itemKeyBind = parsedKey;
-					gui::main_window::keySelected = true;
+					gui::keySelected = true;
 				}
 			}
 		}

@@ -1,6 +1,5 @@
 #include <utils/mem.h>
 #include <utils/keys.h>
-#include <gui/mainwindow.h>
 #include <gui/gui.h>
 #include <iostream>
 
@@ -8,11 +7,11 @@
 #include "maniac.h"
 
 DWORD __cdecl hkParseMidiMessage(DWORD msg) {
-	if (gui::main_window::waitingForKeyPress) {
+	if (gui::waitingForKeyPress) {
 		auto parsedKey = utils::keys::ParseKey(0, (uintptr_t*)msg, utils::keys::DeviceType::MIDI);
 		if (parsedKey.type != utils::keys::DeviceType::NONE) {
 			hooks::maniac::itemKeyBind = parsedKey;
-			gui::main_window::keySelected = true;
+			gui::keySelected = true;
 		}
 	}
 	if (gui::showMenu && gui::muteGameInputs) {

@@ -9,25 +9,10 @@
 
 #include "mainwindow.h"
 #include "gui.h"
+#include "widgets.h"
 
 void SendMsg(std::string s) {
     client::Send(network::ClientToServer::CTS_MESSAGE, s);
-}
-
-void Tooltip(const char* desc) {
-    if (ImGui::BeginItemTooltip())
-    {
-        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-        ImGui::TextUnformatted(desc);
-        ImGui::PopTextWrapPos();
-        ImGui::EndTooltip();
-    }
-}
-
-void HelpMarker(const char* desc)
-{
-    ImGui::TextDisabled(ICON_FA_CIRCLE_INFO);
-    Tooltip(desc);
 }
 
 // Weird tricks where we regroup all consecutive user messages into a blob to reduce processing
@@ -118,7 +103,7 @@ void gui::main_window::Render() {
             ImGui::SetClipboardText(("www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + client::state.selectedSongRemote.hash).c_str());
             ImGui::InsertNotification({ ImGuiToastType::Info, 3000, "Copied LR2IR link to clipboard!" });
         }
-        Tooltip("Copy LR2IR link to clipboard");
+        gui::widgets::Tooltip("Copy LR2IR link to clipboard");
 
         auto buttonWidth = ImGui::CalcTextSize(ICON_FA_LINK).x + ImGui::GetStyle().FramePadding.x * 2;
         auto fontSize = ImGui::GetFontSize();
@@ -194,36 +179,19 @@ void gui::main_window::Render() {
 
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem("Settings"))
+            if (ImGui::BeginTabItem("Settings##Lobby"))
             {
+                ImGui::SeparatorText("Player settings");
                 ImGui::Checkbox("Enable random flip", &hooks::random::random_flip);
-                ImGui::Checkbox("Disable game inputs when overlay is shown", &gui::muteGameInputs);
-                ImGui::SameLine(); HelpMarker("Does not affect the graph display in-game");
-
-                ImGui::Text("Item send key: %s", utils::keys::toString(hooks::maniac::itemKeyBind).c_str());
-                ImGui::SameLine();
-                if (ImGui::Button("Bind"))
-                    ImGui::OpenPopup("Bind item key");
-
-                ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::internal_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::internal_resolution)[1] / 2.0f);
-                ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-                if (ImGui::BeginPopupModal("Bind item key", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-                {
-                    waitingForKeyPress = true;
-                    ImGui::Text("Press any button...");
-                    ImGui::Separator();
-
-                    if (keySelected || ImGui::Button("Cancel")) {
-                        waitingForKeyPress = false;
-                        keySelected = false;
-                        hooks::maniac::SaveToConfigFile();
-                        ImGui::CloseCurrentPopup();
-                    }
-                    ImGui::EndPopup();
-                }
-
                 ImGui::EndTabItem();
+
+                ImGui::SeparatorText("Lobby settings");
+                ImGui::BeginDisabled(!(client::state.host == client::state.remoteId));
+                {
+                    ImGui::Checkbox("Enable item / ojama mode", &hooks::maniac::itemModeEnabled);
+                    ImGui::SameLine(); widgets::HelpMarker("Throw modifiers at your opponents while playing to add some spice!");
+                    ImGui::EndDisabled();
+                }
             }
             ImGui::EndTabBar();
         }

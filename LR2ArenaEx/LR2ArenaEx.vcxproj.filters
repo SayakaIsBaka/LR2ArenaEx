@@ -159,6 +159,9 @@
     <ClInclude Include="src\hooks\midi.h">
       <Filter>Source Files\hooks</Filter>
     </ClInclude>
+    <ClInclude Include="src\gui\widgets.h">
+      <Filter>Source Files\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -262,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="src\hooks\midi.cpp">
       <Filter>Source Files\hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui\widgets.cpp">
+      <Filter>Source Files\gui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

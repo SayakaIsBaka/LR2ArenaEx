@@ -17,8 +17,7 @@ namespace hooks {
 			unsigned int lv3;
 		};
 
-		inline utils::keys::Key itemKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE); // Default binding
-		inline std::vector<Item> items {
+		inline std::vector<Item> items{
 			{ "Earthquake", ICON_FA_HOUSE_CRACK, (unsigned int*)0xff8e0, 0, 5, 10, 15 },
 			{ "Tornado", ICON_FA_TORNADO, (unsigned int*)0xff8e4, 0, 5, 10, 15 },
 			{ "Superloop", ICON_FA_ROTATE, (unsigned int*)0xff8e8, 0, 5, 10, 15 },
@@ -31,6 +30,10 @@ namespace hooks {
 			{ "Spiral", ICON_FA_ARROWS_SPIN, (unsigned int*)0xff914, 0, 5, 10, 15 },
 			{ "Sidejump", ICON_FA_ARROWS_TURN_TO_DOTS, (unsigned int*)0xff918, 0, 5, 10, 15 },
 		};
+
+		inline bool itemModeEnabled = false;
+		inline utils::keys::Key itemKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE); // Default binding
+
 
 		void SaveToConfigFile();
 		void LoadConfig(std::string type, std::string value);
