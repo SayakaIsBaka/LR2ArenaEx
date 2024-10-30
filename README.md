@@ -3,7 +3,7 @@
 ## Quick start
 
 - Download the latest release [here](https://github.com/SayakaIsBaka/LR2ArenaEx/releases) and extract it somewhere
-- Launch LR2
+- Launch LR2 **(as a non-admin user)**
 - Run Launcher.exe
 - Press `Ins` to toggle the overlay and `PgUp` to toggle the graph
 - If hosting the server, make sure port 2222 is reachable from the Internet on your computer (alternatively, all players may use a VPN or a service such as [ZeroTier](https://www.zerotier.com/) or [Tailscale](https://tailscale.com) to remove the need to expose the port to the Internet)
@@ -53,4 +53,5 @@ A small wrapper around LR2ArenaEx's embedded server is available, allowing to ru
 
 - IME is not supported on the overlay
 - LR2FHD is not supported
+- LR2ArenaEx does not work if LR2 is ran as admin
 - Cleanup is not properly performed when LR2 exits (atexit is not called)
