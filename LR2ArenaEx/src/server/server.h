@@ -11,6 +11,7 @@ namespace server {
 	struct State {
 		Garnet::Address host;
 		std::array<unsigned int, 7> currentRandom = { 0, 0, 0, 0, 0, 0, 0 };
+		bool itemModeEnabled = false;
 
 		std::unordered_map<Garnet::Address, network::Peer> peers;
 	};

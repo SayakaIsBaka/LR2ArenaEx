@@ -4,6 +4,7 @@
 #include <hooks/pacemaker.h>
 #include <hooks/loadingdone.h>
 #include <hooks/random.h>
+#include <hooks/maniac.h>
 #include <network/structs.h>
 #include <utils/misc.h>
 #include <gui/mainwindow.h>
@@ -68,6 +69,11 @@ void client::UpdateSelectedSong(std::vector<unsigned char> data) {
 
 	gui::main_window::AddToLog("[#] Selected song: " + selectedBms.title + " / " + selectedBms.artist);
 	gui::main_window::AddToLog("[#] Hash: " + selectedBms.hash);
+
+	hooks::maniac::itemModeEnabled = selectedBms.itemModeEnabled;
+	if (selectedBms.itemModeEnabled) {
+		gui::main_window::AddToLog("[#] Item mode enabled!");
+	}
 
 	if (!(state.host == state.remoteId)) { // If not host (!= is not overloaded!!!)
 		std::cout << "[+] Received random" << std::endl;

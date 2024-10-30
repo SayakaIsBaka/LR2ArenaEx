@@ -24,6 +24,7 @@ void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAdd
 
     if (clientAddr == server::state.host) {
         server::state.currentRandom = selectedBms.random;
+        server::state.itemModeEnabled = selectedBms.itemModeEnabled;
         ResetStateEveryone();
     }
 

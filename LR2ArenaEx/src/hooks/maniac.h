@@ -34,7 +34,6 @@ namespace hooks {
 		inline bool itemModeEnabled = false;
 		inline utils::keys::Key itemKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE); // Default binding
 
-
 		void SaveToConfigFile();
 		void LoadConfig(std::string type, std::string value);
 	}

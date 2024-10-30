@@ -59,10 +59,11 @@ namespace network {
 		std::string artist;
 		unsigned int option;
 		unsigned int gauge;
+		bool itemModeEnabled;
 
 		template<class T>
 		void pack(T& pack) {
-			pack(random, hash, title, artist, option, gauge);
+			pack(random, hash, title, artist, option, gauge, itemModeEnabled);
 		}
 	};
 

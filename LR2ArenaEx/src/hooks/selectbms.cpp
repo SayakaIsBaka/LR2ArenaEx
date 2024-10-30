@@ -12,6 +12,7 @@
 #include "pacemaker.h"
 #include "random.h"
 #include "returnmenu.h"
+#include "maniac.h"
 
 void SendWithRandom(network::SelectedBmsMessage msg) {
 	EnterCriticalSection(&hooks::random::RandomCriticalSection);
@@ -72,6 +73,7 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		auto bmsInfo = GetBmsInfo(selectedBmsUtf8);
 		bmsInfo.option = selected_option;
 		bmsInfo.gauge = selected_gauge;
+		bmsInfo.itemModeEnabled = hooks::maniac::itemModeEnabled;
 
 		if (bmsInfo.hash.length() > 0)
 			SendWithRandom(bmsInfo);
