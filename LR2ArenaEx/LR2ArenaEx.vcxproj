@@ -225,6 +225,7 @@
     <ClInclude Include="src\hooks\loadingdone.h" />
     <ClInclude Include="src\hooks\maniac.h" />
     <ClInclude Include="src\hooks\maxscore.h" />
+    <ClInclude Include="src\hooks\midi.h" />
     <ClInclude Include="src\hooks\pacemaker.h" />
     <ClInclude Include="src\hooks\random.h" />
     <ClInclude Include="src\hooks\returnmenu.h" />
@@ -271,6 +272,7 @@
     <ClCompile Include="src\hooks\loadingdone.cpp" />
     <ClCompile Include="src\hooks\maniac.cpp" />
     <ClCompile Include="src\hooks\maxscore.cpp" />
+    <ClCompile Include="src\hooks\midi.cpp" />
     <ClCompile Include="src\hooks\pacemaker.cpp" />
     <ClCompile Include="src\hooks\random.cpp" />
     <ClCompile Include="src\hooks\returnmenu.cpp" />

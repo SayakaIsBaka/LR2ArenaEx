@@ -4,12 +4,24 @@
 
 #include "keys.h"
 
-utils::keys::Key utils::keys::ParseKey(unsigned long cbData, void* lpvData, DeviceType type) { // TODO: handle midi
+utils::keys::Key ParseMidi(unsigned long msg) {
+	uint8_t status = (msg & 0xFF) >> 4;
+	if (status == 9) { // Note on
+		uint8_t note = (msg & 0xFF00) >> 8;
+		return utils::keys::Key(utils::keys::DeviceType::MIDI, note);
+	}
+	return utils::keys::Key(utils::keys::DeviceType::NONE, 0);
+}
+
+utils::keys::Key utils::keys::ParseKey(unsigned long cbData, void* lpvData, DeviceType type) {
 	unsigned char* arr;
 	unsigned long size = cbData;
 	Key res;
 	res.type = DeviceType::NONE;
 
+	if (type == DeviceType::MIDI) {
+		return ParseMidi((DWORD)lpvData); // Very different processing so treat it separately
+	}
 	if (type == DeviceType::CONTROLLER) {
 		arr = ((LPDIJOYSTATE)lpvData)->rgbButtons;
 		size = 32;
@@ -43,7 +55,9 @@ std::string utils::keys::toString(utils::keys::Key key) {
 		}
 	}
 	else if (key.type == DeviceType::MIDI) {
-		return ""; // TODO
+		int octave = (key.value / 12) - 2;
+		std::string note = midiNotes[key.value % 12];
+		return note + std::to_string(octave) + " (MIDI)";
 	}
 	return "";
 }

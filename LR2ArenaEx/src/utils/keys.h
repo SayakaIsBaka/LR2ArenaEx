@@ -170,6 +170,8 @@ namespace utils {
 			{0xED,"MEDIASELECT"},
 		};
 
+		inline const char* midiNotes[] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+
 		utils::keys::Key ParseKey(unsigned long cbData, void* lpvData, DeviceType type);
 		std::string toString(utils::keys::Key key);
 	}

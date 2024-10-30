@@ -31,7 +31,8 @@ void hooks::maniac::LoadConfig(std::string type, std::string value) {
 			break;
 		case 4:
 			t = utils::keys::DeviceType::MIDI;
-			// TODO
+			if (intVal >= 128)
+				throw std::invalid_argument("Invalid value");
 			break;
 		default:
 			throw std::invalid_argument("Invalid device type");
