@@ -198,6 +198,29 @@ void gui::main_window::Render() {
                 ImGui::Checkbox("Enable random flip", &hooks::random::random_flip);
                 ImGui::Checkbox("Disable game inputs when overlay is shown", &gui::muteGameInputs);
                 ImGui::SameLine(); HelpMarker("Does not affect the graph display in-game");
+
+                ImGui::Text("Item send key: %s", "[something]");
+                ImGui::SameLine();
+                if (ImGui::Button("Bind"))
+                    ImGui::OpenPopup("Bind item key");
+
+                ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::internal_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::internal_resolution)[1] / 2.0f);
+                ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                if (ImGui::BeginPopupModal("Bind item key", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+                {
+                    waitingForKeyPress = true;
+                    ImGui::Text("Press any button...");
+                    ImGui::Separator();
+
+                    if (keySelected || ImGui::Button("Cancel")) {
+                        waitingForKeyPress = false;
+                        keySelected = false;
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::EndPopup();
+                }
+
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();

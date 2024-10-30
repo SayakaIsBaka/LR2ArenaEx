@@ -1,18 +1,34 @@
 #include <iostream>
 #include <utils/mem.h>
+#include <utils/keys.h>
 #include <gui/gui.h>
+#include <gui/mainwindow.h>
 
 #include "dinputhook.h"
 
 HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPVOID lpvData) {
 	HRESULT result = overlay::dinputhook::oGetDeviceState(pThis, cbData, lpvData);
-	if (result == DI_OK && gui::showMenu && gui::muteGameInputs) {
-		if (cbData == sizeof(DIMOUSESTATE2)) { // Mouse device
-			((LPDIMOUSESTATE2)lpvData)->rgbButtons[0] = 0;
-			((LPDIMOUSESTATE2)lpvData)->rgbButtons[1] = 0;
+	if (result == DI_OK) {
+		if (gui::main_window::waitingForKeyPress) {
+			utils::keys::DeviceType type = utils::keys::DeviceType::NONE;
+			if (cbData == sizeof(DIJOYSTATE)) // Controller device
+				type = utils::keys::DeviceType::CONTROLLER;
+			else if (cbData == 256) // Keyboard device
+				type = utils::keys::DeviceType::KEYBOARD;
+			if (type != utils::keys::DeviceType::NONE)
+				utils::keys::ParseKey(cbData, lpvData, type);
 		}
-		else if (cbData == 256) { // Keyboard device
-			memset(lpvData, 0, 256);
+		if (gui::showMenu && gui::muteGameInputs) {
+			if (cbData == sizeof(DIMOUSESTATE2)) { // Mouse device
+				((LPDIMOUSESTATE2)lpvData)->rgbButtons[0] = 0;
+				((LPDIMOUSESTATE2)lpvData)->rgbButtons[1] = 0;
+			}
+			else if (cbData == 256) { // Keyboard device
+				memset(lpvData, 0, 256);
+			}
+			else if (cbData == sizeof(DIJOYSTATE)) { // Controller device
+				memset(lpvData, 0, cbData);
+			}
 		}
 	}
 	return result;

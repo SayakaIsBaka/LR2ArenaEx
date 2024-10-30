@@ -17,6 +17,8 @@ namespace gui {
 		inline std::vector<LogMessage> lines;
 		inline char inputBuf[256];
 		inline bool scrollToBottom = false;
+		inline bool waitingForKeyPress = false;
+		inline bool keySelected = false;
 
 		inline std::unordered_map<overlay::LR2_TYPE, ImVec2> userListDim = {
 			{overlay::LR2_TYPE::LR2_HD, ImVec2(150, 0)},

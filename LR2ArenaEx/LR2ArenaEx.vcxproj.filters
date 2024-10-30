@@ -150,6 +150,9 @@
     <ClInclude Include="src\config\config.h">
       <Filter>Source Files\config</Filter>
     </ClInclude>
+    <ClInclude Include="src\utils\keys.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -244,6 +247,9 @@
     </ClCompile>
     <ClCompile Include="include\Garnet\Garnet.cpp">
       <Filter>Header Files\Garnet</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\keys.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
