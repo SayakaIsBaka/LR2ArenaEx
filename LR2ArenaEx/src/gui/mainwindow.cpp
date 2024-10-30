@@ -5,6 +5,7 @@
 #include <utils/misc.h>
 #include <fonts/IconsFontAwesome6.h>
 #include <ImGui/ImGuiNotify.hpp>
+#include <hooks/maniac.h>
 
 #include "mainwindow.h"
 #include "gui.h"
@@ -199,7 +200,7 @@ void gui::main_window::Render() {
                 ImGui::Checkbox("Disable game inputs when overlay is shown", &gui::muteGameInputs);
                 ImGui::SameLine(); HelpMarker("Does not affect the graph display in-game");
 
-                ImGui::Text("Item send key: %s", "[something]");
+                ImGui::Text("Item send key: %s", utils::keys::toString(hooks::maniac::itemKeyBind).c_str());
                 ImGui::SameLine();
                 if (ImGui::Button("Bind"))
                     ImGui::OpenPopup("Bind item key");
@@ -216,6 +217,7 @@ void gui::main_window::Render() {
                     if (keySelected || ImGui::Button("Cancel")) {
                         waitingForKeyPress = false;
                         keySelected = false;
+                        hooks::maniac::SaveToConfigFile();
                         ImGui::CloseCurrentPopup();
                     }
                     ImGui::EndPopup();

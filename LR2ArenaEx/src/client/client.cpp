@@ -212,8 +212,8 @@ bool client::Connect(const char* host, const char* username) {
 		}
 		Send(network::ClientToServer::CTS_USERNAME, std::string(username));
 
-		config::ini["config"]["username"] = username;
-		config::ini["config"]["host"] = host;
+		config::SetConfigValue("username", username);
+		config::SetConfigValue("host", host);
 		config::SaveConfig();
 		ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "Successfully connected to %s", host });
 

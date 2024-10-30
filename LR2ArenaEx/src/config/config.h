@@ -7,4 +7,5 @@ namespace config {
 
 	void LoadConfig();
 	void SaveConfig();
+	void SetConfigValue(std::string key, std::string val);
 }

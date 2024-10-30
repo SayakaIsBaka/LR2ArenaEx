@@ -1,10 +1,11 @@
+#include "dinputhook.h"
+
 #include <iostream>
 #include <utils/mem.h>
 #include <utils/keys.h>
 #include <gui/gui.h>
 #include <gui/mainwindow.h>
-
-#include "dinputhook.h"
+#include <hooks/maniac.h>
 
 HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPVOID lpvData) {
 	HRESULT result = overlay::dinputhook::oGetDeviceState(pThis, cbData, lpvData);
@@ -15,8 +16,13 @@ HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPV
 				type = utils::keys::DeviceType::CONTROLLER;
 			else if (cbData == 256) // Keyboard device
 				type = utils::keys::DeviceType::KEYBOARD;
-			if (type != utils::keys::DeviceType::NONE)
-				utils::keys::ParseKey(cbData, lpvData, type);
+			if (type != utils::keys::DeviceType::NONE) {
+				auto parsedKey = utils::keys::ParseKey(cbData, lpvData, type);
+				if (parsedKey.type != utils::keys::DeviceType::NONE) {
+					hooks::maniac::itemKeyBind = parsedKey;
+					gui::main_window::keySelected = true;
+				}
+			}
 		}
 		if (gui::showMenu && gui::muteGameInputs) {
 			if (cbData == sizeof(DIMOUSESTATE2)) { // Mouse device

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <utils/misc.h>
 #include <client/client.h>
+#include <hooks/maniac.h>
 
 #include "config.h"
 
@@ -18,6 +19,15 @@ void config::LoadConfig() {
 	auto host = ini.get("config").get("host");
 	if (!host.empty() && host.size() < 128)
 		strcpy_s(client::host, 128, host.c_str());
+
+	auto controllerType = ini.get("config").get("controller_type");
+	auto itemKeybind = ini.get("config").get("item_keybind");
+	if (!controllerType.empty() && !itemKeybind.empty())
+		hooks::maniac::LoadConfig(controllerType, itemKeybind);
+}
+
+void config::SetConfigValue(std::string key, std::string val) {
+	config::ini["config"][key] = val;
 }
 
 void config::SaveConfig() {

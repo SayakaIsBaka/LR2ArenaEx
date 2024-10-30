@@ -223,6 +223,7 @@
     <ClInclude Include="src\gui\mainwindow.h" />
     <ClInclude Include="src\hooks\hooks.h" />
     <ClInclude Include="src\hooks\loadingdone.h" />
+    <ClInclude Include="src\hooks\maniac.h" />
     <ClInclude Include="src\hooks\maxscore.h" />
     <ClInclude Include="src\hooks\pacemaker.h" />
     <ClInclude Include="src\hooks\random.h" />
@@ -268,6 +269,7 @@
     <ClCompile Include="src\gui\mainwindow.cpp" />
     <ClCompile Include="src\hooks\hooks.cpp" />
     <ClCompile Include="src\hooks\loadingdone.cpp" />
+    <ClCompile Include="src\hooks\maniac.cpp" />
     <ClCompile Include="src\hooks\maxscore.cpp" />
     <ClCompile Include="src\hooks\pacemaker.cpp" />
     <ClCompile Include="src\hooks\random.cpp" />

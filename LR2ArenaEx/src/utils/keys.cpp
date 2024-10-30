@@ -32,10 +32,15 @@ utils::keys::Key utils::keys::ParseKey(unsigned long cbData, void* lpvData, Devi
 
 std::string utils::keys::toString(utils::keys::Key key) {
 	if (key.type == DeviceType::CONTROLLER) {
-		return "Button " + std::to_string(key.value);
+		return "Button " + std::to_string(key.value) + " (Controller)";
 	}
 	else if (key.type == DeviceType::KEYBOARD) {
-		return keyToString.at(key.value);
+		try {
+			return keyToString.at(key.value);
+		}
+		catch (std::out_of_range e) {
+			return "[invalid value]";
+		}
 	}
 	else if (key.type == DeviceType::MIDI) {
 		return ""; // TODO
