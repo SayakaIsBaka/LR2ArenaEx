@@ -1,4 +1,5 @@
 #include "graph.h"
+#include "items.h"
 
 #include <ImGui/implot.h>
 #include <client/client.h>
@@ -71,6 +72,7 @@ void DisplayGraph(std::vector<unsigned int>& values, std::vector<const char*>& l
 void gui::graph::Render() {
 	if (ImGui::Begin("Graph", &showGraph, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus))
 	{
+        items::Render();
         if (client::connected && client::state.peers.size() > 0) {
             ImGui::BeginChild("GraphDisp", ImVec2(0, 0), ImGuiChildFlags_ResizeX | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
             {

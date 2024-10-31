@@ -6,6 +6,7 @@
 #include <utils/mem.h>
 #include <gui/gui.h>
 #include <gui/graph.h>
+#include <gui/items.h>
 #include <gui/imguistyle.h>
 #include <windowsx.h>
 #include <fonts/noto_medium.hpp>
@@ -69,6 +70,11 @@ void SetupFonts(ImGuiIO& io, int fontSize) {
 	iconsConfig.PixelSnapH = true;
 	iconsConfig.GlyphMinAdvanceX = iconFontSize;
 	io.Fonts->AddFontFromMemoryCompressedTTF(fa_solid_900_compressed_data, fa_solid_900_compressed_size, iconFontSize, &iconsConfig, iconsRanges);
+
+	// Setup bigger size font for less aliased display
+	iconsConfig.MergeMode = false;
+	iconFontSize *= 2.0f;
+	gui::items::bigIconFont = io.Fonts->AddFontFromMemoryCompressedTTF(fa_solid_900_compressed_data, fa_solid_900_compressed_size, iconFontSize, &iconsConfig, iconsRanges);
 
 	io.Fonts->Build();
 }
