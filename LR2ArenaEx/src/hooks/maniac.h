@@ -34,7 +34,7 @@ namespace hooks {
 			{ "Sidejump", ICON_FA_ARROWS_TURN_TO_DOTS, (unsigned int*)0xff918, 0, 5, 10, 15 },
 		};
 
-		constexpr inline int itemTime = 5000; // 10s
+		constexpr inline int itemTime = 5000; // in ms
 
 		inline bool itemModeEnabled = false;
 		inline unsigned int currentCombo = 0;
