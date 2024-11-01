@@ -102,4 +102,14 @@ namespace network {
 			pack(message, player, systemMessage);
 		}
 	};
+
+	struct CurrentItem {
+		int rolledItemId = -1;
+		unsigned short level = 0;
+
+		template<class T>
+		void pack(T& pack) {
+			pack(rolledItemId, level);
+		}
+	};
 }

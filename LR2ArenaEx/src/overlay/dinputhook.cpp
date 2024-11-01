@@ -5,10 +5,21 @@
 #include <utils/keys.h>
 #include <gui/gui.h>
 #include <hooks/maniac.h>
+#include <client/client.h>
 
 HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPVOID lpvData) {
 	HRESULT result = overlay::dinputhook::oGetDeviceState(pThis, cbData, lpvData);
 	if (result == DI_OK) {
+		if (hooks::maniac::itemModeEnabled && client::state.peers[client::state.remoteId].ready) {
+			if (cbData == sizeof(DIJOYSTATE) && hooks::maniac::itemKeyBind.type == utils::keys::DeviceType::CONTROLLER) {
+				auto arr = ((LPDIJOYSTATE)lpvData)->rgbButtons;
+				if (arr[hooks::maniac::itemKeyBind.value])
+					hooks::maniac::UseItem();
+			} else if (cbData == 256 && hooks::maniac::itemKeyBind.type == utils::keys::DeviceType::KEYBOARD) {
+				if (((BYTE*)lpvData)[hooks::maniac::itemKeyBind.value])
+					hooks::maniac::UseItem();
+			}
+		}
 		if (gui::waitingForKeyPress) {
 			utils::keys::DeviceType type = utils::keys::DeviceType::NONE;
 			if (cbData == sizeof(DIJOYSTATE)) // Controller device

@@ -73,7 +73,7 @@ void SetupFonts(ImGuiIO& io, int fontSize) {
 
 	// Setup bigger size font for less aliased display
 	iconsConfig.MergeMode = false;
-	iconFontSize *= 3.0f;
+	iconFontSize *= 4.0f;
 	gui::items::bigIconFont = io.Fonts->AddFontFromMemoryCompressedTTF(fa_solid_900_compressed_data, fa_solid_900_compressed_size, iconFontSize, &iconsConfig, iconsRanges);
 
 	io.Fonts->Build();

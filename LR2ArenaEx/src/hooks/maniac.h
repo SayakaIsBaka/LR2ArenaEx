@@ -1,5 +1,6 @@
 #pragma once
 
+#include <network/structs.h>
 #include <utils/keys.h>
 #include <dinput.h>
 #include <vector>
@@ -34,7 +35,7 @@ namespace hooks {
 
 		inline bool itemModeEnabled = false;
 		inline unsigned int currentCombo = 0;
-		inline int rolledItemId = -1;
+		inline network::CurrentItem currentItem;
 		inline utils::keys::Key itemKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE); // Default binding
 
 		inline std::random_device dev;
@@ -44,6 +45,7 @@ namespace hooks {
 		void SaveToConfigFile();
 		void LoadConfig(std::string type, std::string value);
 		void ResetState();
+		void UseItem();
 		void Setup();
 	}
 }

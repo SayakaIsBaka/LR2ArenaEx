@@ -46,9 +46,15 @@ void hooks::maniac::LoadConfig(std::string type, std::string value) {
 	}
 }
 
+void hooks::maniac::UseItem() {
+	if (currentItem.rolledItemId < 0) // If no item
+		return;
+	ResetState();
+}
+
 void hooks::maniac::ResetState() {
 	currentCombo = 0;
-	rolledItemId = -1;
+	currentItem = network::CurrentItem();
 }
 
 void hkResetCombo() {
@@ -56,9 +62,18 @@ void hkResetCombo() {
 }
 
 void hkUpdateCombo() {
+	const unsigned int threshold = 100; // TODO: edit threshold
+
 	hooks::maniac::currentCombo++;
-	if (hooks::maniac::currentCombo == 100) { // TODO: edit threshold
-		hooks::maniac::rolledItemId = hooks::maniac::dist(hooks::maniac::rng);
+	if (hooks::maniac::currentCombo == threshold) { 
+		hooks::maniac::currentItem.rolledItemId = hooks::maniac::dist(hooks::maniac::rng);
+		hooks::maniac::currentItem.level = 1;
+	}
+	else if (hooks::maniac::currentCombo == threshold * 2) {
+		hooks::maniac::currentItem.level = 2;
+	}
+	else if (hooks::maniac::currentCombo == threshold * 3) {
+		hooks::maniac::currentItem.level = 3;
 	}
 }
 
