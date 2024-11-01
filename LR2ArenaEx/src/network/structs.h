@@ -107,9 +107,26 @@ namespace network {
 		int rolledItemId = -1;
 		unsigned short level = 0;
 
+		bool operator==(const CurrentItem& other) const {
+			return (rolledItemId == other.rolledItemId && level == other.level);
+		}
+
 		template<class T>
 		void pack(T& pack) {
 			pack(rolledItemId, level);
 		}
 	};
 }
+
+template <>
+struct std::hash<network::CurrentItem>
+{
+	std::size_t operator()(const network::CurrentItem& k) const
+	{
+		using std::size_t;
+		using std::hash;
+
+		return (hash<int>()(k.rolledItemId)
+			^ (hash<int>()(k.level) << 1));
+	}
+};

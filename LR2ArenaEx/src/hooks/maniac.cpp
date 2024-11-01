@@ -1,6 +1,9 @@
+#include <msgpack/msgpack.hpp>
 #include <config/config.h>
 #include <utils/mem.h>
 #include <iostream>
+#include <thread>
+#include <client/client.h>
 
 #include "maniac.h"
 
@@ -46,9 +49,68 @@ void hooks::maniac::LoadConfig(std::string type, std::string value) {
 	}
 }
 
+void ApplyItemEffect(network::CurrentItem item) {
+	auto i = hooks::maniac::items[item.rolledItemId];
+	switch (item.level) {
+	case 1:
+		*(i.address) = i.lv1;
+		break;
+	case 2:
+		*(i.address) = i.lv2;
+		break;
+	case 3:
+		*(i.address) = i.lv3;
+		break;
+	default:
+		break;
+	}
+}
+
+void ResetItemEffect(network::CurrentItem item) {
+	auto i = hooks::maniac::items[item.rolledItemId];
+	*(i.address) = i.defaultVal;
+}
+
+void TriggerItemThread(network::CurrentItem item) {
+	using namespace std::chrono_literals;
+
+	hooks::maniac::activeItems.insert({ item, hooks::maniac::itemTime });
+	ApplyItemEffect(item);
+
+	while (hooks::maniac::activeItems[item] > 0) {
+		hooks::maniac::activeItems[item] -= 10;
+		std::this_thread::sleep_for(10ms);
+	}
+
+	ResetItemEffect(item);
+	hooks::maniac::activeItems.erase(item);
+}
+
+void hooks::maniac::TriggerItem(network::CurrentItem item) {
+	if (item.rolledItemId < 0 || item.rolledItemId >= items.size() || item.level < 1 || item.level > 3) {
+		std::cout << "[!] Invalid item received" << std::endl;
+		return;
+	}
+
+	if (activeItems.count(item)) { // If item already active add time
+		activeItems[item] += itemTime;
+	}
+	else {
+		std::thread t(TriggerItemThread, item);
+		t.detach();
+	}
+}
+
+void SendItem(network::CurrentItem item) {
+	auto buf = msgpack::pack(item);
+	client::Send(network::ClientToServer::CTS_ITEM, buf);
+}
+
 void hooks::maniac::UseItem() {
 	if (currentItem.rolledItemId < 0) // If no item
 		return;
+	std::thread t(SendItem, hooks::maniac::currentItem);
+	t.detach();
 	ResetState();
 }
 
@@ -112,7 +174,7 @@ __declspec(naked) unsigned int trampUpdateCombo() {
 void hooks::maniac::Setup() {
 	// Init RNG
 	rng = std::mt19937(dev());
-	dist = std::uniform_int_distribution<std::mt19937::result_type>(0, items.size());
+	dist = std::uniform_int_distribution<std::mt19937::result_type>(0, items.size() - 1);
 
 	mem::HookFn((char*)0x406404, (char*)trampUpdateCombo, 6);
 	mem::HookFn((char*)0x40643A, (char*)trampResetCombo, 6);

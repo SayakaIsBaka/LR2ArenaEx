@@ -11,6 +11,7 @@ namespace network {
 		CTS_MISSING_CHART,
 		CTS_SET_HOST,
 		CTS_KICK_USER,
+		CTS_ITEM,
 	};
 
 	enum class ServerToClient : unsigned char {
@@ -21,6 +22,7 @@ namespace network {
 		STC_CLIENT_REMOTE_ID,
 		STC_MESSAGE,
 		STC_MISSING_CHART,
+		STC_ITEM,
 	};
 
 	enum class SelectedOption : unsigned int {

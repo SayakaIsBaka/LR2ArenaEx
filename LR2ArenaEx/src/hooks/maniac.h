@@ -6,6 +6,7 @@
 #include <vector>
 #include <fonts/IconsFontAwesome6.h>
 #include <random>
+#include <unordered_map>
 
 namespace hooks {
 	namespace maniac {
@@ -33,6 +34,8 @@ namespace hooks {
 			{ "Sidejump", ICON_FA_ARROWS_TURN_TO_DOTS, (unsigned int*)0xff918, 0, 5, 10, 15 },
 		};
 
+		constexpr inline int itemTime = 5000; // 10s
+
 		inline bool itemModeEnabled = false;
 		inline unsigned int currentCombo = 0;
 		inline network::CurrentItem currentItem;
@@ -42,10 +45,13 @@ namespace hooks {
 		inline std::mt19937 rng;
 		inline std::uniform_int_distribution<std::mt19937::result_type> dist;
 
+		inline std::unordered_map<network::CurrentItem, int> activeItems; // contains remaining time in ms
+
 		void SaveToConfigFile();
 		void LoadConfig(std::string type, std::string value);
 		void ResetState();
 		void UseItem();
 		void Setup();
+		void TriggerItem(network::CurrentItem item);
 	}
 }

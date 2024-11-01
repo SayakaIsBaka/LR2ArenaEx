@@ -170,6 +170,10 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
             std::cout << "[!][server] Sender is not the host!" << std::endl;
         }
         break;
+    case network::ClientToServer::CTS_ITEM:
+        std::cout << "[server] Received item use" << std::endl;
+        SendToEveryone(network::ServerToClient::STC_ITEM, data, clientAddr, false);
+        break;
 	default:
         std::cout << "[server] Unknown message received" << std::endl;
 		break;
