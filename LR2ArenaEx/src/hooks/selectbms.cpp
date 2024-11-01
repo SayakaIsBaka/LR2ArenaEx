@@ -83,6 +83,7 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 
 		gui::graph::showGraph = true; // Show graph on song select
 		hooks::return_menu::is_returning_to_menu = false;
+		hooks::maniac::ResetState();
 	}
 }
 

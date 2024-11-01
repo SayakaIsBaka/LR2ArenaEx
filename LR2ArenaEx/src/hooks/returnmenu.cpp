@@ -6,6 +6,7 @@
 
 #include "returnmenu.h"
 #include "maxscore.h"
+#include "maniac.h"
 
 void hkReturnMenu() {
 	std::cout << "[+] Returning to menu" << std::endl;
@@ -16,6 +17,7 @@ void hkReturnMenu() {
 	}
 	hooks::return_menu::is_returning_to_menu = true;
 	gui::graph::showGraph = false;
+	hooks::maniac::ResetState();
 	client::Send(network::ClientToServer::CTS_CHART_CANCELLED, ""); // send escaped
 }
 

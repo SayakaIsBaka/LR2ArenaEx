@@ -4,6 +4,7 @@
 #include <dinput.h>
 #include <vector>
 #include <fonts/IconsFontAwesome6.h>
+#include <random>
 
 namespace hooks {
 	namespace maniac {
@@ -17,7 +18,7 @@ namespace hooks {
 			unsigned int lv3;
 		};
 
-		inline std::vector<Item> items{
+		inline std::vector<Item> items {
 			{ "Earthquake", ICON_FA_HOUSE_CRACK, (unsigned int*)0xff8e0, 0, 5, 10, 15 },
 			{ "Tornado", ICON_FA_TORNADO, (unsigned int*)0xff8e4, 0, 5, 10, 15 },
 			{ "Superloop", ICON_FA_ROTATE, (unsigned int*)0xff8e8, 0, 5, 10, 15 },
@@ -32,9 +33,17 @@ namespace hooks {
 		};
 
 		inline bool itemModeEnabled = false;
+		inline unsigned int currentCombo = 0;
+		inline int rolledItemId = -1;
 		inline utils::keys::Key itemKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE); // Default binding
+
+		inline std::random_device dev;
+		inline std::mt19937 rng;
+		inline std::uniform_int_distribution<std::mt19937::result_type> dist;
 
 		void SaveToConfigFile();
 		void LoadConfig(std::string type, std::string value);
+		void ResetState();
+		void Setup();
 	}
 }
