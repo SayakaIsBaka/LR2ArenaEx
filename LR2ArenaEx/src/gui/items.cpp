@@ -56,7 +56,10 @@ void gui::items::Render() {
 				{
 					ImGui::SeparatorText("Current effects");
 					for (const auto& [key, value] : hooks::maniac::activeItems) {
-						ImGui::Text("%s (%02d:%02d)", hooks::maniac::items[key.rolledItemId].icon.c_str(), value / 60000, (value / 1000) + 1);
+						auto icon = hooks::maniac::items[key.rolledItemId].icon;
+						for (size_t i = 1; i < key.level; i++)
+							icon += hooks::maniac::items[key.rolledItemId].icon;
+						ImGui::Text("%s (%02d:%02d)", icon.c_str(), value / 60000, (value / 1000) + 1);
 					}
 					ImGui::EndChild();
 				}
