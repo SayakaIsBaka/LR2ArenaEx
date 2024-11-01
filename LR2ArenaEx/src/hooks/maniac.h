@@ -34,10 +34,11 @@ namespace hooks {
 			{ "Sidejump", ICON_FA_ARROWS_TURN_TO_DOTS, (unsigned int*)0xff918, 0, 5, 10, 15 },
 		};
 
-		constexpr inline int itemTime = 5000; // in ms
+		constexpr inline int itemTime = 8000; // in ms
 
 		inline bool itemModeEnabled = false;
 		inline unsigned int currentCombo = 0;
+		inline unsigned int threshold = 100; // Default item threshold
 		inline network::CurrentItem currentItem;
 		inline utils::keys::Key itemKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE); // Default binding
 

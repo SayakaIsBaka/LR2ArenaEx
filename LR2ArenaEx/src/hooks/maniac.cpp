@@ -6,6 +6,7 @@
 #include <client/client.h>
 
 #include "maniac.h"
+#include "maxscore.h"
 
 void hooks::maniac::SaveToConfigFile() {
 	config::SetConfigValue("controller_type", std::to_string(static_cast<unsigned int>(itemKeyBind.type)));
@@ -127,17 +128,18 @@ void hkResetCombo() {
 }
 
 void hkUpdateCombo() {
-	const unsigned int threshold = 100; // TODO: edit threshold
+	if (hooks::max_score::maxScore != 0)
+		hooks::maniac::threshold = std::round((hooks::max_score::maxScore / 2) * 0.15f); // Determine threshold from the number of total notes in chart
 
 	hooks::maniac::currentCombo++;
-	if (hooks::maniac::currentCombo == threshold) { 
+	if (hooks::maniac::currentCombo == hooks::maniac::threshold) {
 		hooks::maniac::currentItem.rolledItemId = hooks::maniac::dist(hooks::maniac::rng);
 		hooks::maniac::currentItem.level = 1;
 	}
-	else if (hooks::maniac::currentCombo == threshold * 2) {
+	else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 2) {
 		hooks::maniac::currentItem.level = 2;
 	}
-	else if (hooks::maniac::currentCombo == threshold * 3) {
+	else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 3) {
 		hooks::maniac::currentItem.level = 3;
 	}
 }
