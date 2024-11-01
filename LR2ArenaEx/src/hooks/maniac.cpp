@@ -68,7 +68,10 @@ void ApplyItemEffect(network::CurrentItem item) {
 
 void ResetItemEffect(network::CurrentItem item) {
 	auto i = hooks::maniac::items[item.rolledItemId];
-	*(i.address) = i.defaultVal;
+	auto numMatchItemsType = std::count_if(hooks::maniac::activeItems.begin(), hooks::maniac::activeItems.end(),
+		[&item](std::pair<network::CurrentItem, int> const& x) { return x.first.rolledItemId == item.rolledItemId; });
+	if (numMatchItemsType == 1) // If only one item type restore otherwise do nothing
+		*(i.address) = i.defaultVal;
 }
 
 void TriggerItemThread(network::CurrentItem item) {
