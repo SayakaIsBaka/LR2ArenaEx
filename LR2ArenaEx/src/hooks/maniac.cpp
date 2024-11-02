@@ -189,7 +189,7 @@ void hooks::maniac::SendItemSettings() {
 }
 
 void hooks::maniac::UpdateItemSettings(network::ItemSettings settings) {
-	if (settings.threshold < 0 || settings.threshold > 100) {
+	if (settings.threshold < 1 || settings.threshold > 100) {
 		std::cout << "[!] Received invalid item threshold from network" << std::endl;
 		return;
 	}

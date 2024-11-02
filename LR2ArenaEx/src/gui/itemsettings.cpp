@@ -55,7 +55,7 @@ void gui::item_settings::Render() {
             ImGui::EndTable();
         }
         ImGui::SeparatorText("Threshold");
-        ImGui::SliderInt("Item threshold", &thresholdMultTmp, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderInt("Item threshold", &thresholdMultTmp, 1, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
         ImGui::SameLine(); widgets::HelpMarker("Indicates after how much combo a player gets an item; given as a percentage of the total number of notes in the selected chart");
 
         ImGui::Separator();
