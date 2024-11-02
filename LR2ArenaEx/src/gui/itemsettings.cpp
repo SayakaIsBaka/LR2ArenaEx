@@ -1,5 +1,6 @@
 #include <hooks/maniac.h>
 #include <ImGui/imgui.h>
+#include <ImGui/ImGuiNotify.hpp>
 #include <overlay/dx9hook.h>
 
 #include "itemsettings.h"
@@ -60,13 +61,18 @@ void gui::item_settings::Render() {
 
         ImGui::Separator();
         if (ImGui::Button("Save")) {
-            hooks::maniac::items = itemsTmp;
-            hooks::maniac::thresholdMult = (float)thresholdMultTmp / 100.0f;
+            if (std::all_of(itemsTmp.begin(), itemsTmp.end(), [](hooks::maniac::Item i) { return i.weight == 0; })) {
+                ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "Item weights must not be all zeroes!" });
+            }
+            else {
+                hooks::maniac::items = itemsTmp;
+                hooks::maniac::thresholdMult = (float)thresholdMultTmp / 100.0f;
 
-            hooks::maniac::SendItemSettings();
+                hooks::maniac::SendItemSettings();
 
-            hooks::maniac::UpdateItemWeights();
-            ImGui::CloseCurrentPopup();
+                hooks::maniac::UpdateItemWeights();
+                ImGui::CloseCurrentPopup();
+            }
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel")) {

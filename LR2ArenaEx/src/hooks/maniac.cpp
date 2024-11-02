@@ -213,6 +213,10 @@ void hooks::maniac::UpdateItemSettings(network::ItemSettings settings) {
 void hooks::maniac::UpdateItemWeights() {
 	std::vector<unsigned int> weights;
 	std::for_each(items.begin(), items.end(), [&weights](Item x) { weights.push_back(x.weight); });
+	if (std::all_of(weights.begin(), weights.end(), [](unsigned int i) { return i == 0; })) {
+		std::cout << "[!] All item weights are 0; update will not be performed" << std::endl;
+		return;
+	}
 	dist = std::discrete_distribution<std::mt19937::result_type>(weights.begin(), weights.end());
 }
 
