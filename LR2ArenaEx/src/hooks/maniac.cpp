@@ -176,6 +176,40 @@ __declspec(naked) unsigned int trampUpdateCombo() {
 	}
 }
 
+void hooks::maniac::SendItemSettings() {
+	network::ItemSettings payload;
+	payload.threshold = thresholdMult * 100;
+
+	for (const auto i : items) {
+		payload.settings.push_back({ i.lv1, i.lv2, i.lv3, i.weight });
+	}
+
+	auto buf = msgpack::pack(payload);
+	client::Send(network::ClientToServer::CTS_ITEM_SETTINGS, buf);
+}
+
+void hooks::maniac::UpdateItemSettings(network::ItemSettings settings) {
+	if (settings.threshold < 0 || settings.threshold > 100) {
+		std::cout << "[!] Received invalid item threshold from network" << std::endl;
+		return;
+	}
+	else if (settings.settings.size() != items.size()) {
+		std::cout << "[!] Length of settings does not match the number of items" << std::endl;
+		return;
+	}
+	thresholdMult = (float)settings.threshold / 100.0f;
+	for (size_t i = 0; i < items.size(); i++) {
+		items[i].lv1 = settings.settings[i].lv1;
+		items[i].lv2 = settings.settings[i].lv2;
+		items[i].lv3 = settings.settings[i].lv3;
+		items[i].weight = settings.settings[i].weight;
+	}
+
+	UpdateItemWeights();
+	settingsRemoteUpdated = true;
+	std::cout << "[+] Successfully updated item settings from host" << std::endl;
+}
+
 void hooks::maniac::UpdateItemWeights() {
 	std::vector<unsigned int> weights;
 	std::for_each(items.begin(), items.end(), [&weights](Item x) { weights.push_back(x.weight); });

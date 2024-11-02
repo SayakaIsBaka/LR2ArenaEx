@@ -15,6 +15,12 @@ void gui::item_settings::Render() {
         static auto itemsTmp = hooks::maniac::items;
         static int thresholdMultTmp = hooks::maniac::thresholdMult * 100;
 
+        if (hooks::maniac::settingsRemoteUpdated) { // Update temp objects if settings were synced from the server
+            itemsTmp = hooks::maniac::items;
+            thresholdMultTmp = hooks::maniac::thresholdMult * 100;
+            hooks::maniac::settingsRemoteUpdated = false;
+        }
+
         if (ImGui::BeginTable("itemTable", 5, ImGuiTableFlags_BordersInnerV)) {
             ImGui::TableSetupColumn("Item");
             ImGui::TableSetupColumn("Lv1", ImGuiTableColumnFlags_WidthStretch);
@@ -57,7 +63,7 @@ void gui::item_settings::Render() {
             hooks::maniac::items = itemsTmp;
             hooks::maniac::thresholdMult = (float)thresholdMultTmp / 100.0f;
 
-            // Send to other players here
+            hooks::maniac::SendItemSettings();
 
             hooks::maniac::UpdateItemWeights();
             ImGui::CloseCurrentPopup();

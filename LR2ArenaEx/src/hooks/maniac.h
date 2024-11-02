@@ -41,6 +41,7 @@ namespace hooks {
 		inline unsigned int currentCombo = 0;
 		inline unsigned int threshold = 100; // Default item threshold (should never be used)
 		inline float thresholdMult = 0.10f; // Item threshold (given as a percentage of total notes)
+		inline bool settingsRemoteUpdated = false; // Hack to update temp variables on GUI
 		inline network::CurrentItem currentItem;
 		inline utils::keys::Key itemKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE); // Default binding
 
@@ -56,6 +57,8 @@ namespace hooks {
 		void UseItem();
 		void Setup();
 		void UpdateItemWeights();
+		void SendItemSettings();
+		void UpdateItemSettings(network::ItemSettings settings);
 		void TriggerItem(network::CurrentItem item);
 	}
 }

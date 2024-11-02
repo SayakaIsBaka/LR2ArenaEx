@@ -144,6 +144,11 @@ void client::UpdateItem(std::vector<unsigned char> data) {
 	hooks::maniac::TriggerItem(item);
 }
 
+void client::UpdateItemSettings(std::vector<unsigned char> data) {
+	auto itemSettings = msgpack::unpack<network::ItemSettings>(data);
+	hooks::maniac::UpdateItemSettings(itemSettings);
+}
+
 void client::ParsePacket(std::vector<unsigned char> data) {
 	unsigned char id = data.front();
 	data.erase(data.begin());
@@ -170,6 +175,9 @@ void client::ParsePacket(std::vector<unsigned char> data) {
 		break;
 	case network::ServerToClient::STC_ITEM:
 		UpdateItem(data);
+		break;
+	case network::ServerToClient::STC_ITEM_SETTINGS:
+		UpdateItemSettings(data);
 		break;
 	default:
 		break;

@@ -116,6 +116,28 @@ namespace network {
 			pack(rolledItemId, level);
 		}
 	};
+
+	struct ItemSetting {
+		unsigned int lv1;
+		unsigned int lv2;
+		unsigned int lv3;
+		unsigned int weight;
+
+		template<class T>
+		void pack(T& pack) {
+			pack(lv1, lv2, lv3, weight);
+		}
+	};
+
+	struct ItemSettings {
+		unsigned int threshold;
+		std::vector<ItemSetting> settings;
+
+		template<class T>
+		void pack(T& pack) {
+			pack(threshold, settings);
+		}
+	};
 }
 
 template <>

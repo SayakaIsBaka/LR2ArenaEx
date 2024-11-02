@@ -93,6 +93,11 @@ void AutoRotateHost() {
         server::state.host = first;
 }
 
+void SetItemSettings(std::vector<unsigned char> data) {
+    auto itemSettings = msgpack::unpack<network::ItemSettings>(data);
+    server::state.itemSettings = itemSettings;
+}
+
 void server::SendToEveryone(network::ServerToClient id, std::vector<unsigned char> data, Garnet::Address origSenderAddr, bool includeOrigSender) {
     data.insert(data.begin(), static_cast<unsigned char>(id));
     for (const Garnet::Address& addr : server->getClientAddresses())
@@ -141,6 +146,8 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
     case network::ClientToServer::CTS_USERNAME:
         SetUsername(data, clientAddr);
         SendTo(network::ServerToClient::STC_CLIENT_REMOTE_ID, msgpack::pack(clientAddr), clientAddr); // Send remote address to sender (use as ID)
+        if (!server::state.itemSettings.settings.empty())
+            SendTo(network::ServerToClient::STC_ITEM_SETTINGS, msgpack::pack(server::state.itemSettings), clientAddr); // Send custom item settings if defined
         SendToEveryone(network::ServerToClient::STC_USERLIST, msgpack::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
         break;
     case network::ClientToServer::CTS_MESSAGE:
@@ -173,6 +180,15 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
     case network::ClientToServer::CTS_ITEM:
         std::cout << "[server] Received item use" << std::endl;
         SendToEveryone(network::ServerToClient::STC_ITEM, data, clientAddr, false);
+        break;
+    case network::ClientToServer::CTS_ITEM_SETTINGS:
+        std::cout << "[server] Received item settings" << std::endl;
+        if (state.host == clientAddr) {
+            SetItemSettings(data);
+            SendToEveryone(network::ServerToClient::STC_ITEM_SETTINGS, data, clientAddr, false);
+        } else {
+            std::cout << "[!][server] Sender is not the host!" << std::endl;
+        }
         break;
 	default:
         std::cout << "[server] Unknown message received" << std::endl;

@@ -47,4 +47,5 @@ namespace client {
 	void UpdateScore(std::vector<unsigned char> data);
 	void UpdateMessage(std::vector<unsigned char> data);
 	void UpdateItem(std::vector<unsigned char> data);
+	void UpdateItemSettings(std::vector<unsigned char> data);
 }

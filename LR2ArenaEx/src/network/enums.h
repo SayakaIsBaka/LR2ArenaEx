@@ -12,6 +12,7 @@ namespace network {
 		CTS_SET_HOST,
 		CTS_KICK_USER,
 		CTS_ITEM,
+		CTS_ITEM_SETTINGS,
 	};
 
 	enum class ServerToClient : unsigned char {
@@ -23,6 +24,7 @@ namespace network {
 		STC_MESSAGE,
 		STC_MISSING_CHART,
 		STC_ITEM,
+		STC_ITEM_SETTINGS,
 	};
 
 	enum class SelectedOption : unsigned int {
