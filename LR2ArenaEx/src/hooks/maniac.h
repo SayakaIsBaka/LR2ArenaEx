@@ -21,17 +21,17 @@ namespace hooks {
 		};
 
 		inline std::vector<Item> items {
-			{ "Earthquake", ICON_FA_HOUSE_CRACK, (unsigned int*)0xff8e0, 0, 5, 10, 15 },
-			{ "Tornado", ICON_FA_TORNADO, (unsigned int*)0xff8e4, 0, 5, 10, 15 },
-			{ "Superloop", ICON_FA_ROTATE, (unsigned int*)0xff8e8, 0, 5, 10, 15 },
-			{ "Char", ICON_FA_ANGLES_DOWN, (unsigned int*)0xff8f0, 0, 5, 10, 15 },
-			{ "Heartbeat", ICON_FA_HEART_PULSE, (unsigned int*)0xff8f4, 0, 5, 10, 15 },
-			{ "Nabeatsu", ICON_FA_FACE_DIZZY, (unsigned int*)0xff904, 0, 5, 10, 15 },
-			{ "Acceleration", ICON_FA_PERSON_RUNNING, (unsigned int*)0xff908, 0, 1, 2, 3 },
-			{ "Sin curve", ICON_FA_WAVE_SQUARE, (unsigned int*)0xff90c, 0, 5, 10, 15 },
-			{ "Wave", ICON_FA_WATER, (unsigned int*)0xff910, 0, 5, 10, 15 },
-			{ "Spiral", ICON_FA_ARROWS_SPIN, (unsigned int*)0xff914, 0, 5, 10, 15 },
-			{ "Sidejump", ICON_FA_ARROWS_TURN_TO_DOTS, (unsigned int*)0xff918, 0, 5, 10, 15 },
+			{ "Earthquake", ICON_FA_HOUSE_CRACK, (unsigned int*)0xff8e0, 0, 15, 30, 50 }, // Easy-mid
+			{ "Tornado", ICON_FA_TORNADO, (unsigned int*)0xff8e4, 0, 15, 30, 50 }, // Mid-hard
+			{ "Superloop", ICON_FA_ROTATE, (unsigned int*)0xff8e8, 0, 5, 15, 30 }, // Very hard
+			{ "Char", ICON_FA_ANGLES_DOWN, (unsigned int*)0xff8f0, 0, 40, 60, 80 }, // Mid
+			{ "Heartbeat", ICON_FA_HEART_PULSE, (unsigned int*)0xff8f4, 0, 10, 25, 40 }, // Easy
+			{ "Nabeatsu", ICON_FA_FACE_DIZZY, (unsigned int*)0xff904, 0, 25, 50, 100 }, // Mid
+			{ "Acceleration", ICON_FA_PERSON_RUNNING, (unsigned int*)0xff908, 0, 1, 2, 3 }, // Mid
+			{ "Sin curve", ICON_FA_WAVE_SQUARE, (unsigned int*)0xff90c, 0, 15, 30, 50 }, // Mid
+			{ "Wave", ICON_FA_WATER, (unsigned int*)0xff910, 0, 50, 75, 100 }, // Easy
+			{ "Spiral", ICON_FA_ARROWS_SPIN, (unsigned int*)0xff914, 0, 20, 35, 50 }, // Mid-hard
+			{ "Sidejump", ICON_FA_ARROWS_TURN_TO_DOTS, (unsigned int*)0xff918, 0, 30, 50, 70 }, // Mid
 		};
 
 		constexpr inline int itemTime = 8000; // in ms
