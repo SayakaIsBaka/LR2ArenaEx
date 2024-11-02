@@ -39,7 +39,8 @@ namespace hooks {
 
 		inline bool itemModeEnabled = false;
 		inline unsigned int currentCombo = 0;
-		inline unsigned int threshold = 100; // Default item threshold
+		inline unsigned int threshold = 100; // Default item threshold (should never be used)
+		inline float thresholdMult = 0.10f; // Item threshold (given as a percentage of total notes)
 		inline network::CurrentItem currentItem;
 		inline utils::keys::Key itemKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE); // Default binding
 
@@ -54,6 +55,7 @@ namespace hooks {
 		void ResetState();
 		void UseItem();
 		void Setup();
+		void UpdateItemWeights();
 		void TriggerItem(network::CurrentItem item);
 	}
 }

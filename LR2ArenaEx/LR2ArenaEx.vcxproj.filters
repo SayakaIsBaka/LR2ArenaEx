@@ -165,6 +165,9 @@
     <ClInclude Include="src\gui\items.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
+    <ClInclude Include="src\gui\itemsettings.h">
+      <Filter>Source Files\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -273,6 +276,9 @@
       <Filter>Source Files\gui</Filter>
     </ClCompile>
     <ClCompile Include="src\gui\items.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui\itemsettings.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
   </ItemGroup>

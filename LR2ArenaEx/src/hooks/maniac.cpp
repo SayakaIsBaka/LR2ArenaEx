@@ -129,7 +129,7 @@ void hkResetCombo() {
 
 void hkUpdateCombo() {
 	if (hooks::max_score::maxScore != 0)
-		hooks::maniac::threshold = std::round((hooks::max_score::maxScore / 2) * 0.15f); // Determine threshold from the number of total notes in chart
+		hooks::maniac::threshold = std::round((hooks::max_score::maxScore / 2) * hooks::maniac::thresholdMult); // Determine threshold from the number of total notes in chart
 
 	hooks::maniac::currentCombo++;
 	if (hooks::maniac::currentCombo == hooks::maniac::threshold) {
@@ -176,12 +176,16 @@ __declspec(naked) unsigned int trampUpdateCombo() {
 	}
 }
 
-void hooks::maniac::Setup() {
-	// Init RNG
+void hooks::maniac::UpdateItemWeights() {
 	std::vector<unsigned int> weights;
 	std::for_each(items.begin(), items.end(), [&weights](Item x) { weights.push_back(x.weight); });
-	rng = std::mt19937(dev());
 	dist = std::discrete_distribution<std::mt19937::result_type>(weights.begin(), weights.end());
+}
+
+void hooks::maniac::Setup() {
+	// Init RNG
+	rng = std::mt19937(dev());
+	UpdateItemWeights();
 
 	mem::HookFn((char*)0x406404, (char*)trampUpdateCombo, 6);
 	mem::HookFn((char*)0x40643A, (char*)trampResetCombo, 6);

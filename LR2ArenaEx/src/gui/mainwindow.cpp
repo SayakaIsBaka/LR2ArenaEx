@@ -10,6 +10,7 @@
 #include "mainwindow.h"
 #include "gui.h"
 #include "widgets.h"
+#include "itemsettings.h"
 
 void SendMsg(std::string s) {
     client::Send(network::ClientToServer::CTS_MESSAGE, s);
@@ -190,6 +191,9 @@ void gui::main_window::Render() {
                 {
                     ImGui::Checkbox("Enable item / ojama mode", &hooks::maniac::itemModeEnabled);
                     ImGui::SameLine(); widgets::HelpMarker("Throw modifiers at your opponents while playing to add some spice!");
+                    if (ImGui::Button("Item settings..."))
+                        ImGui::OpenPopup("Item settings");
+                    gui::item_settings::Render();
                     ImGui::EndDisabled();
                 }
             }

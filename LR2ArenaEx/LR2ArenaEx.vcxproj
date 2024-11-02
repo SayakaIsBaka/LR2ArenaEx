@@ -221,6 +221,7 @@
     <ClInclude Include="src\gui\gui.h" />
     <ClInclude Include="src\gui\imguistyle.h" />
     <ClInclude Include="src\gui\items.h" />
+    <ClInclude Include="src\gui\itemsettings.h" />
     <ClInclude Include="src\gui\mainwindow.h" />
     <ClInclude Include="src\gui\widgets.h" />
     <ClInclude Include="src\hooks\hooks.h" />
@@ -270,6 +271,7 @@
     <ClCompile Include="src\gui\gui.cpp" />
     <ClCompile Include="src\gui\imguistyle.cpp" />
     <ClCompile Include="src\gui\items.cpp" />
+    <ClCompile Include="src\gui\itemsettings.cpp" />
     <ClCompile Include="src\gui\mainwindow.cpp" />
     <ClCompile Include="src\gui\widgets.cpp" />
     <ClCompile Include="src\hooks\hooks.cpp" />
