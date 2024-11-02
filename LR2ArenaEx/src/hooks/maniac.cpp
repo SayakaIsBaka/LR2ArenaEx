@@ -178,8 +178,10 @@ __declspec(naked) unsigned int trampUpdateCombo() {
 
 void hooks::maniac::Setup() {
 	// Init RNG
+	std::vector<unsigned int> weights;
+	std::for_each(items.begin(), items.end(), [&weights](Item x) { weights.push_back(x.weight); });
 	rng = std::mt19937(dev());
-	dist = std::uniform_int_distribution<std::mt19937::result_type>(0, items.size() - 1);
+	dist = std::discrete_distribution<std::mt19937::result_type>(weights.begin(), weights.end());
 
 	mem::HookFn((char*)0x406404, (char*)trampUpdateCombo, 6);
 	mem::HookFn((char*)0x40643A, (char*)trampResetCombo, 6);
