@@ -38,21 +38,37 @@ void gui::item_settings::Render() {
                 ImGui::Text("%s %s", item.icon.c_str(), item.name.c_str());
                 ImGui::TableNextColumn();
                 if (item.name == "Acceleration") {
-                    ImGui::Text("Accel");
+                    const char* accelOptions[] = {"None", "Accel", "Decel", "Random"};
+                    ImGui::PushItemWidth(-1);
+                    ImGui::Combo("##comboAccel1", (int*)&item.lv1, accelOptions, IM_ARRAYSIZE(accelOptions));
+                    ImGui::PopItemWidth();
                     ImGui::TableNextColumn();
-                    ImGui::Text("Deccel");
+                    ImGui::PushItemWidth(-1);
+                    ImGui::Combo("##comboAccel2", (int*)&item.lv2, accelOptions, IM_ARRAYSIZE(accelOptions));
+                    ImGui::PopItemWidth();
                     ImGui::TableNextColumn();
-                    ImGui::Text("Random");
+                    ImGui::PushItemWidth(-1);
+                    ImGui::Combo("##comboAccel3", (int*)&item.lv3, accelOptions, IM_ARRAYSIZE(accelOptions));
+                    ImGui::PopItemWidth();
                 }
                 else {
+                    ImGui::PushItemWidth(-1);
                     ImGui::DragInt(("##Lv1" + item.name).c_str(), (int*)&item.lv1, 1.0f, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+                    ImGui::PopItemWidth();
                     ImGui::TableNextColumn();
+                    ImGui::PushItemWidth(-1);
                     ImGui::DragInt(("##Lv2" + item.name).c_str(), (int*)&item.lv2, 1.0f, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+                    ImGui::PopItemWidth();
                     ImGui::TableNextColumn();
+                    ImGui::PushItemWidth(-1);
                     ImGui::DragInt(("##Lv3" + item.name).c_str(), (int*)&item.lv3, 1.0f, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+                    ImGui::PopItemWidth();
                 }
                 ImGui::TableNextColumn();
+                ImGui::PushItemWidth(-1);
                 ImGui::DragInt(("##Weight" + item.name).c_str(), (int*)&item.weight, 1.0f, 0, 1000, "%d", ImGuiSliderFlags_AlwaysClamp);
+                ImGui::PopItemWidth();
+                
             }
 
             ImGui::EndTable();
