@@ -15,6 +15,8 @@ void gui::item_settings::Render() {
         ImGui::SeparatorText("Items");
         static auto itemsTmp = hooks::maniac::items;
         static int thresholdMultTmp = hooks::maniac::thresholdMult * 100;
+        static auto itemsDefault = hooks::maniac::items;
+        static int thresholdMultDefault = hooks::maniac::thresholdMult * 100;
 
         if (hooks::maniac::settingsRemoteUpdated) { // Update temp objects if settings were synced from the server
             itemsTmp = hooks::maniac::items;
@@ -79,6 +81,14 @@ void gui::item_settings::Render() {
             itemsTmp = hooks::maniac::items;
             thresholdMultTmp = hooks::maniac::thresholdMult * 100;
             ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        const char* resetButtonText = "Reset settings";
+        float resetWidth = ImGui::CalcTextSize(resetButtonText).x + ImGui::GetStyle().FramePadding.x * 2.0f;
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - resetWidth);
+        if (ImGui::Button(resetButtonText)) {
+            itemsTmp = itemsDefault;
+            thresholdMultTmp = thresholdMultDefault;
         }
         ImGui::EndPopup();
     }
