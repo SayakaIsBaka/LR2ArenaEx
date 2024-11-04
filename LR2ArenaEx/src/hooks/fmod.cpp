@@ -1,11 +1,18 @@
 #include <utils/mem.h>
 #include <config/config.h>
 #include <iostream>
+#include <ImGui/ImGuiNotify.hpp>
 
 #include "fmod.h"
 
 void hooks::fmod::SaveToConfigFile() {
 	config::SetConfigValue("item_sound_volume", std::to_string(volume));
+	for (const auto& [key, val] : soundEffects) {
+		if (!val.customPath.empty())
+			config::SetConfigValue(key, val.customPath, "sfx");
+		else
+			config::RemoveConfigValue("sfx", key);
+	}
 	config::SaveConfig();
 }
 
@@ -45,19 +52,40 @@ void hooks::fmod::LoadConfig(std::string volume, mINI::INIMap<std::string> sfxCo
 	}
 }
 
-void hooks::fmod::LoadSound(std::string id, std::string path) {
+bool hooks::fmod::LoadSound(std::string id, std::string path) {
 	if (soundEffects.count(id) == 0) {
 		std::cout << "[!] Specified sound effect id does not exist" << std::endl;
-		return;
+		return false;
 	}
 	void* tmpSound = NULL;
 	if (CreateSound(systemObj, path.c_str(), FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE, NULL, &tmpSound)) {
 		std::cout << "[!] Error loading the following SFX: " << soundEffects[id].name << std::endl;
-		return;
+		return false;
 	}
 	if (soundEffects[id].soundObject != NULL)
 		ReleaseSound(soundEffects[id].soundObject);
 	soundEffects[id].soundObject = tmpSound;
+	return true;
+}
+
+void hooks::fmod::LoadNewCustomSound(std::string id) {
+	auto selectedFile = utils::OpenFileDialog(L"Audio files (*.wav;*.ogg)\0*.wav;*.ogg\0", L"Select an audio file...");
+	if (!selectedFile.empty()) {
+		if (LoadSound(id, selectedFile)) {
+			soundEffects[id].customPath = selectedFile;
+			SaveToConfigFile();
+		}
+		else
+			ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "Error loading the following file: %s", selectedFile });
+	}
+}
+
+void hooks::fmod::ResetAllCustomSounds() {
+	for (auto& [key, val] : soundEffects) {
+		val.customPath = "";
+	}
+	InitSounds(true);
+	SaveToConfigFile();
 }
 
 void hooks::fmod::PlaySfx(std::string id) {

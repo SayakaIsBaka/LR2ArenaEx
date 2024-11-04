@@ -31,8 +31,13 @@ void config::LoadConfig() {
 	hooks::fmod::LoadConfig(itemVolume, sfxConfig);
 }
 
-void config::SetConfigValue(std::string key, std::string val) {
-	config::ini["config"][key] = val;
+void config::SetConfigValue(std::string key, std::string val, std::string section) {
+	config::ini[section][key] = val;
+}
+
+void config::RemoveConfigValue(std::string section, std::string key) {
+	if (config::ini.has(section) && config::ini[section].has(key))
+		config::ini[section].remove(key);
 }
 
 void config::SaveConfig() {

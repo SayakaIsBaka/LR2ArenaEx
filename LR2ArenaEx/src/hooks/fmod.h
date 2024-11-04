@@ -93,6 +93,8 @@ namespace hooks {
 		void SetItemVolume(int volume);
 		void LoadConfig(std::string volume, mINI::INIMap<std::string> sfxConfig);
 		void SaveToConfigFile();
-		void LoadSound(std::string id, std::string path);
+		void LoadNewCustomSound(std::string id);
+		void ResetAllCustomSounds();
+		bool LoadSound(std::string id, std::string path);
 	}
 }

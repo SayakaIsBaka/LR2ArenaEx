@@ -97,6 +97,37 @@ void gui::Render() {
                     hooks::fmod::SetItemVolume(hooks::fmod::volume);
                 }
 
+                if (ImGui::CollapsingHeader("Item SFX settings")) {
+                    if (ImGui::BeginTable("ItemSfxTable", 3,
+                        ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH,
+                        ImVec2(ImGui::GetFontSize() * 25.0f, ImGui::GetTextLineHeightWithSpacing() * 6))) {
+                        ImGui::TableSetupScrollFreeze(1, 0);
+                        ImGui::TableSetupColumn("");
+                        ImGui::TableSetupColumn("Name");
+                        ImGui::TableSetupColumn("File");
+                        ImGui::TableHeadersRow();
+                        for (const auto& [key, val] : hooks::fmod::soundEffects) {
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
+                            if (ImGui::Button(("Load##" + key).c_str())) {
+                                hooks::fmod::LoadNewCustomSound(key);
+
+                            }
+                            ImGui::TableNextColumn();
+                            ImGui::Text("%s", val.name.c_str());
+                            ImGui::TableNextColumn();
+                            if (val.customPath.empty())
+                                ImGui::TextDisabled("(Default)");
+                            else
+                                ImGui::Text("%s", val.customPath.c_str());
+                        }
+                        ImGui::EndTable();
+                    }
+                    if (ImGui::Button("Reset all SFXs")) {
+                        hooks::fmod::ResetAllCustomSounds();
+                    }
+                }
+
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
