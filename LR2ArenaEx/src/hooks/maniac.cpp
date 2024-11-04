@@ -131,22 +131,24 @@ void hkResetCombo() {
 }
 
 void hkUpdateCombo() {
-	if (hooks::max_score::maxScore != 0)
-		hooks::maniac::threshold = std::round((hooks::max_score::maxScore / 2) * hooks::maniac::thresholdMult); // Determine threshold from the number of total notes in chart
+	if (client::connected && hooks::maniac::itemModeEnabled) {
+		if (hooks::max_score::maxScore != 0)
+			hooks::maniac::threshold = std::round((hooks::max_score::maxScore / 2) * hooks::maniac::thresholdMult); // Determine threshold from the number of total notes in chart
 
-	hooks::maniac::currentCombo++;
-	if (hooks::maniac::currentCombo == hooks::maniac::threshold) {
-		hooks::maniac::currentItem.rolledItemId = hooks::maniac::dist(hooks::maniac::rng);
-		hooks::maniac::currentItem.level = 1;
-		hooks::fmod::PlaySfx("item_get");
-	}
-	else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 2) {
-		hooks::maniac::currentItem.level = 2;
-		hooks::fmod::PlaySfx("item_upgrade");
-	}
-	else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 3) {
-		hooks::maniac::currentItem.level = 3;
-		hooks::fmod::PlaySfx("item_upgrade");
+		hooks::maniac::currentCombo++;
+		if (hooks::maniac::currentCombo == hooks::maniac::threshold) {
+			hooks::maniac::currentItem.rolledItemId = hooks::maniac::dist(hooks::maniac::rng);
+			hooks::maniac::currentItem.level = 1;
+			hooks::fmod::PlaySfx("item_get");
+		}
+		else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 2) {
+			hooks::maniac::currentItem.level = 2;
+			hooks::fmod::PlaySfx("item_upgrade");
+		}
+		else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 3) {
+			hooks::maniac::currentItem.level = 3;
+			hooks::fmod::PlaySfx("item_upgrade");
+		}
 	}
 }
 
