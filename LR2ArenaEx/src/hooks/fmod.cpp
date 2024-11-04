@@ -40,6 +40,13 @@ void hooks::fmod::InitDefaultSounds() {
 	}
 }
 
+void hooks::fmod::SetItemVolume(int volume) {
+	if (channelGroup != NULL) {
+		float vol = (float)volume / 100.0f;
+		SetVolume(channelGroup, vol);
+	}
+}
+
 int __stdcall hkFmodSystemUpdate(void *system) {
 	int res = hooks::fmod::oFmodSystemUpdate(system);
 	if (res == 0 && hooks::fmod::systemObj == NULL) { // if FMOD_OK, get system object handle and init LR2ArenaEx channel group
@@ -66,4 +73,10 @@ void hooks::fmod::Destroy() {
 		ReleaseChannelGroup(channelGroup);
 	if (itemGetSound != NULL)
 		ReleaseSound(itemGetSound);
+	if (itemUpgradeSound != NULL)
+		ReleaseSound(itemUpgradeSound);
+	if (itemReceivedSound != NULL)
+		ReleaseSound(itemReceivedSound);
+	if (itemSendSound != NULL)
+		ReleaseSound(itemSendSound);
 }

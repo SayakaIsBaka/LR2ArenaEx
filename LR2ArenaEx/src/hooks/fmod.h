@@ -69,10 +69,13 @@ namespace hooks {
 		inline void* itemReceivedSound = NULL;
 		inline void* itemSendSound = NULL;
 
+		inline int volume = 100;
+
 		void Setup();
 		void Destroy();
 
 		void InitDefaultSounds();
 		void PlayItemSound(void *sound);
+		void SetItemVolume(int volume);
 	}
 }

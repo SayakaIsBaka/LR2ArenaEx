@@ -2,6 +2,7 @@
 #include <server/server.h>
 #include <client/client.h>
 #include <hooks/maniac.h>
+#include <hooks/fmod.h>
 #include <overlay/dx9hook.h>
 
 #include "gui.h"
@@ -87,6 +88,13 @@ void gui::Render() {
                         ImGui::CloseCurrentPopup();
                     }
                     ImGui::EndPopup();
+                }
+
+                static int volumeTmp = hooks::fmod::volume;
+                ImGui::SliderInt("Item sounds volume", &volumeTmp, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+                if (volumeTmp != hooks::fmod::volume) {
+                    hooks::fmod::volume = volumeTmp;
+                    hooks::fmod::SetItemVolume(hooks::fmod::volume);
                 }
 
                 ImGui::EndTabItem();
