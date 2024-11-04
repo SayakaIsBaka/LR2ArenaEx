@@ -2,6 +2,7 @@
 #include <utils/misc.h>
 #include <client/client.h>
 #include <hooks/maniac.h>
+#include <hooks/fmod.h>
 
 #include "config.h"
 
@@ -24,6 +25,10 @@ void config::LoadConfig() {
 	auto itemKeybind = ini.get("config").get("item_keybind");
 	if (!controllerType.empty() && !itemKeybind.empty())
 		hooks::maniac::LoadConfig(controllerType, itemKeybind);
+
+	auto itemVolume = ini.get("config").get("item_sound_volume");
+	if (!itemVolume.empty())
+		hooks::fmod::LoadConfig(itemVolume);
 }
 
 void config::SetConfigValue(std::string key, std::string val) {

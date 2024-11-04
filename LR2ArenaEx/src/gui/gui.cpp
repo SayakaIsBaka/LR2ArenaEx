@@ -92,7 +92,7 @@ void gui::Render() {
 
                 static int volumeTmp = hooks::fmod::volume;
                 ImGui::SliderInt("Item sounds volume", &volumeTmp, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
-                if (volumeTmp != hooks::fmod::volume) {
+                if (ImGui::IsItemDeactivated() && volumeTmp != hooks::fmod::volume) { // Only update when the slider is not being dragged anymore
                     hooks::fmod::volume = volumeTmp;
                     hooks::fmod::SetItemVolume(hooks::fmod::volume);
                 }

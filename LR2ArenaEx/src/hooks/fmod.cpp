@@ -1,8 +1,31 @@
 #include <utils/mem.h>
 #include <utils/misc.h>
+#include <config/config.h>
 #include <iostream>
 
 #include "fmod.h"
+
+void hooks::fmod::SaveToConfigFile() {
+	config::SetConfigValue("item_sound_volume", std::to_string(volume));
+	config::SaveConfig();
+}
+
+void hooks::fmod::LoadConfig(std::string volume) {
+	try {
+		int intVol = std::stoi(volume);
+
+		if (intVol < 0 || intVol > 100)
+			throw std::invalid_argument("Invalid value");
+
+		hooks::fmod::volume = intVol;
+		if (channelGroup != NULL) { // If channel group is already created (extremely unlikely)
+			SetVolume(channelGroup, (float)hooks::fmod::volume / 100.0f);
+		}
+	}
+	catch (std::exception e) {
+		std::cout << "[!] Error parsing config file for sound settings, falling back to default" << std::endl;
+	}
+}
 
 void hooks::fmod::PlayItemSound(void *sound) {
 	if (systemObj != NULL && sound != NULL && channelGroup != NULL) {
@@ -44,6 +67,7 @@ void hooks::fmod::SetItemVolume(int volume) {
 	if (channelGroup != NULL) {
 		float vol = (float)volume / 100.0f;
 		SetVolume(channelGroup, vol);
+		SaveToConfigFile();
 	}
 }
 
@@ -57,6 +81,7 @@ int __stdcall hkFmodSystemUpdate(void *system) {
 			}
 			else {
 				hooks::fmod::InitDefaultSounds();
+				hooks::fmod::SetVolume(hooks::fmod::channelGroup, (float)hooks::fmod::volume / 100.0f); // Apply volume when group is created
 				std::cout << "[i] Succesfully initialized FMOD channel group and sounds" << std::endl;
 			}
 		}

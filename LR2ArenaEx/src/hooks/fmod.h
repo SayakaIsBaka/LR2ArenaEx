@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 // FMOD_MODE flags, from https://github.com/thibaudcolas/icopter/blob/master/Classes/engine/sound/FMOD%20Libraries/Headers/fmod.h
 #define FMOD_DEFAULT                   0x00000000  /* Default for all modes listed below. FMOD_LOOP_OFF, FMOD_2D, FMOD_HARDWARE */
 #define FMOD_LOOP_OFF                  0x00000001  /* For non looping sounds. (DEFAULT).  Overrides FMOD_LOOP_NORMAL / FMOD_LOOP_BIDI. */
@@ -77,5 +79,7 @@ namespace hooks {
 		void InitDefaultSounds();
 		void PlayItemSound(void *sound);
 		void SetItemVolume(int volume);
+		void LoadConfig(std::string volume);
+		void SaveToConfigFile();
 	}
 }
