@@ -1,5 +1,4 @@
 #include <utils/mem.h>
-#include <utils/misc.h>
 #include <config/config.h>
 #include <iostream>
 
@@ -27,7 +26,11 @@ void hooks::fmod::LoadConfig(std::string volume) {
 	}
 }
 
-void hooks::fmod::PlayItemSound(void *sound) {
+void hooks::fmod::PlaySfx(std::string id) {
+	if (soundEffects.count(id) == 0) {
+		std::cout << "[!] Sound effect not found: " << id << std::endl;
+	}
+	auto sound = soundEffects[id].soundObject;
 	if (systemObj != NULL && sound != NULL && channelGroup != NULL) {
 		void* channel = NULL;
 		if (PlaySound(systemObj, -1, sound, false, &channel) == 0) {
@@ -37,29 +40,10 @@ void hooks::fmod::PlayItemSound(void *sound) {
 }
 
 void hooks::fmod::InitDefaultSounds() {
-	auto pathItemGetSound = (utils::GetLR2BasePath() / "LR2files" / "Sound" / "lr2" / "o-open.wav").u8string();
-	auto pathItemUpgradeSound = (utils::GetLR2BasePath() / "LR2files" / "Sound" / "lr2" / "o-change.wav").u8string();
-	auto pathItemReceivedSound = (utils::GetLR2BasePath() / "LR2files" / "Sound" / "lr2" / "f-close.wav").u8string();
-	auto pathItemSendSound = (utils::GetLR2BasePath() / "LR2files" / "Sound" / "lr2" / "f-open.wav").u8string();
-
-	if (CreateSound(systemObj, pathItemGetSound.c_str(), FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE, NULL, &itemGetSound)) {
-		std::cout << "[!] Error loading item get sound" << std::endl;
-		return;
-	}
-
-	if (CreateSound(systemObj, pathItemUpgradeSound.c_str(), FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE, NULL, &itemUpgradeSound)) {
-		std::cout << "[!] Error loading item upgrade sound" << std::endl;
-		return;
-	}
-
-	if (CreateSound(systemObj, pathItemReceivedSound.c_str(), FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE, NULL, &itemReceivedSound)) {
-		std::cout << "[!] Error loading item received sound" << std::endl;
-		return;
-	}
-
-	if (CreateSound(systemObj, pathItemSendSound.c_str(), FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE, NULL, &itemSendSound)) {
-		std::cout << "[!] Error loading item send sound" << std::endl;
-		return;
+	for (auto& [key, val] : soundEffects) {
+		if (CreateSound(systemObj, val.defaultPath.c_str(), FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE, NULL, &val.soundObject)) {
+			std::cout << "[!] Error loading the following SFX: " << val.name << std::endl;
+		}
 	}
 }
 
@@ -96,12 +80,8 @@ void hooks::fmod::Setup() {
 void hooks::fmod::Destroy() {
 	if (channelGroup != NULL)
 		ReleaseChannelGroup(channelGroup);
-	if (itemGetSound != NULL)
-		ReleaseSound(itemGetSound);
-	if (itemUpgradeSound != NULL)
-		ReleaseSound(itemUpgradeSound);
-	if (itemReceivedSound != NULL)
-		ReleaseSound(itemReceivedSound);
-	if (itemSendSound != NULL)
-		ReleaseSound(itemSendSound);
+	for (auto& [key, val] : soundEffects) {
+		if (val.soundObject != NULL)
+			ReleaseSound(val.soundObject);
+	}
 }

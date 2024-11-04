@@ -97,7 +97,7 @@ void hooks::maniac::TriggerItem(network::CurrentItem item) {
 		return;
 	}
 
-	hooks::fmod::PlayItemSound(hooks::fmod::itemReceivedSound);
+	hooks::fmod::PlaySfx("item_received");
 	if (activeItems.count(item)) { // If item already active add time
 		activeItems[item] += itemTime;
 	}
@@ -108,7 +108,7 @@ void hooks::maniac::TriggerItem(network::CurrentItem item) {
 }
 
 void SendItem(network::CurrentItem item) {
-	hooks::fmod::PlayItemSound(hooks::fmod::itemSendSound);
+	hooks::fmod::PlaySfx("item_send");
 	auto buf = msgpack::pack(item);
 	client::Send(network::ClientToServer::CTS_ITEM, buf);
 }
@@ -138,15 +138,15 @@ void hkUpdateCombo() {
 	if (hooks::maniac::currentCombo == hooks::maniac::threshold) {
 		hooks::maniac::currentItem.rolledItemId = hooks::maniac::dist(hooks::maniac::rng);
 		hooks::maniac::currentItem.level = 1;
-		hooks::fmod::PlayItemSound(hooks::fmod::itemGetSound);
+		hooks::fmod::PlaySfx("item_get");
 	}
 	else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 2) {
 		hooks::maniac::currentItem.level = 2;
-		hooks::fmod::PlayItemSound(hooks::fmod::itemUpgradeSound);
+		hooks::fmod::PlaySfx("item_upgrade");
 	}
 	else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 3) {
 		hooks::maniac::currentItem.level = 3;
-		hooks::fmod::PlayItemSound(hooks::fmod::itemUpgradeSound);
+		hooks::fmod::PlaySfx("item_upgrade");
 	}
 }
 

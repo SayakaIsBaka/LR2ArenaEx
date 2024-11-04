@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
+#include <utils/misc.h>
 
 // FMOD_MODE flags, from https://github.com/thibaudcolas/icopter/blob/master/Classes/engine/sound/FMOD%20Libraries/Headers/fmod.h
 #define FMOD_DEFAULT                   0x00000000  /* Default for all modes listed below. FMOD_LOOP_OFF, FMOD_2D, FMOD_HARDWARE */
@@ -38,6 +40,13 @@
 
 namespace hooks {
 	namespace fmod {
+		struct Sfx {
+			std::string name;
+			std::string defaultPath;
+			std::string customPath;
+			void* soundObject = NULL;
+		};
+
 		typedef int(__stdcall* FMOD_System_Update)(void*);
 		inline FMOD_System_Update oFmodSystemUpdate;
 
@@ -66,10 +75,12 @@ namespace hooks {
 		inline void* systemObj = NULL;
 		inline void* channelGroup = NULL;
 
-		inline void* itemGetSound = NULL;
-		inline void* itemUpgradeSound = NULL;
-		inline void* itemReceivedSound = NULL;
-		inline void* itemSendSound = NULL;
+		inline std::unordered_map<std::string, Sfx> soundEffects{
+			{"item_get", { "Item get", (utils::GetLR2BasePath() / "LR2files" / "Sound" / "lr2" / "o-open.wav").u8string(), "", NULL }},
+			{"item_upgrade", { "Item upgrade", (utils::GetLR2BasePath() / "LR2files" / "Sound" / "lr2" / "o-change.wav").u8string(), "", NULL }},
+			{"item_received", { "Item received", (utils::GetLR2BasePath() / "LR2files" / "Sound" / "lr2" / "f-close.wav").u8string(), "", NULL }},
+			{"item_send", { "Item send", (utils::GetLR2BasePath() / "LR2files" / "Sound" / "lr2" / "f-open.wav").u8string(), "", NULL }},
+		};
 
 		inline int volume = 100;
 
@@ -77,7 +88,7 @@ namespace hooks {
 		void Destroy();
 
 		void InitDefaultSounds();
-		void PlayItemSound(void *sound);
+		void PlaySfx(std::string id);
 		void SetItemVolume(int volume);
 		void LoadConfig(std::string volume);
 		void SaveToConfigFile();

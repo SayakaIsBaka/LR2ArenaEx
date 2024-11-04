@@ -129,3 +129,27 @@ float utils::CalculateRate(network::Score score, unsigned int maxScore) {
 	auto percentage (((float)CalculateExScore(score) / (float)maxScore) * 100.0f);
 	return floorf(percentage * 100) / 100; // Round down
 }
+
+std::string utils::OpenFileDialog(LPCWSTR filter, LPCWSTR title) {
+	OPENFILENAMEW ofn = { 0 };
+	WCHAR path[MAX_PATH] = { 0 };
+
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFile = path;
+	ofn.nMaxFile = sizeof(path);
+	ofn.lpstrFilter = filter;
+	ofn.nFilterIndex = 0;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.lpstrTitle = title;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileNameW(&ofn)) {
+		std::filesystem::path pathStr(path);
+		return pathStr.u8string();
+	}
+	std::cout << "[!] Error opening file: " << CommDlgExtendedError() << std::endl;
+	return "";
+}

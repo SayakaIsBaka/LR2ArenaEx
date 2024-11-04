@@ -13,5 +13,6 @@ namespace utils {
 	std::string GetChartPath(std::string hash);
 	std::string GetOptionName(unsigned int opt);
 	std::string GetGaugeName(unsigned int gauge);
+	std::string OpenFileDialog(LPCWSTR filter, LPCWSTR title);
 	float CalculateRate(network::Score score, unsigned int maxScore);
 }
