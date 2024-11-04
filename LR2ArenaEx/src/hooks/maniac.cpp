@@ -7,6 +7,7 @@
 
 #include "maniac.h"
 #include "maxscore.h"
+#include "fmod.h"
 
 void hooks::maniac::SaveToConfigFile() {
 	config::SetConfigValue("controller_type", std::to_string(static_cast<unsigned int>(itemKeyBind.type)));
@@ -96,6 +97,7 @@ void hooks::maniac::TriggerItem(network::CurrentItem item) {
 		return;
 	}
 
+	hooks::fmod::PlayItemSound(hooks::fmod::itemReceivedSound);
 	if (activeItems.count(item)) { // If item already active add time
 		activeItems[item] += itemTime;
 	}
@@ -106,6 +108,7 @@ void hooks::maniac::TriggerItem(network::CurrentItem item) {
 }
 
 void SendItem(network::CurrentItem item) {
+	hooks::fmod::PlayItemSound(hooks::fmod::itemSendSound);
 	auto buf = msgpack::pack(item);
 	client::Send(network::ClientToServer::CTS_ITEM, buf);
 }
@@ -135,12 +138,15 @@ void hkUpdateCombo() {
 	if (hooks::maniac::currentCombo == hooks::maniac::threshold) {
 		hooks::maniac::currentItem.rolledItemId = hooks::maniac::dist(hooks::maniac::rng);
 		hooks::maniac::currentItem.level = 1;
+		hooks::fmod::PlayItemSound(hooks::fmod::itemGetSound);
 	}
 	else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 2) {
 		hooks::maniac::currentItem.level = 2;
+		hooks::fmod::PlayItemSound(hooks::fmod::itemUpgradeSound);
 	}
 	else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 3) {
 		hooks::maniac::currentItem.level = 3;
+		hooks::fmod::PlayItemSound(hooks::fmod::itemUpgradeSound);
 	}
 }
 

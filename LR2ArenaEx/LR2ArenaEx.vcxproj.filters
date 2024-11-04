@@ -168,6 +168,9 @@
     <ClInclude Include="src\gui\itemsettings.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
+    <ClInclude Include="src\hooks\fmod.h">
+      <Filter>Source Files\hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -280,6 +283,9 @@
     </ClCompile>
     <ClCompile Include="src\gui\itemsettings.cpp">
       <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hooks\fmod.cpp">
+      <Filter>Source Files\hooks</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

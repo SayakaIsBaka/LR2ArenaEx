@@ -1,11 +1,13 @@
 #pragma once
 
 #include <network/structs.h>
+#include <filesystem>
 
 namespace utils {
 	unsigned int CalculateExScore(network::Score score);
 	void StrTrim(char* s);
 	std::string SJISToUTF8(const std::string& sjis);
+	std::filesystem::path GetLR2BasePath();
 	std::string GetDatabasePath();
 	std::string GetConfigPath();
 	std::string GetChartPath(std::string hash);

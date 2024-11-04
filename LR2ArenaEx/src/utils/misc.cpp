@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <sqlite_modern_cpp.h>
 #include <network/enums.h>
 
@@ -40,11 +39,16 @@ std::string utils::SJISToUTF8(const std::string& sjis) {
 	return utf8_string;
 }
 
-std::string utils::GetDatabasePath() {
-	WCHAR dllPath[MAX_PATH];
-	GetModuleFileNameW(NULL, dllPath, MAX_PATH);
-	std::filesystem::path wPath(dllPath);
+std::filesystem::path utils::GetLR2BasePath() {
+	WCHAR exePath[MAX_PATH];
+	GetModuleFileNameW(NULL, exePath, MAX_PATH);
+	std::filesystem::path wPath(exePath);
 	wPath.remove_filename();
+	return wPath;
+}
+
+std::string utils::GetDatabasePath() {
+	auto wPath = GetLR2BasePath();
 	wPath = wPath / "LR2files" / "Database" / "song.db";
 	return wPath.u8string();
 }

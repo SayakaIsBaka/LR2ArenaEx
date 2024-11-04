@@ -11,6 +11,7 @@
 #include "maxscore.h"
 #include "midi.h"
 #include "maniac.h"
+#include "fmod.h"
 
 bool hooks::SetupHooks() { // Pacemaker hook is missing from here as we only hook when connecting
 	client::Init();
@@ -23,6 +24,7 @@ bool hooks::SetupHooks() { // Pacemaker hook is missing from here as we only hoo
 	hooks::max_score::Setup();
 	hooks::midi::Setup();
 	hooks::maniac::Setup();
+	hooks::fmod::Setup();
 
 	return true;
 }
