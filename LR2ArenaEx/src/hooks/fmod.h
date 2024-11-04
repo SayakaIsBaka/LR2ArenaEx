@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <utils/misc.h>
+#include <mini/ini.h>
 
 // FMOD_MODE flags, from https://github.com/thibaudcolas/icopter/blob/master/Classes/engine/sound/FMOD%20Libraries/Headers/fmod.h
 #define FMOD_DEFAULT                   0x00000000  /* Default for all modes listed below. FMOD_LOOP_OFF, FMOD_2D, FMOD_HARDWARE */
@@ -87,10 +88,11 @@ namespace hooks {
 		void Setup();
 		void Destroy();
 
-		void InitDefaultSounds();
+		void InitSounds(bool forceDefault);
 		void PlaySfx(std::string id);
 		void SetItemVolume(int volume);
-		void LoadConfig(std::string volume);
+		void LoadConfig(std::string volume, mINI::INIMap<std::string> sfxConfig);
 		void SaveToConfigFile();
+		void LoadSound(std::string id, std::string path);
 	}
 }

@@ -9,21 +9,55 @@ void hooks::fmod::SaveToConfigFile() {
 	config::SaveConfig();
 }
 
-void hooks::fmod::LoadConfig(std::string volume) {
+void hooks::fmod::LoadConfig(std::string volume, mINI::INIMap<std::string> sfxConfig) {
 	try {
-		int intVol = std::stoi(volume);
+		if (!volume.empty()) {
+			int intVol = std::stoi(volume);
 
-		if (intVol < 0 || intVol > 100)
-			throw std::invalid_argument("Invalid value");
+			if (intVol < 0 || intVol > 100)
+				throw std::invalid_argument("Invalid value");
 
-		hooks::fmod::volume = intVol;
-		if (channelGroup != NULL) { // If channel group is already created (extremely unlikely)
-			SetVolume(channelGroup, (float)hooks::fmod::volume / 100.0f);
+			hooks::fmod::volume = intVol;
+			if (channelGroup != NULL) { // If channel group is already created (extremely unlikely)
+				SetVolume(channelGroup, (float)hooks::fmod::volume / 100.0f);
+			}
 		}
 	}
 	catch (std::exception e) {
 		std::cout << "[!] Error parsing config file for sound settings, falling back to default" << std::endl;
 	}
+	try {
+		if (sfxConfig.size() != 0) {
+			for (const auto& [key, val] : sfxConfig) {
+				if (soundEffects.count(key) == 0) {
+					std::cout << "[!] Following sound effect does not exist, skipping: " << key << std::endl;
+					continue;
+				}
+				soundEffects[key].customPath = val;
+				if (systemObj != NULL && soundEffects[key].soundObject != NULL) { // If sound object is already created (extremely unlikely)
+					LoadSound(key, val);
+				}
+			}
+		}
+	}
+	catch (std::exception e) {
+		std::cout << "[!] Error parsing config file for custom SFXs, falling back to default" << std::endl;
+	}
+}
+
+void hooks::fmod::LoadSound(std::string id, std::string path) {
+	if (soundEffects.count(id) == 0) {
+		std::cout << "[!] Specified sound effect id does not exist" << std::endl;
+		return;
+	}
+	void* tmpSound = NULL;
+	if (CreateSound(systemObj, path.c_str(), FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE, NULL, &tmpSound)) {
+		std::cout << "[!] Error loading the following SFX: " << soundEffects[id].name << std::endl;
+		return;
+	}
+	if (soundEffects[id].soundObject != NULL)
+		ReleaseSound(soundEffects[id].soundObject);
+	soundEffects[id].soundObject = tmpSound;
 }
 
 void hooks::fmod::PlaySfx(std::string id) {
@@ -39,11 +73,13 @@ void hooks::fmod::PlaySfx(std::string id) {
 	}
 }
 
-void hooks::fmod::InitDefaultSounds() {
+void hooks::fmod::InitSounds(bool forceDefault) {
 	for (auto& [key, val] : soundEffects) {
-		if (CreateSound(systemObj, val.defaultPath.c_str(), FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE, NULL, &val.soundObject)) {
-			std::cout << "[!] Error loading the following SFX: " << val.name << std::endl;
-		}
+		std::string path = val.defaultPath;
+		if (!val.customPath.empty() && !forceDefault)
+			path = val.customPath;
+
+		LoadSound(key, path);
 	}
 }
 
@@ -64,7 +100,7 @@ int __stdcall hkFmodSystemUpdate(void *system) {
 				std::cout << "[!] Error creating FMOD channel group" << std::endl;
 			}
 			else {
-				hooks::fmod::InitDefaultSounds();
+				hooks::fmod::InitSounds(false);
 				hooks::fmod::SetVolume(hooks::fmod::channelGroup, (float)hooks::fmod::volume / 100.0f); // Apply volume when group is created
 				std::cout << "[i] Succesfully initialized FMOD channel group and sounds" << std::endl;
 			}

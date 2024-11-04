@@ -27,8 +27,8 @@ void config::LoadConfig() {
 		hooks::maniac::LoadConfig(controllerType, itemKeybind);
 
 	auto itemVolume = ini.get("config").get("item_sound_volume");
-	if (!itemVolume.empty())
-		hooks::fmod::LoadConfig(itemVolume);
+	auto sfxConfig = ini.get("sfx");
+	hooks::fmod::LoadConfig(itemVolume, sfxConfig);
 }
 
 void config::SetConfigValue(std::string key, std::string val) {
