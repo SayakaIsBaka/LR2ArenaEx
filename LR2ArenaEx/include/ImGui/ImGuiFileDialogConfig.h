@@ -173,7 +173,7 @@
 
 #define USE_PLACES_FEATURE
 #define PLACES_PANE_DEFAULT_SHOWN true
-// #define placesPaneWith 150.0f
+// #define defaultPlacePaneWith 150.0f
 // #define IMGUI_TOGGLE_BUTTON ToggleButton
 // #define placesButtonString "Place"
 // #define placesButtonHelpString "Places"

@@ -1,14 +1,13 @@
-#include <ImGui/imgui.h>
+#include "gui.h"
+#include "widgets.h"
+#include "mainwindow.h"
+
 #include <server/server.h>
 #include <client/client.h>
 #include <hooks/maniac.h>
 #include <hooks/fmod.h>
 #include <overlay/dx9hook.h>
 #include <ImGui/ImGuiFileDialog.h>
-
-#include "gui.h"
-#include "widgets.h"
-#include "mainwindow.h"
 
 void gui::Render() {
 	if (ImGui::Begin("LR2ArenaEx", &showMenu, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus))
@@ -101,7 +100,7 @@ void gui::Render() {
                 if (ImGui::CollapsingHeader("Item SFX settings")) {
                     if (ImGui::BeginTable("ItemSfxTable", 3,
                         ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH,
-                        ImVec2(ImGui::GetFontSize() * 25.0f, ImGui::GetTextLineHeightWithSpacing() * 6))) {
+                        ImVec2(ImGui::GetFontSize() * 25.0f, ImGui::GetTextLineHeightWithSpacing() * 7))) {
                         ImGui::TableSetupScrollFreeze(1, 0);
                         ImGui::TableSetupColumn("");
                         ImGui::TableSetupColumn("Name");
@@ -110,12 +109,16 @@ void gui::Render() {
                         for (const auto& [key, val] : hooks::fmod::soundEffects) {
                             ImGui::TableNextRow();
                             ImGui::TableNextColumn();
-                            if (ImGui::Button(("Load##" + key).c_str())) {
+                            if (ImGui::Button((ICON_FA_FOLDER_OPEN "##" + key).c_str())) {
                                 IGFD::FileDialogConfig config;
                                 config.countSelectionMax = 1;
                                 config.flags = ImGuiFileDialogFlags_Modal | ImGuiFileDialogFlags_DisableCreateDirectoryButton | ImGuiFileDialogFlags_CaseInsensitiveExtentionFiltering;
                                 config.userDatas = IGFD::UserDatas(key.c_str());
                                 ImGuiFileDialog::Instance()->OpenDialog("ChooseAudioFileDlg", "Select an audio file...", "Audio files (*.wav, *.ogg, *.mp3){.wav,.ogg,.mp3}", config);
+                            }
+                            ImGui::SameLine();
+                            if (ImGui::Button((ICON_FA_PLAY "##" + key).c_str())) {
+                                hooks::fmod::PlaySfx(key);
                             }
                             ImGui::TableNextColumn();
                             ImGui::Text("%s", val.name.c_str());
@@ -141,7 +144,11 @@ void gui::Render() {
         ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".wav", ImVec4(1.0f, 1.0f, 1.0f, 0.9f), ICON_FA_MUSIC);
         ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".ogg", ImVec4(1.0f, 1.0f, 1.0f, 0.9f), ICON_FA_MUSIC);
         ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".mp3", ImVec4(1.0f, 1.0f, 1.0f, 0.9f), ICON_FA_MUSIC);
-        if (ImGuiFileDialog::Instance()->Display("ChooseAudioFileDlg", ImGuiWindowFlags_NoCollapse, ImVec2(500, 300))) {
+
+        ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::internal_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::internal_resolution)[1] / 2.0f);
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+        if (ImGuiFileDialog::Instance()->Display("ChooseAudioFileDlg", ImGuiWindowFlags_NoCollapse, fileDialogDim[overlay::lr2type])) {
             if (ImGuiFileDialog::Instance()->IsOk()) {
                 std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
                 std::string id;
