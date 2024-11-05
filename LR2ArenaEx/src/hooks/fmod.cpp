@@ -58,8 +58,18 @@ bool hooks::fmod::LoadSound(std::string id, std::string path) {
 		return false;
 	}
 	void* tmpSound = NULL;
-	if (CreateSound(systemObj, path.c_str(), FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE, NULL, &tmpSound)) {
-		std::cout << "[!] Error loading the following SFX: " << soundEffects[id].name << std::endl;
+	auto buffer = utils::LoadFileToVector(path);
+	if (buffer.size() == 0) {
+		std::cout << "[!] Error loading file: " << path << std::endl;
+		return false;
+	}
+	FMOD_CREATESOUNDEXINFO exInfo = { 0 };
+
+	exInfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+	exInfo.length = buffer.size();
+
+	if (int res = CreateSound(systemObj, &buffer[0], FMOD_LOOP_OFF | FMOD_ACCURATETIME | FMOD_HARDWARE | FMOD_OPENMEMORY | FMOD_CREATESAMPLE, &exInfo, &tmpSound)) {
+		std::cout << "[!] Error loading the following SFX (error " << std::to_string(res) << "): " << soundEffects[id].name << std::endl;
 		return false;
 	}
 	if (soundEffects[id].soundObject != NULL)

@@ -1,5 +1,6 @@
 #include <sqlite_modern_cpp.h>
 #include <network/enums.h>
+#include <fstream>
 
 #include "misc.h"
 
@@ -84,6 +85,16 @@ std::string utils::GetChartPath(std::string hash) {
 		std::cout << "[!] Error: " << e.what() << std::endl;
 		return "";
 	}
+}
+
+std::vector<char> utils::LoadFileToVector(std::string path) {
+	std::filesystem::path tmp = std::filesystem::u8path(path); // Fix loading for paths with unicode characters
+	std::ifstream infile(tmp, std::ios_base::binary);
+
+	std::vector<char> buffer;
+	buffer = std::vector<char>(std::istreambuf_iterator<char>(infile), std::istreambuf_iterator<char>());
+
+	return buffer;
 }
 
 std::string utils::GetOptionName(unsigned int option) {
