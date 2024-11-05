@@ -4,6 +4,7 @@
 #include <hooks/maniac.h>
 #include <hooks/fmod.h>
 #include <overlay/dx9hook.h>
+#include <ImGui/ImGuiFileDialog.h>
 
 #include "gui.h"
 #include "widgets.h"
@@ -110,8 +111,11 @@ void gui::Render() {
                             ImGui::TableNextRow();
                             ImGui::TableNextColumn();
                             if (ImGui::Button(("Load##" + key).c_str())) {
-                                hooks::fmod::LoadNewCustomSound(key);
-
+                                IGFD::FileDialogConfig config;
+                                config.countSelectionMax = 1;
+                                config.flags = ImGuiFileDialogFlags_Modal | ImGuiFileDialogFlags_DisableCreateDirectoryButton | ImGuiFileDialogFlags_CaseInsensitiveExtentionFiltering;
+                                config.userDatas = IGFD::UserDatas(key.c_str());
+                                ImGuiFileDialog::Instance()->OpenDialog("ChooseAudioFileDlg", "Select an audio file...", "Audio files (*.wav, *.ogg, *.mp3){.wav,.ogg,.mp3}", config);
                             }
                             ImGui::TableNextColumn();
                             ImGui::Text("%s", val.name.c_str());
@@ -133,6 +137,20 @@ void gui::Render() {
             ImGui::EndTabBar();
         }
 
+        ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByTypeDir, "", ImVec4(1.0f, 1.0f, 1.0f, 0.9f), ICON_FA_FOLDER);
+        ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".wav", ImVec4(1.0f, 1.0f, 1.0f, 0.9f), ICON_FA_MUSIC);
+        ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".ogg", ImVec4(1.0f, 1.0f, 1.0f, 0.9f), ICON_FA_MUSIC);
+        ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".mp3", ImVec4(1.0f, 1.0f, 1.0f, 0.9f), ICON_FA_MUSIC);
+        if (ImGuiFileDialog::Instance()->Display("ChooseAudioFileDlg", ImGuiWindowFlags_NoCollapse, ImVec2(500, 300))) {
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string id;
+                if (ImGuiFileDialog::Instance()->GetUserDatas())
+                    id = std::string((const char*)ImGuiFileDialog::Instance()->GetUserDatas());
+                hooks::fmod::LoadNewCustomSound(id, filePath);
+            }
+            ImGuiFileDialog::Instance()->Close();
+        }
 	}
 	ImGui::End();
 }

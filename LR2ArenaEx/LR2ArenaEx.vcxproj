@@ -212,6 +212,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\framework.h" />
+    <ClInclude Include="include\ImGui\ImGuiFileDialog.h" />
+    <ClInclude Include="include\ImGui\ImGuiFileDialogConfig.h" />
     <ClInclude Include="include\ImGui\ImGuiNotify.hpp" />
     <ClInclude Include="include\ImGui\implot.h" />
     <ClInclude Include="include\ImGui\implot_internal.h" />
@@ -257,6 +259,7 @@
   <ItemGroup>
     <ClCompile Include="include\Garnet\Garnet.cpp" />
     <ClCompile Include="include\ImGui\imgui.cpp" />
+    <ClCompile Include="include\ImGui\ImGuiFileDialog.cpp" />
     <ClCompile Include="include\ImGui\imgui_demo.cpp" />
     <ClCompile Include="include\ImGui\imgui_draw.cpp" />
     <ClCompile Include="include\ImGui\imgui_impl_dx9.cpp" />

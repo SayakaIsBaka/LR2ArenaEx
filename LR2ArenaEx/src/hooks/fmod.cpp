@@ -68,15 +68,14 @@ bool hooks::fmod::LoadSound(std::string id, std::string path) {
 	return true;
 }
 
-void hooks::fmod::LoadNewCustomSound(std::string id) {
-	auto selectedFile = utils::OpenFileDialog(L"Audio files (*.wav;*.ogg)\0*.wav;*.ogg\0", L"Select an audio file...");
+void hooks::fmod::LoadNewCustomSound(std::string id, std::string selectedFile) {
 	if (!selectedFile.empty()) {
 		if (LoadSound(id, selectedFile)) {
 			soundEffects[id].customPath = selectedFile;
 			SaveToConfigFile();
 		}
 		else
-			ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "Error loading the following file: %s", selectedFile });
+			ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "Error loading the following file: %s", selectedFile.c_str() });
 	}
 }
 

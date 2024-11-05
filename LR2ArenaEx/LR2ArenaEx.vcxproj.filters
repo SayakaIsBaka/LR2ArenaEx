@@ -171,6 +171,12 @@
     <ClInclude Include="src\hooks\fmod.h">
       <Filter>Source Files\hooks</Filter>
     </ClInclude>
+    <ClInclude Include="include\ImGui\ImGuiFileDialog.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\ImGuiFileDialogConfig.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -286,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="src\hooks\fmod.cpp">
       <Filter>Source Files\hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\ImGuiFileDialog.cpp">
+      <Filter>Header Files\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

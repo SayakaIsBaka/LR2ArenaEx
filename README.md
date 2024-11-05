@@ -33,14 +33,11 @@ LR2ArenaEx uses the following libraries:
 - [implot](https://github.com/epezent/implot)
 - [ImGuiNotify](https://github.com/TyomaVader/ImGuiNotify)
 - [mINI](https://github.com/metayeti/mINI)
+- [ImGuiFileDialog](https://github.com/aiekick/ImGuiFileDialog)
 
 ## Standalone server
 
 A small wrapper around LR2ArenaEx's embedded server is available, allowing to run it as a cross-platform standalone executable. Instructions and code are available [here](https://github.com/SayakaIsBaka/LR2ArenaEx/tree/master/LR2ArenaEx/standalone).
-
-## Planned features
-
-- Add an item / "ojama" mode similar to pop'n music battle mode
 
 ## Special thanks
 
