@@ -128,6 +128,8 @@ void hooks::maniac::ResetState() {
 
 void hkResetCombo() {
 	hooks::maniac::currentCombo = 0;
+	if (hooks::maniac::currentItem.rolledItemId != -1) // If already rolled item, set item as final so we cannot upgrade it further
+		hooks::maniac::currentItem.final = true;
 }
 
 void hkUpdateCombo() {
@@ -135,19 +137,21 @@ void hkUpdateCombo() {
 		if (hooks::max_score::maxScore != 0)
 			hooks::maniac::threshold = std::round((hooks::max_score::maxScore / 2) * hooks::maniac::thresholdMult); // Determine threshold from the number of total notes in chart
 
-		hooks::maniac::currentCombo++;
-		if (hooks::maniac::currentCombo == hooks::maniac::threshold) {
-			hooks::maniac::currentItem.rolledItemId = hooks::maniac::dist(hooks::maniac::rng);
-			hooks::maniac::currentItem.level = 1;
-			hooks::fmod::PlaySfx("item_get");
-		}
-		else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 2) {
-			hooks::maniac::currentItem.level = 2;
-			hooks::fmod::PlaySfx("item_upgrade");
-		}
-		else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 3) {
-			hooks::maniac::currentItem.level = 3;
-			hooks::fmod::PlaySfx("item_upgrade");
+		if (!hooks::maniac::currentItem.final) {
+			hooks::maniac::currentCombo++;
+			if (hooks::maniac::currentCombo == hooks::maniac::threshold) {
+				hooks::maniac::currentItem.rolledItemId = hooks::maniac::dist(hooks::maniac::rng);
+				hooks::maniac::currentItem.level = 1;
+				hooks::fmod::PlaySfx("item_get");
+			}
+			else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 2) {
+				hooks::maniac::currentItem.level = 2;
+				hooks::fmod::PlaySfx("item_upgrade");
+			}
+			else if (hooks::maniac::currentCombo == hooks::maniac::threshold * 3) {
+				hooks::maniac::currentItem.level = 3;
+				hooks::fmod::PlaySfx("item_upgrade");
+			}
 		}
 	}
 }

@@ -106,6 +106,7 @@ namespace network {
 	struct CurrentItem {
 		int rolledItemId = -1;
 		unsigned short level = 0;
+		bool final = false;
 
 		bool operator==(const CurrentItem& other) const {
 			return (rolledItemId == other.rolledItemId && level == other.level);
