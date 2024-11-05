@@ -83,6 +83,7 @@ void hooks::fmod::LoadNewCustomSound(std::string id, std::string selectedFile) {
 		if (LoadSound(id, selectedFile)) {
 			soundEffects[id].customPath = selectedFile;
 			SaveToConfigFile();
+			ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "Succesfully loaded file: %s", selectedFile.c_str() });
 		}
 		else
 			ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "Error loading the following file: %s", selectedFile.c_str() });
@@ -95,6 +96,7 @@ void hooks::fmod::ResetAllCustomSounds() {
 	}
 	InitSounds(true);
 	SaveToConfigFile();
+	ImGui::InsertNotification({ ImGuiToastType::Info, 3000, "All sound effects reset to default sounds!" });
 }
 
 void hooks::fmod::PlaySfx(std::string id) {
