@@ -158,7 +158,7 @@ int __cdecl hkShowCursor(int enabled) {
 }
 
 void overlay::dx9hook::HookDX9() {
-	char* d3dPointer = mem::ScanModIn(d3dPattern, d3dMask, d3dName);
+	char* d3dPointer = mem::ScanModIn(d3dPattern, d3dMask, d3dName, true);
 	std::cout << "[i] D3D pointer: " << (int*)d3dPointer << std::endl;
 
 	uintptr_t d3dDeviceAddr = mem::FindDMAAddy((uintptr_t)d3dPointer + 0x4, { 0x0 });

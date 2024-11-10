@@ -14,6 +14,6 @@ namespace mem
 	char* TrampHook(char* src, char* dst, unsigned int len);
 	char* ScanBasic(char* pattern, char* mask, char* begin, intptr_t size);
 	char* ScanInternal(char* pattern, char* mask, char* begin, intptr_t size);
-	char* ScanModIn(char* pattern, char* mask, std::string modName);
+	char* ScanModIn(char* pattern, char* mask, std::string modName, bool forceSystem = false);
 	void WriteMemory(LPVOID address, LPVOID value, int byteNum);
 }

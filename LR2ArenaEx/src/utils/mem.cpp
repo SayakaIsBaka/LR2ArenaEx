@@ -203,7 +203,7 @@ PEB* GetPEB()
 	return peb;
 }
 
-LDR_DATA_TABLE_ENTRY* GetLDREntry(std::string name)
+LDR_DATA_TABLE_ENTRY* GetLDREntry(std::string name, bool forceSystem)
 {
 	LDR_DATA_TABLE_ENTRY* ldr = nullptr;
 
@@ -212,6 +212,9 @@ LDR_DATA_TABLE_ENTRY* GetLDREntry(std::string name)
 	LIST_ENTRY head = peb->Ldr->InMemoryOrderModuleList;
 
 	LIST_ENTRY curr = head;
+
+	WCHAR system_dir[MAX_PATH];
+	GetSystemDirectoryW(system_dir, MAX_PATH);
 
 	while (curr.Flink != head.Blink)
 	{
@@ -223,8 +226,10 @@ LDR_DATA_TABLE_ENTRY* GetLDREntry(std::string name)
 
 			if (_stricmp(cName, name.c_str()) == 0)
 			{
-				ldr = mod;
-				break;
+				if (!forceSystem || (forceSystem && std::wstring(mod->FullDllName.Buffer).rfind(system_dir, 0) == 0)) {
+					ldr = mod;
+					break;
+				}
 			}
 			delete[] cName;
 		}
@@ -233,9 +238,9 @@ LDR_DATA_TABLE_ENTRY* GetLDREntry(std::string name)
 	return ldr;
 }
 
-char* mem::ScanModIn(char* pattern, char* mask, std::string modName)
+char* mem::ScanModIn(char* pattern, char* mask, std::string modName, bool forceSystem)
 {
-	LDR_DATA_TABLE_ENTRY* ldr = GetLDREntry(modName);
+	LDR_DATA_TABLE_ENTRY* ldr = GetLDREntry(modName, forceSystem);
 	std::cout << "[i] DLL base for " << modName << ": " << ldr->DllBase << std::endl;
 	std::cout << "[i] Size of image: " << ldr->SizeOfImage << std::endl;
 	char* match = mem::ScanInternal(pattern, mask, (char*)ldr->DllBase, ldr->SizeOfImage);
