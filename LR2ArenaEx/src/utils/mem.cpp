@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <cstring>
+#include <filesystem>
 
 #include <framework.h>
 #include <ntdll.h>
@@ -226,7 +227,16 @@ LDR_DATA_TABLE_ENTRY* GetLDREntry(std::string name, bool forceSystem)
 
 			if (_stricmp(cName, name.c_str()) == 0)
 			{
-				if (!forceSystem || (forceSystem && std::wstring(mod->FullDllName.Buffer).rfind(system_dir, 0) == 0)) {
+				if (forceSystem) {
+					auto dllPath = std::filesystem::path(mod->FullDllName.Buffer);
+					auto systemPath = std::filesystem::path(system_dir);
+					auto rel = std::filesystem::relative(dllPath, systemPath);
+					if (!rel.empty() && rel.native()[0] != '.') { // If subpath
+						ldr = mod;
+						break;
+					}
+				}
+				else {
 					ldr = mod;
 					break;
 				}
@@ -241,6 +251,8 @@ LDR_DATA_TABLE_ENTRY* GetLDREntry(std::string name, bool forceSystem)
 char* mem::ScanModIn(char* pattern, char* mask, std::string modName, bool forceSystem)
 {
 	LDR_DATA_TABLE_ENTRY* ldr = GetLDREntry(modName, forceSystem);
+	if (!ldr)
+		return nullptr;
 	std::cout << "[i] DLL base for " << modName << ": " << ldr->DllBase << std::endl;
 	std::cout << "[i] Size of image: " << ldr->SizeOfImage << std::endl;
 	char* match = mem::ScanInternal(pattern, mask, (char*)ldr->DllBase, ldr->SizeOfImage);
