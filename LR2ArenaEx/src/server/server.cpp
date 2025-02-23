@@ -23,17 +23,14 @@ void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAdd
     auto selectedBms = msgpack::unpack<network::SelectedBmsMessage>(data);
 
     if (clientAddr == server::state.host) {
-        server::state.currentRandom = selectedBms.random;
+        server::state.currentRandomSeed = selectedBms.randomSeed;
         server::state.itemModeEnabled = selectedBms.itemModeEnabled;
         ResetStateEveryone();
     }
 
     std::cout << "[server] Received selected bms: " << selectedBms.title << " / " << selectedBms.artist << std::endl;
     std::cout << "[server] Hash: " << selectedBms.hash << std::endl;
-    std::cout << "[server] Random: ";
-    for (const auto e : server::state.currentRandom)
-        std::cout << e << " ";
-    std::cout << std::endl;
+    std::cout << "[server] Random seed: " << server::state.currentRandomSeed << std::endl;
 
     server::state.peers[clientAddr].selectedHash = selectedBms.hash;
     server::state.peers[clientAddr].option = selectedBms.option;

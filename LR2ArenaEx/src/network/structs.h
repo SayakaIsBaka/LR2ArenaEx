@@ -53,7 +53,7 @@ namespace network {
 	};
 
 	struct SelectedBmsMessage {
-		std::array<unsigned int, 7> random = { 0, 0, 0, 0, 0, 0, 0 };
+		int randomSeed;
 		std::string hash;
 		std::string title;
 		std::string artist;
@@ -63,7 +63,7 @@ namespace network {
 
 		template<class T>
 		void pack(T& pack) {
-			pack(random, hash, title, artist, option, gauge, itemModeEnabled);
+			pack(randomSeed, hash, title, artist, option, gauge, itemModeEnabled);
 		}
 	};
 

@@ -10,7 +10,7 @@
 namespace server {
 	struct State {
 		Garnet::Address host;
-		std::array<unsigned int, 7> currentRandom = { 0, 0, 0, 0, 0, 0, 0 };
+		int currentRandomSeed;
 		network::ItemSettings itemSettings;
 		bool itemModeEnabled = false;
 

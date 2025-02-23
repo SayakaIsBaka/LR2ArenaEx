@@ -78,10 +78,7 @@ void client::UpdateSelectedSong(std::vector<unsigned char> data) {
 	if (!(state.host == state.remoteId)) { // If not host (!= is not overloaded!!!)
 		std::cout << "[+] Received random" << std::endl;
 		hooks::random::received_random = true;
-
-		EnterCriticalSection(&hooks::random::RandomCriticalSection);
-		hooks::random::current_random = selectedBms.random;
-		LeaveCriticalSection(&hooks::random::RandomCriticalSection);
+		hooks::random::current_seed = selectedBms.randomSeed;
 	}
 
 	std::string path = utils::GetChartPath(selectedBms.hash);

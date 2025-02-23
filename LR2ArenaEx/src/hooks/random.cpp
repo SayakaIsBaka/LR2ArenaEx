@@ -2,15 +2,6 @@
 
 #include "random.h"
 
-void hooks::random::UpdateRandom() {
-	EnterCriticalSection(&RandomCriticalSection);
-	for (int i = 6; i >= 0; i--) {
-		current_random[i] = GetRandomNumber(i);
-		fprintf(stdout, "Random number %d: %d\n", i, current_random[i]);
-	}
-	LeaveCriticalSection(&RandomCriticalSection);
-}
-
 void swap_two_lanes(unsigned int* random, int i, int j) {
 	unsigned int tmp = random[i];
 	random[i] = random[j];
@@ -25,9 +16,7 @@ void mirror_random(unsigned int* random) {
 
 // This is hooking the call to the RNG generator which is why the function is kinda odd at first
 int hkRandom(int range, unsigned char* memory) {
-	EnterCriticalSection(&hooks::random::RandomCriticalSection);
-	int rand = hooks::random::current_random[range];
-	LeaveCriticalSection(&hooks::random::RandomCriticalSection);
+	int rand = hooks::random::GetRandomNumber(range);
 	if (range == 1 && hooks::random::random_flip) { // last call to trampRandom
 		unsigned int* random_addr = (unsigned int*)(memory + 476);
 		fprintf(stdout, "flipping random at address %p\n", random_addr);
@@ -74,11 +63,32 @@ __declspec(naked) void trampRandom() {
 	}
 }
 
+int hkGetRandom(int maxNum) {
+	if (hooks::random::received_random) {
+		return hooks::random::current_seed;
+	} else {
+		int num = hooks::random::GetRandomNumber(maxNum);
+		fprintf(stdout, "Generated seed: %d\n", num);
+		return num;
+	}
+}
+
+BOOL hkErrorLogFmtAdd(const char* format, unsigned int gp) {
+	if (hooks::random::received_random) { // Rewrite here as well in case the player is not the host and tried to gbattle, same behaviour as gbattle (aka seed not writte in replay on first run)
+		*(int*)(gp + 506736) = hooks::random::current_seed;
+	}
+	int num = *(int*)(gp + 506736);
+	hooks::random::current_seed = num;
+	fprintf(stdout, "Random seed: %d\n", hooks::random::current_seed);
+	return hooks::random::ErrorLogFmtAdd(format, num);
+}
+
 void hooks::random::Setup() {
-	InitializeCriticalSection(&RandomCriticalSection);
 	mem::HookFn((char*)0x4B4698, (char*)trampRandom, 5);
+	mem::HookFn((char*)0x4B07D3, (char*)hkGetRandom, 5); // Hook seed generation
+	mem::HookFn((char*)0x4B080E, (char*)hkErrorLogFmtAdd, 5); // Hook logging call after seed generation
+	mem::WriteMemory((char*)0x4B0802, "\x89\xEA\x90\x90\x90\x90", 6); // Change param to ErrorLogFmtAdd from struct member to pointer to struct
 }
 
 void hooks::random::Destroy() {
-	DeleteCriticalSection(&RandomCriticalSection);
 }

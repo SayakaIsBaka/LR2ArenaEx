@@ -15,10 +15,7 @@
 #include "maniac.h"
 
 void SendWithRandom(network::SelectedBmsMessage msg) {
-	EnterCriticalSection(&hooks::random::RandomCriticalSection);
-	msg.random = hooks::random::current_random;
-	LeaveCriticalSection(&hooks::random::RandomCriticalSection);
-
+	msg.randomSeed = hooks::random::current_seed;
 	auto msgPack = msgpack::pack(msg);
 
 	client::Send(network::ClientToServer::CTS_SELECTED_BMS, msgPack);
@@ -66,10 +63,6 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		std::cout << "[+] Selected option: " << selected_option << std::endl;
 		std::cout << "[+] Selected gauge: " << selected_gauge << std::endl;
 
-		if (!hooks::random::received_random) {
-			hooks::random::UpdateRandom();
-		}
-
 		auto bmsInfo = GetBmsInfo(selectedBmsUtf8);
 		bmsInfo.option = selected_option;
 		bmsInfo.gauge = selected_gauge;
@@ -93,7 +86,7 @@ __declspec(naked) void trampSelectBms() {
 		// hook ecx = ptr ptr bms path
 		pushfd
 		pushad
-		push[esp + 0x4c] // selected option is at [[esp+0x4c] + 0x10]
+		push [esp + 0x4c] // selected option is at [[esp+0x4c] + 0x10]
 		push ecx
 		call hkSelectBms
 		add esp, 8
