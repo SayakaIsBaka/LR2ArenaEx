@@ -15,6 +15,7 @@ namespace overlay {
 		typedef long(__stdcall* ResetScene)(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS*);
 		inline ResetScene oResetScene;
 		inline WNDPROC oWndProcHandler = NULL;
+		inline IDirect3DDevice9* lastKnownDevice = NULL;
 
 		typedef long(__cdecl* ShowCursor)(int);
 		inline ShowCursor oShowCursor;

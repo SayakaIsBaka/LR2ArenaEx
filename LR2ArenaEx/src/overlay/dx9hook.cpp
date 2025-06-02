@@ -104,7 +104,23 @@ void InitImGui(IDirect3DDevice9* pDevice) {
 
 	overlay::dx9hook::oWndProcHandler = (WNDPROC)SetWindowLongPtr(window, GWL_WNDPROC, (LONG)hkWndProc);
 	std::cout << "[i] Original WndProc: " << overlay::dx9hook::oWndProcHandler << std::endl;
+
+	overlay::dx9hook::lastKnownDevice = pDevice;
 	return;
+}
+
+void ResetImGui(IDirect3DDevice9* pDevice)
+{
+	D3DDEVICE_CREATION_PARAMETERS params;
+	pDevice->GetCreationParameters(&params);
+
+	ImGui_ImplWin32_Shutdown();
+	ImGui_ImplWin32_Init(params.hFocusWindow);
+
+	ImGui_ImplDX9_Shutdown();
+	ImGui_ImplDX9_Init(pDevice);
+
+	overlay::dx9hook::lastKnownDevice = pDevice;
 }
 
 void RenderNotifications() {
@@ -119,27 +135,31 @@ void RenderNotifications() {
 }
 
 HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
-	if (!overlay::dx9hook::init) InitImGui(pDevice);
-	else {
-		ImGui_ImplDX9_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-
-		ImGui::NewFrame();
-
-		if (gui::showMenu)
-		{
-			gui::Render();
-		}
-		if (gui::graph::showGraph)
-		{
-			gui::graph::Render();
-		}
-		RenderNotifications();
-
-		ImGui::EndFrame();
-		ImGui::Render();
-		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+	if (!overlay::dx9hook::init) {
+		InitImGui(pDevice);
+		return overlay::dx9hook::oEndScene(pDevice);
 	}
+
+	if (overlay::dx9hook::lastKnownDevice != pDevice) ResetImGui(pDevice);
+
+	ImGui_ImplDX9_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+
+	ImGui::NewFrame();
+
+	if (gui::showMenu)
+	{
+		gui::Render();
+	}
+	if (gui::graph::showGraph)
+	{
+		gui::graph::Render();
+	}
+	RenderNotifications();
+
+	ImGui::EndFrame();
+	ImGui::Render();
+	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 	return overlay::dx9hook::oEndScene(pDevice);
 }
 
