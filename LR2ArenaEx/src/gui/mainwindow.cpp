@@ -1,4 +1,4 @@
-﻿#include <msgpack/msgpack.hpp>
+﻿#include <utils/msgpack_utils.h>
 #include <client/client.h>
 #include <hooks/random.h>
 #include <cstdio>
@@ -84,11 +84,11 @@ void gui::main_window::Render() {
                 ImGui::TextDisabled("Selected user: %s", value.username.c_str());
                 if (ImGui::MenuItem("Give host")) {
                     Garnet::Address userId = key;
-                    client::Send(network::ClientToServer::CTS_SET_HOST, msgpack::pack(userId));
+                    client::Send(network::ClientToServer::CTS_SET_HOST, msgpack_utils::pack(userId));
                 }
                 if (ImGui::MenuItem("Kick")) {
                     Garnet::Address userId = key;
-                    client::Send(network::ClientToServer::CTS_KICK_USER, msgpack::pack(userId));
+                    client::Send(network::ClientToServer::CTS_KICK_USER, msgpack_utils::pack(userId));
                 }
                 ImGui::EndPopup();
             }

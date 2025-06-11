@@ -1,4 +1,4 @@
-#include <msgpack/msgpack.hpp>
+#include <utils/msgpack_utils.h>
 #include <iostream>
 #include <utils/mem.h>
 #include <client/client.h>
@@ -18,7 +18,7 @@ DWORD WINAPI ScoreConsumer(LPVOID lpParameter)
 			score_event.max_combo, score_event.score
 		);
 
-		auto score_data = msgpack::pack(score_event);
+		auto score_data = msgpack_utils::pack(score_event);
 		client::Send(network::ClientToServer::CTS_PLAYER_SCORE, score_data);
 	}
 }

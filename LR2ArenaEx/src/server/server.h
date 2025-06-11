@@ -28,8 +28,8 @@ namespace server {
 	void Receive(void* data, int size, int actualSize, Garnet::Address clientAddr);
 	void ClientConnected(Garnet::Address clientAddr);
 	void ClientDisconnected(Garnet::Address clientAddr);
-	void SendToEveryone(network::ServerToClient id, std::vector<unsigned char> data, Garnet::Address origSenderAddr, bool includeOrigSender);
-	void SendTo(network::ServerToClient id, std::vector<unsigned char> data, Garnet::Address addr);
+	void SendToEveryone(network::ServerToClient id, std::vector<char> data, Garnet::Address origSenderAddr, bool includeOrigSender);
+	void SendTo(network::ServerToClient id, std::vector<char> data, Garnet::Address addr);
 
-	void ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr);
+	void ParsePacket(std::vector<char> data, Garnet::Address clientAddr);
 }

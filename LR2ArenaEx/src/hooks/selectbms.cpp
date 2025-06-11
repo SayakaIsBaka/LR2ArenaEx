@@ -1,4 +1,4 @@
-#include <msgpack/msgpack.hpp>
+#include <utils/msgpack_utils.h>
 #include <iostream>
 #include <utils/mem.h>
 #include <client/client.h>
@@ -16,7 +16,7 @@
 
 void SendWithRandom(network::SelectedBmsMessage msg) {
 	msg.randomSeed = hooks::random::current_seed;
-	auto msgPack = msgpack::pack(msg);
+	auto msgPack = msgpack_utils::pack(msg);
 
 	client::Send(network::ClientToServer::CTS_SELECTED_BMS, msgPack);
 }

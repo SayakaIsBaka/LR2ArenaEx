@@ -36,16 +36,16 @@ namespace client {
 	void Disconnect();
 
 	DWORD WINAPI ListenLoop(LPVOID lpParam);
-	void Send(network::ClientToServer id, std::vector<unsigned char> data);
+	void Send(network::ClientToServer id, std::vector<char> data);
 	void Send(network::ClientToServer id, std::string msg);
-	void ParsePacket(std::vector<unsigned char> data);
-	void UnpackPeerList(std::vector<unsigned char> data);
+	void ParsePacket(std::vector<char> data);
+	void UnpackPeerList(std::vector<char> data);
 
-	void UpdatePeersState(std::vector<unsigned char> data);
-	bool UpdateReadyState(std::vector<unsigned char> data);
-	void UpdateSelectedSong(std::vector<unsigned char> data);
-	void UpdateScore(std::vector<unsigned char> data);
-	void UpdateMessage(std::vector<unsigned char> data);
-	void UpdateItem(std::vector<unsigned char> data);
-	void UpdateItemSettings(std::vector<unsigned char> data);
+	void UpdatePeersState(std::vector<char> data);
+	bool UpdateReadyState(std::vector<char> data);
+	void UpdateSelectedSong(std::vector<char> data);
+	void UpdateScore(std::vector<char> data);
+	void UpdateMessage(std::vector<char> data);
+	void UpdateItem(std::vector<char> data);
+	void UpdateItemSettings(std::vector<char> data);
 }

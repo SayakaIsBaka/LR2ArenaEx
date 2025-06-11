@@ -1,5 +1,6 @@
 #pragma once
 
+#include <msgpack.hpp>
 #include <string>
 #include <array>
 #include <unordered_map>
@@ -15,10 +16,7 @@ namespace network {
 		int max_combo;
 		int score;
 
-		template<class T>
-		void pack(T& pack) {
-			pack(poor, bad, good, great, p_great, max_combo, score);
-		}
+		MSGPACK_DEFINE(poor, bad, good, great, p_great, max_combo, score);
 	};
 
 	struct Peer {
@@ -29,10 +27,7 @@ namespace network {
 		unsigned int option;
 		unsigned int gauge;
 
-		template<class T>
-		void pack(T& pack) {
-			pack(username, selectedHash, ready, score, option, gauge);
-		}
+		MSGPACK_DEFINE(username, selectedHash, ready, score, option, gauge);
 	};
 
 	struct PeerList { // Only used for networking
@@ -46,10 +41,7 @@ namespace network {
 			this->host = host;
 		}
 
-		template<class T>
-		void pack(T& pack) {
-			pack(list, host);
-		}
+		MSGPACK_DEFINE(list, host);
 	};
 
 	struct SelectedBmsMessage {
@@ -61,10 +53,7 @@ namespace network {
 		unsigned int gauge;
 		bool itemModeEnabled;
 
-		template<class T>
-		void pack(T& pack) {
-			pack(randomSeed, hash, title, artist, option, gauge, itemModeEnabled);
-		}
+		MSGPACK_DEFINE(randomSeed, hash, title, artist, option, gauge, itemModeEnabled);
 	};
 
 	struct ScoreMessage { // Used from server to clients
@@ -78,10 +67,7 @@ namespace network {
 			this->player = player;
 		}
 
-		template<class T>
-		void pack(T& pack) {
-			pack(score, player);
-		}
+		MSGPACK_DEFINE(score, player);
 	};
 
 	struct Message { // Used from server to clients
@@ -97,10 +83,7 @@ namespace network {
 			this->systemMessage = systemMessage;
 		}
 
-		template<class T>
-		void pack(T& pack) {
-			pack(message, player, systemMessage);
-		}
+		MSGPACK_DEFINE(message, player, systemMessage);
 	};
 
 	struct CurrentItem {
@@ -112,10 +95,7 @@ namespace network {
 			return (rolledItemId == other.rolledItemId && level == other.level);
 		}
 
-		template<class T>
-		void pack(T& pack) {
-			pack(rolledItemId, level);
-		}
+		MSGPACK_DEFINE(rolledItemId, level);
 	};
 
 	struct ItemSetting {
@@ -124,20 +104,14 @@ namespace network {
 		unsigned int lv3;
 		unsigned int weight;
 
-		template<class T>
-		void pack(T& pack) {
-			pack(lv1, lv2, lv3, weight);
-		}
+		MSGPACK_DEFINE(lv1, lv2, lv3, weight);
 	};
 
 	struct ItemSettings {
 		unsigned int threshold;
 		std::vector<ItemSetting> settings;
 
-		template<class T>
-		void pack(T& pack) {
-			pack(threshold, settings);
-		}
+		MSGPACK_DEFINE(threshold, settings);
 	};
 }
 

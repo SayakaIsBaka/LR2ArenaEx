@@ -29,7 +29,7 @@ LR2ArenaEx uses the following libraries:
 - [Garnet](https://github.com/jopo86/garnet)
 - [SQLite](https://www.sqlite.org)
 - [sqlite_modern_cpp](https://github.com/SqliteModernCpp/sqlite_modern_cpp)
-- [cppack](https://github.com/dacap/cppack)
+- [msgpack](https://github.com/msgpack/msgpack-c)
 - [implot](https://github.com/epezent/implot)
 - [ImGuiNotify](https://github.com/TyomaVader/ImGuiNotify)
 - [mINI](https://github.com/metayeti/mINI)

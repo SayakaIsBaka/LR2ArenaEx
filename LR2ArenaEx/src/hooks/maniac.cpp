@@ -1,4 +1,4 @@
-#include <msgpack/msgpack.hpp>
+#include <utils/msgpack_utils.h>
 #include <config/config.h>
 #include <utils/mem.h>
 #include <iostream>
@@ -109,7 +109,7 @@ void hooks::maniac::TriggerItem(network::CurrentItem item) {
 
 void SendItem(network::CurrentItem item) {
 	hooks::fmod::PlaySfx("item_send");
-	auto buf = msgpack::pack(item);
+	auto buf = msgpack_utils::pack(item);
 	client::Send(network::ClientToServer::CTS_ITEM, buf);
 }
 
@@ -196,7 +196,7 @@ void hooks::maniac::SendItemSettings() {
 		payload.settings.push_back({ i.lv1, i.lv2, i.lv3, i.weight });
 	}
 
-	auto buf = msgpack::pack(payload);
+	auto buf = msgpack_utils::pack(payload);
 	client::Send(network::ClientToServer::CTS_ITEM_SETTINGS, buf);
 }
 

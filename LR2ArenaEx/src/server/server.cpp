@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <network/enums.h>
-#include <msgpack/msgpack.hpp>
+#include <utils/msgpack_utils.h>
 
 #include "server.h"
 
@@ -19,8 +19,8 @@ void ResetStateEveryone() {
     }
 }
 
-void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAddr) {
-    auto selectedBms = msgpack::unpack<network::SelectedBmsMessage>(data);
+void ParseSelectedBms(std::vector<char> data, Garnet::Address clientAddr) {
+    auto selectedBms = msgpack_utils::unpack<network::SelectedBmsMessage>(data);
 
     if (clientAddr == server::state.host) {
         server::state.currentRandomSeed = selectedBms.randomSeed;
@@ -37,12 +37,12 @@ void ParseSelectedBms(std::vector<unsigned char> data, Garnet::Address clientAdd
     server::state.peers[clientAddr].gauge = selectedBms.gauge;
 }
 
-void ParseScore(std::vector<unsigned char> data, Garnet::Address clientAddr) {
-    auto score = msgpack::unpack<network::Score>(data);
+void ParseScore(std::vector<char> data, Garnet::Address clientAddr) {
+    auto score = msgpack_utils::unpack<network::Score>(data);
     server::state.peers[clientAddr].score = score;
 }
 
-void SetUsername(std::vector<unsigned char> data, Garnet::Address clientAddr) { // Performing state update here to avoid race condition
+void SetUsername(std::vector<char> data, Garnet::Address clientAddr) { // Performing state update here to avoid race condition
     std::string username(data.begin(), data.end());
     std::cout << "[server] Username: " << username << std::endl;
     if (server::state.peers.size() == 0) { // If first user to connect, set as host
@@ -52,8 +52,8 @@ void SetUsername(std::vector<unsigned char> data, Garnet::Address clientAddr) { 
     server::state.peers[clientAddr].username = username;
 }
 
-void SetHost(std::vector<unsigned char> data) {
-    auto newHost = msgpack::unpack<Garnet::Address>(data);
+void SetHost(std::vector<char> data) {
+    auto newHost = msgpack_utils::unpack<Garnet::Address>(data);
     if (server::state.peers.find(newHost) == server::state.peers.end()) {
         std::cout << "[!][server] Player not found for new host" << std::endl;
         return;
@@ -90,13 +90,13 @@ void AutoRotateHost() {
         server::state.host = first;
 }
 
-void SetItemSettings(std::vector<unsigned char> data) {
-    auto itemSettings = msgpack::unpack<network::ItemSettings>(data);
+void SetItemSettings(std::vector<char> data) {
+    auto itemSettings = msgpack_utils::unpack<network::ItemSettings>(data);
     server::state.itemSettings = itemSettings;
 }
 
-void server::SendToEveryone(network::ServerToClient id, std::vector<unsigned char> data, Garnet::Address origSenderAddr, bool includeOrigSender) {
-    data.insert(data.begin(), static_cast<unsigned char>(id));
+void server::SendToEveryone(network::ServerToClient id, std::vector<char> data, Garnet::Address origSenderAddr, bool includeOrigSender) {
+    data.insert(data.begin(), static_cast<char>(id));
     for (const Garnet::Address& addr : server->getClientAddresses())
     {
        if (origSenderAddr == addr && !includeOrigSender)
@@ -105,13 +105,13 @@ void server::SendToEveryone(network::ServerToClient id, std::vector<unsigned cha
     }
 }
 
-void server::SendTo(network::ServerToClient id, std::vector<unsigned char> data, Garnet::Address addr) {
-    data.insert(data.begin(), static_cast<unsigned char>(id));
+void server::SendTo(network::ServerToClient id, std::vector<char> data, Garnet::Address addr) {
+    data.insert(data.begin(), static_cast<char>(id));
     server->send(&data[0], data.size(), addr);
 }
 
-void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address clientAddr) {
-	unsigned char id = data.front();
+void server::ParsePacket(std::vector<char> data, Garnet::Address clientAddr) {
+	char id = data.front();
 	data.erase(data.begin());
 
 	switch ((network::ClientToServer)id)
@@ -125,41 +125,41 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
 	case network::ClientToServer::CTS_PLAYER_SCORE:
         std::cout << "[server] Received player score" << std::endl;
         ParseScore(data, clientAddr);
-        SendToEveryone(network::ServerToClient::STC_PLAYERS_SCORE, msgpack::pack(network::ScoreMessage(state.peers[clientAddr].score, clientAddr)), clientAddr, true);
+        SendToEveryone(network::ServerToClient::STC_PLAYERS_SCORE, msgpack_utils::pack(network::ScoreMessage(state.peers[clientAddr].score, clientAddr)), clientAddr, true);
 		break;
 	case network::ClientToServer::CTS_CHART_CANCELLED:
         std::cout << "[server] Received chart cancelled" << std::endl;
         server::state.peers[clientAddr].ready = false;
         server::state.peers[clientAddr].selectedHash = "";
-        SendToEveryone(network::ServerToClient::STC_PLAYERS_READY_UPDATE, msgpack::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
+        SendToEveryone(network::ServerToClient::STC_PLAYERS_READY_UPDATE, msgpack_utils::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
 		break;
 	case network::ClientToServer::CTS_LOADING_COMPLETE:
         std::cout << "[server] Received loading complete from " << clientAddr.host << std::endl;
         server::state.peers[clientAddr].ready = true;
         if (autoRotateHost && IsEveryoneReady())
             AutoRotateHost();
-        SendToEveryone(network::ServerToClient::STC_PLAYERS_READY_UPDATE, msgpack::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
+        SendToEveryone(network::ServerToClient::STC_PLAYERS_READY_UPDATE, msgpack_utils::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
 		break;
     case network::ClientToServer::CTS_USERNAME:
         SetUsername(data, clientAddr);
-        SendTo(network::ServerToClient::STC_CLIENT_REMOTE_ID, msgpack::pack(clientAddr), clientAddr); // Send remote address to sender (use as ID)
+        SendTo(network::ServerToClient::STC_CLIENT_REMOTE_ID, msgpack_utils::pack(clientAddr), clientAddr); // Send remote address to sender (use as ID)
         if (!server::state.itemSettings.settings.empty())
-            SendTo(network::ServerToClient::STC_ITEM_SETTINGS, msgpack::pack(server::state.itemSettings), clientAddr); // Send custom item settings if defined
-        SendToEveryone(network::ServerToClient::STC_USERLIST, msgpack::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
+            SendTo(network::ServerToClient::STC_ITEM_SETTINGS, msgpack_utils::pack(server::state.itemSettings), clientAddr); // Send custom item settings if defined
+        SendToEveryone(network::ServerToClient::STC_USERLIST, msgpack_utils::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
         break;
     case network::ClientToServer::CTS_MESSAGE:
         std::cout << "[server] Received message" << std::endl;
-        SendToEveryone(network::ServerToClient::STC_MESSAGE, msgpack::pack(network::Message(std::string(data.begin(), data.end()), clientAddr, false)), clientAddr, false);
+        SendToEveryone(network::ServerToClient::STC_MESSAGE, msgpack_utils::pack(network::Message(std::string(data.begin(), data.end()), clientAddr, false)), clientAddr, false);
         break;
     case network::ClientToServer::CTS_MISSING_CHART:
         std::cout << "[server] Received missing chart" << std::endl;
-        SendToEveryone(network::ServerToClient::STC_MESSAGE, msgpack::pack(network::Message("[!] " + state.peers[clientAddr].username + " is missing the selected chart!", clientAddr, true)), clientAddr, false);
+        SendToEveryone(network::ServerToClient::STC_MESSAGE, msgpack_utils::pack(network::Message("[!] " + state.peers[clientAddr].username + " is missing the selected chart!", clientAddr, true)), clientAddr, false);
         break;
     case network::ClientToServer::CTS_SET_HOST:
         std::cout << "[server] Received set host" << std::endl;
         if (state.host == clientAddr) {
             SetHost(data);
-            SendToEveryone(network::ServerToClient::STC_USERLIST, msgpack::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
+            SendToEveryone(network::ServerToClient::STC_USERLIST, msgpack_utils::pack(network::PeerList(state.peers, state.host)), clientAddr, true);
         }
         else {
             std::cout << "[!][server] Sender is not the host!" << std::endl;
@@ -168,7 +168,7 @@ void server::ParsePacket(std::vector<unsigned char> data, Garnet::Address client
     case network::ClientToServer::CTS_KICK_USER:
         std::cout << "[server] Received kick user" << std::endl;
         if (state.host == clientAddr) {
-            server->getClientAcceptedSocket(msgpack::unpack<Garnet::Address>(data)).close();
+            server->getClientAcceptedSocket(msgpack_utils::unpack<Garnet::Address>(data)).close();
         }
         else {
             std::cout << "[!][server] Sender is not the host!" << std::endl;
@@ -202,7 +202,7 @@ void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address
         delete data;
         return;
     }
-    std::vector<unsigned char> dataVector((unsigned char*)data, (unsigned char*)data + actualSize);
+    std::vector<char> dataVector((char*)data, (char*)data + actualSize);
     ParsePacket(dataVector, clientAddr);
 
     delete data;
@@ -222,8 +222,8 @@ void server::ClientDisconnected(Garnet::Address clientAddr)
             state.host = state.peers.begin()->first; // Change host to first peer in the list
 
         if (state.peers.size() > 0) {
-            auto res = msgpack::pack(network::PeerList(state.peers, state.host));
-            res.insert(res.begin(), (unsigned char)network::ServerToClient::STC_USERLIST);
+            auto res = msgpack_utils::pack(network::PeerList(state.peers, state.host));
+            res.insert(res.begin(), (char)network::ServerToClient::STC_USERLIST);
         
             for (const Garnet::Address& addr : server->getClientAddresses())
             {

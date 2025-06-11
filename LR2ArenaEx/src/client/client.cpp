@@ -1,4 +1,4 @@
-#include <msgpack/msgpack.hpp>
+#include <utils/msgpack_utils.h>
 #include <iostream>
 #include <vector>
 #include <hooks/pacemaker.h>
@@ -14,8 +14,8 @@
 
 #include "client.h"
 
-void client::Send(network::ClientToServer id, std::vector<unsigned char> data) {
-	data.insert(data.begin(), static_cast<unsigned char>(id));
+void client::Send(network::ClientToServer id, std::vector<char> data) {
+	data.insert(data.begin(), static_cast<char>(id));
 	int buffer_length = data.size();
 
 	if (client.isOpen() && connected) {
@@ -28,18 +28,18 @@ void client::Send(network::ClientToServer id, std::vector<unsigned char> data) {
 }
 
 void client::Send(network::ClientToServer id, std::string msg) {
-	std::vector<unsigned char> data;
+	std::vector<char> data;
 	data.insert(data.begin(), msg.begin(), msg.end());
 	Send(id, data);
 }
 
-void client::UnpackPeerList(std::vector<unsigned char> data) {
-	auto receivedPeers = msgpack::unpack<network::PeerList>(data);
+void client::UnpackPeerList(std::vector<char> data) {
+	auto receivedPeers = msgpack_utils::unpack<network::PeerList>(data);
 	state.peers = receivedPeers.list;
 	state.host = receivedPeers.host;
 }
 
-void client::UpdatePeersState(std::vector<unsigned char> data) {
+void client::UpdatePeersState(std::vector<char> data) {
 	UnpackPeerList(data);
 
 	std::cout << "[+] Connected users:" << std::endl;
@@ -47,7 +47,7 @@ void client::UpdatePeersState(std::vector<unsigned char> data) {
 		std::cout << "- " << state.peers[key].username << std::endl;
 }
 
-bool client::UpdateReadyState(std::vector<unsigned char> data) {
+bool client::UpdateReadyState(std::vector<char> data) {
 	UnpackPeerList(data);
 
 	bool allReady = true;
@@ -59,8 +59,8 @@ bool client::UpdateReadyState(std::vector<unsigned char> data) {
 	return allReady;
 }
 
-void client::UpdateSelectedSong(std::vector<unsigned char> data) {
-	auto selectedBms = msgpack::unpack<network::SelectedBmsMessage>(data);
+void client::UpdateSelectedSong(std::vector<char> data) {
+	auto selectedBms = msgpack_utils::unpack<network::SelectedBmsMessage>(data);
 	std::cout << "[+] Received selected song" << std::endl;
 
 	state.selectedSongRemote.hash = selectedBms.hash;
@@ -106,8 +106,8 @@ unsigned int CalculatePacemakerDisplayScore(std::unordered_map<Garnet::Address, 
 	return maxScore;
 }
 
-void client::UpdateScore(std::vector<unsigned char> data) {
-	auto scoreMsg = msgpack::unpack<network::ScoreMessage>(data);
+void client::UpdateScore(std::vector<char> data) {
+	auto scoreMsg = msgpack_utils::unpack<network::ScoreMessage>(data);
 	if (state.peers.find(scoreMsg.player) == state.peers.end()) {
 		std::cout << "[!] Player not found for score update" << std::endl;
 		return;
@@ -122,8 +122,8 @@ void client::UpdateScore(std::vector<unsigned char> data) {
 	std::cout << "Max score: " << hooks::pacemaker::displayed_score << std::endl;
 }
 
-void client::UpdateMessage(std::vector<unsigned char> data) {
-	auto msg = msgpack::unpack<network::Message>(data);
+void client::UpdateMessage(std::vector<char> data) {
+	auto msg = msgpack_utils::unpack<network::Message>(data);
 	if (msg.systemMessage) {
 		gui::main_window::AddToLog(msg.message);
 	}
@@ -136,18 +136,18 @@ void client::UpdateMessage(std::vector<unsigned char> data) {
 	}
 }
 
-void client::UpdateItem(std::vector<unsigned char> data) {
-	auto item = msgpack::unpack<network::CurrentItem>(data);
+void client::UpdateItem(std::vector<char> data) {
+	auto item = msgpack_utils::unpack<network::CurrentItem>(data);
 	hooks::maniac::TriggerItem(item);
 }
 
-void client::UpdateItemSettings(std::vector<unsigned char> data) {
-	auto itemSettings = msgpack::unpack<network::ItemSettings>(data);
+void client::UpdateItemSettings(std::vector<char> data) {
+	auto itemSettings = msgpack_utils::unpack<network::ItemSettings>(data);
 	hooks::maniac::UpdateItemSettings(itemSettings);
 }
 
-void client::ParsePacket(std::vector<unsigned char> data) {
-	unsigned char id = data.front();
+void client::ParsePacket(std::vector<char> data) {
+	char id = data.front();
 	data.erase(data.begin());
 	switch ((network::ServerToClient)id)
 	{
@@ -165,7 +165,7 @@ void client::ParsePacket(std::vector<unsigned char> data) {
 		UpdatePeersState(data);
 		break;
 	case network::ServerToClient::STC_CLIENT_REMOTE_ID:
-		state.remoteId = msgpack::unpack<Garnet::Address>(data);
+		state.remoteId = msgpack_utils::unpack<Garnet::Address>(data);
 		break;
 	case network::ServerToClient::STC_MESSAGE:
 		UpdateMessage(data);
@@ -182,7 +182,7 @@ void client::ParsePacket(std::vector<unsigned char> data) {
 }
 
 DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
-	std::vector<unsigned char> data(MAX_TCP);
+	std::vector<char> data(MAX_TCP);
 
     while (true)
     {

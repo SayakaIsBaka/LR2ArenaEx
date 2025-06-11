@@ -14,6 +14,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(argparse)
 
 add_executable(lr2arenaex-server server.cpp ../src/server/server.cpp ../include/Garnet/Garnet.cpp)
+target_compile_definitions(lr2arenaex-server PUBLIC MSGPACK_NO_BOOST)
 target_include_directories(lr2arenaex-server PRIVATE ../src/ ../include/)
 target_link_libraries(lr2arenaex-server argparse)
 if(WIN32)

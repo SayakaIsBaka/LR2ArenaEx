@@ -6,6 +6,7 @@
 #ifdef GNET_OS_WINDOWS
     bool wsaInitialized = false;
     WSADATA wsaData;
+    typedef char byte;
 #endif
 
 #ifdef GNET_OS_UNIX

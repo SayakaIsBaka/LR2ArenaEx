@@ -1,5 +1,6 @@
 #pragma once
 
+#include <msgpack.hpp>
 #include <functional>
 #include <string>
 #include <unordered_map>
@@ -137,10 +138,7 @@ namespace Garnet
         void operator=(const Address& other);
         bool operator==(const Address& other) const;
 
-        template<class T>
-        void pack(T& pack) {
-            pack(host, port);
-        }
+        MSGPACK_DEFINE(host, port);
     };
 
     /*
