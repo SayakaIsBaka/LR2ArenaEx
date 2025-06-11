@@ -8,6 +8,8 @@
 #include <network/structs.h>
 
 namespace server {
+	constexpr int MAX_TCP = 1448;
+
 	struct State {
 		Garnet::Address host;
 		int currentRandomSeed;

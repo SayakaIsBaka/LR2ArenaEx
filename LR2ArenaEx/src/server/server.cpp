@@ -250,6 +250,7 @@ bool server::Start(const char* host, ushort port) {
     }
     started = true;
 
+    server->setBufferSize(MAX_TCP);
     server->setReceiveCallback(Receive);
     server->setClientConnectCallback(ClientConnected);
     server->setClientDisconnectCallback(ClientDisconnected);
