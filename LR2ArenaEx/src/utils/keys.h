@@ -20,6 +20,10 @@ namespace utils {
 				this->value = value;
 			}
 
+			bool operator==(const Key& other) const {
+				return (type == other.type && value == other.value);
+			};
+
 			Key() {};
 		};
 
@@ -176,3 +180,16 @@ namespace utils {
 		std::string toString(utils::keys::Key key);
 	}
 }
+
+template <>
+struct std::hash<utils::keys::Key>
+{
+	std::size_t operator()(const utils::keys::Key& k) const
+	{
+		using std::size_t;
+		using std::hash;
+
+		return (hash<unsigned int>()((unsigned int)k.type)
+			^ (hash<unsigned int>()(k.value) << 4));
+	}
+};

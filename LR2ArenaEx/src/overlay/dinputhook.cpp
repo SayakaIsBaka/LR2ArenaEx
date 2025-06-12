@@ -2,24 +2,46 @@
 
 #include <iostream>
 #include <utils/mem.h>
-#include <utils/keys.h>
 #include <gui/gui.h>
+#include <gui/graph.h>
 #include <hooks/maniac.h>
 #include <client/client.h>
+
+void CheckKeyAndProcess(DWORD cbData, LPVOID lpvData, utils::keys::Key key, std::function<void()> onMatch) {
+	constexpr int debounceRate = 50;
+
+	if (cbData == sizeof(DIJOYSTATE) && key.type == utils::keys::DeviceType::CONTROLLER) {
+		auto arr = ((LPDIJOYSTATE)lpvData)->rgbButtons;
+		if (arr[key.value]) {
+			if (overlay::dinputhook::heldKeys.find(key) == overlay::dinputhook::heldKeys.end()) {
+				onMatch();
+			}
+			overlay::dinputhook::heldKeys[key] = debounceRate;
+		}
+	}
+	else if (cbData == 256 && key.type == utils::keys::DeviceType::KEYBOARD) {
+		if (((BYTE*)lpvData)[key.value]) {
+			if (overlay::dinputhook::heldKeys.find(key) == overlay::dinputhook::heldKeys.end()) {
+				onMatch();
+			}
+			overlay::dinputhook::heldKeys[key] = debounceRate;
+		}
+	}
+	for (auto& [key, value] : overlay::dinputhook::heldKeys) {
+		value--;
+		if (value <= 0)
+			overlay::dinputhook::heldKeys.erase(key);
+	}
+}
 
 HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPVOID lpvData) {
 	HRESULT result = overlay::dinputhook::oGetDeviceState(pThis, cbData, lpvData);
 	if (result == DI_OK) {
 		if (hooks::maniac::itemModeEnabled && client::state.peers[client::state.remoteId].ready) {
-			if (cbData == sizeof(DIJOYSTATE) && hooks::maniac::itemKeyBind.type == utils::keys::DeviceType::CONTROLLER) {
-				auto arr = ((LPDIJOYSTATE)lpvData)->rgbButtons;
-				if (arr[hooks::maniac::itemKeyBind.value])
-					hooks::maniac::UseItem();
-			} else if (cbData == 256 && hooks::maniac::itemKeyBind.type == utils::keys::DeviceType::KEYBOARD) {
-				if (((BYTE*)lpvData)[hooks::maniac::itemKeyBind.value])
-					hooks::maniac::UseItem();
-			}
+			CheckKeyAndProcess(cbData, lpvData, hooks::maniac::itemKeyBind, hooks::maniac::UseItem);
 		}
+		CheckKeyAndProcess(cbData, lpvData, gui::menuKeyBind, [] { gui::showMenu = !gui::showMenu; });
+		CheckKeyAndProcess(cbData, lpvData, gui::graph::graphKeyBind, [] { gui::graph::showGraph = !gui::graph::showGraph; });
 		if (gui::waitingForKeyPress) {
 			utils::keys::DeviceType type = utils::keys::DeviceType::NONE;
 			if (cbData == sizeof(DIJOYSTATE)) // Controller device
@@ -42,9 +64,10 @@ HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPV
 			else if (cbData == 256) { // Keyboard device
 				memset(lpvData, 0, 256);
 			}
+			/*
 			else if (cbData == sizeof(DIJOYSTATE)) { // Controller device
 				memset(lpvData, 0, cbData);
-			}
+			}*/
 		}
 	}
 	return result;

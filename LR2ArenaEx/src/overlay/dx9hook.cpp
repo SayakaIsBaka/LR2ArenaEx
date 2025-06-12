@@ -19,14 +19,6 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT __stdcall hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	if (GetAsyncKeyState(VK_INSERT) & 1) {
-		gui::showMenu = !gui::showMenu;
-	}
-
-	if (GetAsyncKeyState(VK_PRIOR) & 1) {
-		gui::graph::showGraph = !gui::graph::showGraph;
-	}
-
 	// Fix mouse scaling for non-standard resolutions, taken from https://github.com/tenaibms/LR2OOL/blob/master/src/graphics/gui.cpp
 	LPARAM imgui_lParam = lParam;
 

@@ -2,6 +2,8 @@
 
 #include <unordered_map>
 #include <overlay/overlay.h>
+#include <dinput.h>
+#include <utils/keys.h>
 #include <ImGui/imgui.h>
 
 namespace gui {
@@ -17,6 +19,8 @@ namespace gui {
 			{overlay::LR2_TYPE::LR2_HD, ImVec2(150, 400)},
 			{overlay::LR2_TYPE::LR2_SD, ImVec2(100, 200)},
 		};
+
+		inline utils::keys::Key graphKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_PRIOR); // Default binding
 
 		void Render();
 	}
