@@ -14,8 +14,6 @@
 #include "fmod.h"
 
 bool hooks::SetupHooks() { // Pacemaker hook is missing from here as we only hook when connecting
-	client::Init();
-
 	hooks::select_bms::Setup();
 	hooks::score::Setup();
 	hooks::random::Setup();
@@ -30,6 +28,7 @@ bool hooks::SetupHooks() { // Pacemaker hook is missing from here as we only hoo
 }
 
 void hooks::Destroy() {
+	client::Disconnect();
 	client::Destroy();
 	hooks::random::Destroy();
 }

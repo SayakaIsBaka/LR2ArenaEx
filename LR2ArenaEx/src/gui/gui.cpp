@@ -31,8 +31,8 @@ void gui::Render() {
                     ImGui::BeginDisabled(!client::connected);
                     {
                         if (ImGui::Button("Disconnect")) {
+                            client::Disconnect();
                             client::Destroy();
-                            client::Init();
                         }
                         ImGui::EndDisabled();
                     }

@@ -5,7 +5,7 @@
 
 #include "server.h"
 
-void ResetState(Garnet::Address player) {
+void ResetState(network::Address player) {
     server::state.peers[player].ready = false;
     server::state.peers[player].selectedHash = "";
     server::state.peers[player].score = network::Score();
@@ -19,7 +19,7 @@ void ResetStateEveryone() {
     }
 }
 
-void ParseSelectedBms(std::vector<char> data, Garnet::Address clientAddr) {
+void ParseSelectedBms(std::vector<char> data, network::Address clientAddr) {
     auto selectedBms = msgpack_utils::unpack<network::SelectedBmsMessage>(data);
 
     if (clientAddr == server::state.host) {
@@ -37,12 +37,12 @@ void ParseSelectedBms(std::vector<char> data, Garnet::Address clientAddr) {
     server::state.peers[clientAddr].gauge = selectedBms.gauge;
 }
 
-void ParseScore(std::vector<char> data, Garnet::Address clientAddr) {
+void ParseScore(std::vector<char> data, network::Address clientAddr) {
     auto score = msgpack_utils::unpack<network::Score>(data);
     server::state.peers[clientAddr].score = score;
 }
 
-void SetUsername(std::vector<char> data, Garnet::Address clientAddr) { // Performing state update here to avoid race condition
+void SetUsername(std::vector<char> data, network::Address clientAddr) { // Performing state update here to avoid race condition
     std::string username(data.begin(), data.end());
     std::cout << "[server] Username: " << username << std::endl;
     if (server::state.peers.size() == 0) { // If first user to connect, set as host
@@ -53,7 +53,7 @@ void SetUsername(std::vector<char> data, Garnet::Address clientAddr) { // Perfor
 }
 
 void SetHost(std::vector<char> data) {
-    auto newHost = msgpack_utils::unpack<Garnet::Address>(data);
+    auto newHost = msgpack_utils::unpack<network::Address>(data);
     if (server::state.peers.find(newHost) == server::state.peers.end()) {
         std::cout << "[!][server] Player not found for new host" << std::endl;
         return;
@@ -74,7 +74,7 @@ bool IsEveryoneReady() {
 void AutoRotateHost() {
     auto currentHost = server::state.host;
     bool isNext = false;
-    Garnet::Address first;
+    network::Address first;
     for (const auto [key, value] : server::state.peers) {
         if (first.host.empty())
             first = key;
@@ -95,22 +95,37 @@ void SetItemSettings(std::vector<char> data) {
     server::state.itemSettings = itemSettings;
 }
 
-void server::SendToEveryone(network::ServerToClient id, std::vector<char> data, Garnet::Address origSenderAddr, bool includeOrigSender) {
-    data.insert(data.begin(), static_cast<char>(id));
-    for (const Garnet::Address& addr : server->getClientAddresses())
+void KickUser(network::Address userToKick) {
+    for (const auto& c : server::server->getClients())
     {
-       if (origSenderAddr == addr && !includeOrigSender)
-           continue;
-        server->send(&data[0], data.size(), addr);
+        std::string userUrl = userToKick.host + ":" + std::to_string(userToKick.port);
+        if (userUrl == c->getUrl())
+            c->close();
     }
 }
 
-void server::SendTo(network::ServerToClient id, std::vector<char> data, Garnet::Address addr) {
+void server::SendToEveryone(network::ServerToClient id, std::vector<char> data, network::Address origSenderAddr, bool includeOrigSender) {
     data.insert(data.begin(), static_cast<char>(id));
-    server->send(&data[0], data.size(), addr);
+    for (const auto& addr : server->getClients())
+    {
+        std::string origSenderUrl = origSenderAddr.host + ":" + std::to_string(origSenderAddr.port);
+        if (origSenderUrl == addr->getUrl() && !includeOrigSender)
+           continue;
+        addr->sendBinary(data);
+    }
 }
 
-void server::ParsePacket(std::vector<char> data, Garnet::Address clientAddr) {
+void server::SendTo(network::ServerToClient id, std::vector<char> data, network::Address addr) {
+    data.insert(data.begin(), static_cast<char>(id));
+    for (const auto& c : server->getClients())
+    {
+        std::string addrUrl = addr.host + ":" + std::to_string(addr.port);
+        if (addrUrl == c->getUrl())
+            c->sendBinary(data);
+    }
+}
+
+void server::ParsePacket(std::vector<char> data, network::Address clientAddr) {
 	char id = data.front();
 	data.erase(data.begin());
 
@@ -168,7 +183,7 @@ void server::ParsePacket(std::vector<char> data, Garnet::Address clientAddr) {
     case network::ClientToServer::CTS_KICK_USER:
         std::cout << "[server] Received kick user" << std::endl;
         if (state.host == clientAddr) {
-            server->getClientAcceptedSocket(msgpack_utils::unpack<Garnet::Address>(data)).close();
+            KickUser(msgpack_utils::unpack<network::Address>(data));
         }
         else {
             std::cout << "[!][server] Sender is not the host!" << std::endl;
@@ -193,27 +208,12 @@ void server::ParsePacket(std::vector<char> data, Garnet::Address clientAddr) {
 	}
 }
 
-void server::Receive(void* data, int bufferSize, int actualSize, Garnet::Address clientAddr)
-{
-    if (actualSize == 0)
-        return;
-    if (actualSize > bufferSize) {
-        std::cout << "[!!!][server] actualSize higher than bufferSize (this shouldn't happen)" << std::endl;
-        delete data;
-        return;
-    }
-    std::vector<char> dataVector((char*)data, (char*)data + actualSize);
-    ParsePacket(dataVector, clientAddr);
-
-    delete data;
-}
-
-void server::ClientConnected(Garnet::Address clientAddr)
+void server::ClientConnected(network::Address clientAddr)
 {
     std::cout << "[server] Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") connected." << std::endl;
 }
 
-void server::ClientDisconnected(Garnet::Address clientAddr)
+void server::ClientDisconnected(network::Address clientAddr)
 {
     std::cout << "[server] Client (" + clientAddr.host + ":" + std::to_string(clientAddr.port) + ") disconnected." << std::endl;
     if (started) {
@@ -225,49 +225,57 @@ void server::ClientDisconnected(Garnet::Address clientAddr)
             auto res = msgpack_utils::pack(network::PeerList(state.peers, state.host));
             res.insert(res.begin(), (char)network::ServerToClient::STC_USERLIST);
         
-            for (const Garnet::Address& addr : server->getClientAddresses())
+            for (const auto& addr : server->getClients())
             {
-                if (clientAddr == addr) continue;
-                server->send(&res[0], res.size(), addr);
+                std::string clientUrl = clientAddr.host + ":" + std::to_string(clientAddr.port);
+                if (clientUrl == addr->getUrl()) continue;
+                addr->sendBinary(res);
             }
         }
     }
 }
 
-bool server::Start(const char* host, ushort port) {
-    Garnet::Address addr;
-    bool success = false;
-    addr.host = host;
-    addr.port = port;
+void server::OnClientMessageReceived(std::shared_ptr<ix::ConnectionState> connectionState, ix::WebSocket& webSocket, const ix::WebSocketMessagePtr& msg) {
+    network::Address clientAddr;
+    clientAddr.host = connectionState->getRemoteIp();
+    clientAddr.port = connectionState->getRemotePort();
 
+    if (msg->type == ix::WebSocketMessageType::Open) {
+        webSocket.setUrl(clientAddr.host + ":" + std::to_string(clientAddr.port)); // URL is unused on client sockets, use it to store host + port
+        ClientConnected(clientAddr);
+    }
+    else if (msg->type == ix::WebSocketMessageType::Message) {
+        std::vector<char> data(msg->str.begin(), msg->str.end());
+        ParsePacket(data, clientAddr);
+    }
+    else if (msg->type == ix::WebSocketMessageType::Close || msg->type == ix::WebSocketMessageType::Error) {
+        ClientDisconnected(clientAddr);
+    }
+}
+
+bool server::Start(const char* host, unsigned short port) {
     // Hopefully this is enough to avoid a memleak because delete on a regular pointer crashes the thing
-    server = std::make_shared<Garnet::ServerTCP>(addr, &success);
+    server = std::make_shared<ix::WebSocketServer>(port, host);
+    server->setOnClientMessageCallback(OnClientMessageReceived);
+    auto success = server->listen();
 
-    if (!success)
+    if (!success.first)
     {
         std::cout << "[!] Error creating server" << std::endl;
         return false;
     }
+
     started = true;
+    server->disablePerMessageDeflate();
+    server->start();
 
-    server->setBufferSize(MAX_TCP);
-    server->setReceiveCallback(Receive);
-    server->setClientConnectCallback(ClientConnected);
-    server->setClientDisconnectCallback(ClientDisconnected);
-    server->open();
-
-    std::cout << "[+] Started server on port " << std::dec << addr.port << std::endl;
+    std::cout << "[+] Started server on port " << std::dec << port << std::endl;
 
     return true;
 }
 
 bool server::Stop() {
-    bool success = false;
-    server->close(&success);
-    if (!success) {
-        std::cout << "[!] Error stopping server" << std::endl;
-        return false;
-    }
+    server->stop();
     started = false;
     state = State();
     std::cout << "[+] Stopped server" << std::endl;

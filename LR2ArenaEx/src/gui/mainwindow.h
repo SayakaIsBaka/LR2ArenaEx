@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <Garnet/Garnet.h>
+#include <network/structs.h>
 #include <overlay/overlay.h>
 #include <ImGui/imgui.h>
 
@@ -31,6 +31,6 @@ namespace gui {
 		void Render();
 		void ProcessInput();
 		void AddToLog(std::string s);
-		void AddToLogWithUser(std::string s, Garnet::Address id);
+		void AddToLogWithUser(std::string s, network::Address id);
 	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Garnet/Garnet.h>
+#include <ixwebsocket/IXWebSocketServer.h>
 #include <array>
 #include <memory>
 #include <unordered_map>
@@ -11,27 +11,27 @@ namespace server {
 	constexpr int MAX_TCP = 1448;
 
 	struct State {
-		Garnet::Address host;
+		network::Address host;
 		int currentRandomSeed;
 		network::ItemSettings itemSettings;
 		bool itemModeEnabled = false;
 
-		std::unordered_map<Garnet::Address, network::Peer> peers;
+		std::unordered_map<network::Address, network::Peer> peers;
 	};
 
-	inline std::shared_ptr<Garnet::ServerTCP> server;
+	inline std::shared_ptr<ix::WebSocketServer> server;
 	inline State state;
 	inline bool started = false;
 	inline bool autoRotateHost = false;
 
-	bool Start(const char* host = "0.0.0.0", ushort port = 2222);
+	bool Start(const char* host = "0.0.0.0", unsigned short port = 2222);
 	bool Stop();
 
-	void Receive(void* data, int size, int actualSize, Garnet::Address clientAddr);
-	void ClientConnected(Garnet::Address clientAddr);
-	void ClientDisconnected(Garnet::Address clientAddr);
-	void SendToEveryone(network::ServerToClient id, std::vector<char> data, Garnet::Address origSenderAddr, bool includeOrigSender);
-	void SendTo(network::ServerToClient id, std::vector<char> data, Garnet::Address addr);
+	void OnClientMessageReceived(std::shared_ptr<ix::ConnectionState> connectionState, ix::WebSocket& webSocket, const ix::WebSocketMessagePtr& msg);
+	void ClientConnected(network::Address clientAddr);
+	void ClientDisconnected(network::Address clientAddr);
+	void SendToEveryone(network::ServerToClient id, std::vector<char> data, network::Address origSenderAddr, bool includeOrigSender);
+	void SendTo(network::ServerToClient id, std::vector<char> data, network::Address addr);
 
-	void ParsePacket(std::vector<char> data, Garnet::Address clientAddr);
+	void ParsePacket(std::vector<char> data, network::Address clientAddr);
 }

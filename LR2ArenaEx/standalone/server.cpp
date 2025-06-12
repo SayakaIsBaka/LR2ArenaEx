@@ -1,6 +1,6 @@
 #include <argparse/argparse.hpp>
 #include <server/server.h>
-#include <Garnet/Garnet.h>
+#include <ixwebsocket/IXNetSystem.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -10,7 +10,7 @@
 
 void cleanup() {
     server::Stop();
-    Garnet::Terminate();
+    ix::uninitNetSystem();
 }
 
 #ifdef _WIN32
@@ -42,8 +42,8 @@ int main(int argc, char *argv[]) {
     program.add_argument("-p", "--port")
         .help("port to listen to")
         .metavar("PORT")
-        .scan<'u', ushort>()
-        .default_value(ushort(2222));
+        .scan<'u', unsigned short>()
+        .default_value(unsigned short(2222));
 
     try {
         program.parse_args(argc, argv);
@@ -53,10 +53,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (!Garnet::Init(true)) {
-		std::cout << "[!] Error initalizing sockets" << std::endl;
-		return 1;
-	}
+    ix::initNetSystem();
 
     if (program["--rotate"] == true) {
         server::autoRotateHost = true;
@@ -74,7 +71,7 @@ int main(int argc, char *argv[]) {
     sigaction(SIGINT, &action, NULL);
 #endif
 
-    if (!server::Start(program.get<std::string>("--address").c_str(), program.get<ushort>("--port")))
+    if (!server::Start(program.get<std::string>("--address").c_str(), program.get<unsigned short>("--port")))
         return 1;
     std::cout << "[+] Press Ctrl+C to stop the server..." << std::endl;
     while (true);

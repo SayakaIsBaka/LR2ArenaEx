@@ -17,7 +17,7 @@ void SendMsg(std::string s) {
 }
 
 // Weird tricks where we regroup all consecutive user messages into a blob to reduce processing
-void gui::main_window::AddToLogWithUser(std::string s, Garnet::Address id) {
+void gui::main_window::AddToLogWithUser(std::string s, network::Address id) {
     auto username = client::state.peers[id].username;
     LogMessage msg;
     msg.msg = username + ": " + s + "\n";
@@ -83,11 +83,11 @@ void gui::main_window::Render() {
             {
                 ImGui::TextDisabled("Selected user: %s", value.username.c_str());
                 if (ImGui::MenuItem("Give host")) {
-                    Garnet::Address userId = key;
+                    network::Address userId = key;
                     client::Send(network::ClientToServer::CTS_SET_HOST, msgpack_utils::pack(userId));
                 }
                 if (ImGui::MenuItem("Kick")) {
-                    Garnet::Address userId = key;
+                    network::Address userId = key;
                     client::Send(network::ClientToServer::CTS_KICK_USER, msgpack_utils::pack(userId));
                 }
                 ImGui::EndPopup();

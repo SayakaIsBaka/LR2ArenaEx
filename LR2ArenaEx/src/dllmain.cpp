@@ -1,6 +1,6 @@
 #include <iostream>
 #include <framework.h>
-#include <Garnet/Garnet.h>
+#include <ixwebsocket/IXNetSystem.h>
 
 #include "utils/mem.h"
 #include "overlay/overlay.h"
@@ -14,11 +14,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	{
 	case DLL_PROCESS_ATTACH:
 	{
-		if (!Garnet::Init(true)) {
-			std::cout << "[!] Error initalizing sockets" << std::endl;
-			return false;
-		}
-		atexit(Garnet::Terminate);
+		ix::initNetSystem();
+		atexit([] { ix::uninitNetSystem(); });
 
 		auto* hThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)overlay::Setup, hModule, 0, nullptr);
 		if (hThread == nullptr)

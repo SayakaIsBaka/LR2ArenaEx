@@ -26,7 +26,7 @@ Paths for the DirectX SDK have been hardcoded in the project settings; if you ch
 LR2ArenaEx uses the following libraries:
 - [Dear ImGui](https://github.com/ocornut/imgui)
 - [readerwriterqueue](https://github.com/cameron314/readerwriterqueue)
-- [Garnet](https://github.com/jopo86/garnet)
+- [IXWebSocket](https://github.com/machinezone/IXWebSocket)
 - [SQLite](https://www.sqlite.org)
 - [sqlite_modern_cpp](https://github.com/SqliteModernCpp/sqlite_modern_cpp)
 - [msgpack](https://github.com/msgpack/msgpack-c)

@@ -16,14 +16,9 @@
 
 void client::Send(network::ClientToServer id, std::vector<char> data) {
 	data.insert(data.begin(), static_cast<char>(id));
-	int buffer_length = data.size();
 
-	if (client.isOpen() && connected) {
-		if (buffer_length > MAX_TCP) {
-			std::cout << "[!] Packet size is over the defined limit (" << MAX_TCP << "), this shouldn't happen" << std::endl;
-			buffer_length = MAX_TCP;
-		}
-		client.send(&data[0], data.size());
+	if (client.getReadyState() == ix::ReadyState::Open && connected) {
+		client.sendBinary(data);
 	}
 }
 
@@ -94,7 +89,7 @@ void client::UpdateSelectedSong(std::vector<char> data) {
 	}
 }
 
-unsigned int CalculatePacemakerDisplayScore(std::unordered_map<Garnet::Address, network::Peer> peers) {
+unsigned int CalculatePacemakerDisplayScore(std::unordered_map<network::Address, network::Peer> peers) {
 	if (peers.size() == 1)
 		return utils::CalculateExScore(peers[client::state.remoteId].score); // Return own score if alone in lobby
 	unsigned int maxScore = 0;
@@ -165,7 +160,7 @@ void client::ParsePacket(std::vector<char> data) {
 		UpdatePeersState(data);
 		break;
 	case network::ServerToClient::STC_CLIENT_REMOTE_ID:
-		state.remoteId = msgpack_utils::unpack<Garnet::Address>(data);
+		state.remoteId = msgpack_utils::unpack<network::Address>(data);
 		break;
 	case network::ServerToClient::STC_MESSAGE:
 		UpdateMessage(data);
@@ -181,87 +176,55 @@ void client::ParsePacket(std::vector<char> data) {
 	}
 }
 
-DWORD WINAPI client::ListenLoop(LPVOID lpParam) {
-	std::vector<char> data(MAX_TCP);
-
-    while (true)
-    {
-		data.resize(MAX_TCP);
-		if (!connected)
-			break;
-		auto receivedBytes = client.receive(&data[0], MAX_TCP);
-		if (receivedBytes <= 0) { // Probably disconnected or something
-			Destroy();
-			Init();
-			break;
-		}
-		data.resize(receivedBytes);
+void client::OnMessageReceived(const ix::WebSocketMessagePtr& msg) {
+	if (msg->type == ix::WebSocketMessageType::Message) {
+		std::vector<char> data(msg->str.begin(), msg->str.end());
 		ParsePacket(data);
-    }
-
-	return 0;
-}
-
-bool client::Connect(const char* host, const char* username) {
-
-	if (connected) { // Reset client if already connected
-		Destroy();
-		Init();
 	}
-
-	Garnet::Address addr;
-	bool success = false;
-	addr.host = host;
-	addr.port = 2222;
-
-	client.connect(addr, &success);
-
-	if (success)
-	{
+	else if (msg->type == ix::WebSocketMessageType::Open) {
 		std::cout << "[+] Connected to " << host << std::endl;
 		connected = true;
 		hooks::pacemaker::Setup(); // Hook pacemaker
 
-		DWORD clientReceiverId;
-		clientReceiverHandle = CreateThread(NULL, 0, ListenLoop, NULL, 0, &clientReceiverId);
-		if (clientReceiverHandle == NULL)
-		{
-			std::cout << "[!] run::CreateThread clientListenLoop failed" << std::endl;
-			return false;
-		}
 		Send(network::ClientToServer::CTS_USERNAME, std::string(username));
 
 		config::SetConfigValue("username", username);
 		config::SetConfigValue("host", host);
 		config::SaveConfig();
 		ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "Successfully connected to %s", host });
-
-		return true;
 	}
-	else
-	{
+	else if (msg->type == ix::WebSocketMessageType::Close) {
+		Destroy();
+	}
+	else if (msg->type == ix::WebSocketMessageType::Error) {
 		std::cout << "[!] Connection to " << host << " failed" << std::endl;
 		ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "Connection to %s failed", host });
-		return false;
+		Destroy();
+	}
+	else {
+		std::cout << "[!] Unsupported WebSocket message type received: " << (int)(msg->type) << std::endl;
 	}
 }
 
-bool client::Init() {
-	bool success = false;
-	client = Garnet::Socket(Garnet::Protocol::TCP, &success);
-	if (!success)
-	{
-		std::cout << "[!] Error creating TCP client" << std::endl;
+void client::Connect(const char* host, const char* username) {
+	Disconnect();
+	if (connected) { // Reset client if already connected
+		Destroy();
 	}
-	return success;
+
+	std::string url = "ws://" + std::string(host) + ":2222/";
+
+	client.setUrl(url);
+	client.setOnMessageCallback(OnMessageReceived);
+	client.disableAutomaticReconnection();
+	client.start();
 }
 
 void client::Disconnect() {
-	client.close();
+	client.stop();
 }
 
 bool client::Destroy() {
-	Disconnect();
 	if (connected == true) {
 		connected = false;
 		state = ClientState(); // Reset state

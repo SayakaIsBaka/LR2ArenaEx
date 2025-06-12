@@ -4,7 +4,32 @@
 #include <string>
 #include <array>
 #include <unordered_map>
-#include <Garnet/Garnet.h>
+
+namespace network {
+	struct Address {
+		std::string host = "";
+		unsigned short port = 0;
+
+		void operator=(const Address& other) {
+			host = other.host;
+			port = other.port;
+		};
+		bool operator==(const Address& other) const {
+			return (host == other.host && port == other.port);
+		};
+
+		MSGPACK_DEFINE(host, port);
+	};
+}
+
+template <>
+struct std::hash<network::Address>
+{
+	size_t operator()(const network::Address& addr) const
+	{
+		return hash<string>()(addr.host) ^ (hash<int>()(addr.port) << 1);
+	}
+};
 
 namespace network {
 	struct Score {
@@ -31,12 +56,12 @@ namespace network {
 	};
 
 	struct PeerList { // Only used for networking
-		std::unordered_map<Garnet::Address, network::Peer> list;
-		Garnet::Address host;
+		std::unordered_map<network::Address, network::Peer> list;
+		network::Address host;
 
 		PeerList() {};
 
-		PeerList(std::unordered_map<Garnet::Address, network::Peer> list, Garnet::Address host) {
+		PeerList(std::unordered_map<network::Address, network::Peer> list, network::Address host) {
 			this->list = list;
 			this->host = host;
 		}
@@ -58,11 +83,11 @@ namespace network {
 
 	struct ScoreMessage { // Used from server to clients
 		Score score = Score();
-		Garnet::Address player;
+		network::Address player;
 
 		ScoreMessage() {};
 
-		ScoreMessage(Score score, Garnet::Address player) {
+		ScoreMessage(Score score, network::Address player) {
 			this->score = score;
 			this->player = player;
 		}
@@ -72,12 +97,12 @@ namespace network {
 
 	struct Message { // Used from server to clients
 		std::string message;
-		Garnet::Address player;
+		network::Address player;
 		bool systemMessage;
 
 		Message() {};
 
-		Message(std::string message, Garnet::Address player, bool systemMessage) {
+		Message(std::string message, network::Address player, bool systemMessage) {
 			this->message = message;
 			this->player = player;
 			this->systemMessage = systemMessage;
