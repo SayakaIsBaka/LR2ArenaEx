@@ -115,8 +115,7 @@ void gui::Render() {
                 if (ImGui::CollapsingHeader("Bindings settings")) {
                     if (ImGui::BeginTable("BindingsTable", 3,
                         ImGuiTableFlags_ScrollX | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH,
-                        ImVec2(ImGui::GetFontSize() * 25.0f, 0))) {
-                        ImGui::TableSetupScrollFreeze(1, 0);
+                        ImVec2(ImGui::GetFontSize() * 25.0f, ImGui::GetTextLineHeightWithSpacing() * 5 + (overlay::lr2type == overlay::LR2_TYPE::LR2_HD ? -1 : 3)))) {
                         ImGui::TableSetupColumn("Name");
                         ImGui::TableSetupColumn("Key");
                         ImGui::TableSetupColumn("");
