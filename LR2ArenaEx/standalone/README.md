@@ -16,6 +16,6 @@ Alternatively, use the CMake extension in VS Code which does most of the work fo
 ## Libraries
 
 The standalone server for LR2ArenaEx uses the following libraries:
-- [Garnet](https://github.com/jopo86/garnet)
-- [cppack](https://github.com/dacap/cppack)
+- [IXWebSocket](https://github.com/machinezone/IXWebSocket)
+- [msgpack](https://github.com/msgpack/msgpack-c)
 - [argparse](https://github.com/p-ranav/argparse)

@@ -290,6 +290,7 @@
     <ClInclude Include="src\hooks\returnmenu.h" />
     <ClInclude Include="src\hooks\score.h" />
     <ClInclude Include="src\hooks\selectbms.h" />
+    <ClInclude Include="src\hooks\selectscene.h" />
     <ClInclude Include="src\network\enums.h" />
     <ClInclude Include="src\network\structs.h" />
     <ClInclude Include="src\overlay\dinputhook.h" />
@@ -381,6 +382,7 @@
     <ClCompile Include="src\hooks\returnmenu.cpp" />
     <ClCompile Include="src\hooks\score.cpp" />
     <ClCompile Include="src\hooks\selectbms.cpp" />
+    <ClCompile Include="src\hooks\selectscene.cpp" />
     <ClCompile Include="src\overlay\dinputhook.cpp" />
     <ClCompile Include="src\overlay\dx9hook.cpp" />
     <ClCompile Include="src\overlay\overlay.cpp" />

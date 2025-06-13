@@ -12,6 +12,7 @@
 #include "midi.h"
 #include "maniac.h"
 #include "fmod.h"
+#include "selectscene.h"
 
 bool hooks::SetupHooks() { // Pacemaker hook is missing from here as we only hook when connecting
 	hooks::select_bms::Setup();
@@ -23,6 +24,7 @@ bool hooks::SetupHooks() { // Pacemaker hook is missing from here as we only hoo
 	hooks::midi::Setup();
 	hooks::maniac::Setup();
 	hooks::fmod::Setup();
+	hooks::select_scene::Setup();
 
 	return true;
 }

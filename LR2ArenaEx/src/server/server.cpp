@@ -251,6 +251,9 @@ void server::OnClientMessageReceived(std::shared_ptr<ix::ConnectionState> connec
     else if (msg->type == ix::WebSocketMessageType::Close || msg->type == ix::WebSocketMessageType::Error) {
         ClientDisconnected(clientAddr);
     }
+    else if (msg->type == ix::WebSocketMessageType::Fragment) {
+        std::cout << "[!] Received websocket fragment, unsupported" << std::endl;
+    }
 }
 
 bool server::Start(const char* host, unsigned short port) {

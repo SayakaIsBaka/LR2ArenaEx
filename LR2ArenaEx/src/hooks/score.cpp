@@ -13,10 +13,11 @@ DWORD WINAPI ScoreConsumer(LPVOID lpParameter)
 		network::Score score_event;
 		hooks::score::score_queue.wait_dequeue(score_event);
 
+		/*
 		fprintf(stdout, "poor:%d bad:%d good:%d great:%d p_great:%d max_combo:%d score:%d\n",
 			score_event.poor, score_event.bad, score_event.good, score_event.great, score_event.p_great,
 			score_event.max_combo, score_event.score
-		);
+		);*/
 
 		auto score_data = msgpack_utils::pack(score_event);
 		client::Send(network::ClientToServer::CTS_PLAYER_SCORE, score_data);
