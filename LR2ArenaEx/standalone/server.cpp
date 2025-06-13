@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
         .help("port to listen to")
         .metavar("PORT")
         .scan<'u', unsigned short>()
-        .default_value(unsigned short(2222));
+        .default_value((unsigned short)(2222));
 
     try {
         program.parse_args(argc, argv);
