@@ -12,6 +12,7 @@ namespace gui {
 
 	inline utils::keys::BindingType waitingForKeyPress = utils::keys::BindingType::NONE;
 	inline bool keySelected = false;
+	inline utils::keys::Key keyAlreadyBound = {utils::keys::DeviceType::NONE, 0};
 
 	inline std::unordered_map<overlay::LR2_TYPE, ImVec2> fileDialogDim = {
 		{overlay::LR2_TYPE::LR2_HD, ImVec2(700, 500)},

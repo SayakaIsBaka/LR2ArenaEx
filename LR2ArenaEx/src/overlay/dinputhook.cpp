@@ -37,11 +37,6 @@ void CheckKeyAndProcess(DWORD cbData, LPVOID lpvData, utils::keys::Key key, std:
 HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPVOID lpvData) {
 	HRESULT result = overlay::dinputhook::oGetDeviceState(pThis, cbData, lpvData);
 	if (result == DI_OK) {
-		if (hooks::maniac::itemModeEnabled && client::state.peers[client::state.remoteId].ready) {
-			CheckKeyAndProcess(cbData, lpvData, utils::keys::bindings[utils::keys::BindingType::ITEM_TRIGGER].key, hooks::maniac::UseItem);
-		}
-		CheckKeyAndProcess(cbData, lpvData, utils::keys::bindings[utils::keys::BindingType::MENU_TOGGLE].key, [] { gui::showMenu = !gui::showMenu; });
-		CheckKeyAndProcess(cbData, lpvData, utils::keys::bindings[utils::keys::BindingType::GRAPH_TOGGLE].key, [] { gui::graph::showGraph = !gui::graph::showGraph; });
 		if (gui::waitingForKeyPress != utils::keys::BindingType::NONE) {
 			utils::keys::DeviceType type = utils::keys::DeviceType::NONE;
 			if (cbData == sizeof(DIJOYSTATE)) // Controller device
@@ -51,11 +46,20 @@ HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPV
 			if (type != utils::keys::DeviceType::NONE) {
 				auto parsedKey = utils::keys::ParseKey(cbData, lpvData, type);
 				if (parsedKey.type != utils::keys::DeviceType::NONE) {
-					utils::keys::bindings[gui::waitingForKeyPress].key = parsedKey;
 					overlay::dinputhook::heldKeys[parsedKey] = debounceRate;
-					gui::keySelected = true;
+					if (utils::keys::BindKey(gui::waitingForKeyPress, parsedKey))
+						gui::keySelected = true;
+					else
+						gui::keyAlreadyBound = parsedKey;
 				}
 			}
+		}
+		else {
+			if (hooks::maniac::itemModeEnabled && client::state.peers[client::state.remoteId].ready) {
+				CheckKeyAndProcess(cbData, lpvData, utils::keys::bindings[utils::keys::BindingType::ITEM_TRIGGER].key, hooks::maniac::UseItem);
+			}
+			CheckKeyAndProcess(cbData, lpvData, utils::keys::bindings[utils::keys::BindingType::MENU_TOGGLE].key, [] { gui::showMenu = !gui::showMenu; });
+			CheckKeyAndProcess(cbData, lpvData, utils::keys::bindings[utils::keys::BindingType::GRAPH_TOGGLE].key, [] { gui::graph::showGraph = !gui::graph::showGraph; });
 		}
 		if (gui::showMenu && gui::muteGameInputs) {
 			if (cbData == sizeof(DIMOUSESTATE2)) { // Mouse device

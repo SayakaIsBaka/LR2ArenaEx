@@ -111,3 +111,12 @@ void utils::keys::LoadConfig(mINI::INIMap<std::string> bindingsConfig) {
 		}
 	}
 }
+
+bool utils::keys::BindKey(BindingType bindingType, Key key) {
+	for (const auto& [_, val] : bindings) {
+		if (val.key == key) // If key already bound to another feature
+			return false;
+	}
+	bindings[bindingType].key = key;
+	return true;
+}

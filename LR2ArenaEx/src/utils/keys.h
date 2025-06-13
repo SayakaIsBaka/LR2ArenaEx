@@ -214,6 +214,7 @@ namespace utils {
 		std::string toString(utils::keys::Key key);
 		void SaveToConfigFile();
 		void LoadConfig(mINI::INIMap<std::string> bindingsConfig);
+		bool BindKey(BindingType bindingType, Key key);
 	}
 }
 

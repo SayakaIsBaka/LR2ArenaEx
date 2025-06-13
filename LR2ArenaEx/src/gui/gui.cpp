@@ -144,13 +144,15 @@ void gui::Render() {
 
                 if (ImGui::BeginPopupModal("Bind key", NULL, ImGuiWindowFlags_AlwaysAutoResize))
                 {
-                    ImGui::Text("Binding key for: %s", utils::keys::bindings[waitingForKeyPress].name.c_str());
-                    ImGui::Text("Press any button...");
+                    ImGui::Text(ICON_FA_CIRCLE_INFO " Binding key for: %s\nPress any button...", utils::keys::bindings[waitingForKeyPress].name.c_str());
+                    if (keyAlreadyBound.type != utils::keys::DeviceType::NONE)
+                        ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s is already bound, please select another key", utils::keys::toString(keyAlreadyBound).c_str());
                     ImGui::Separator();
 
                     if (keySelected || ImGui::Button("Cancel")) {
                         waitingForKeyPress = utils::keys::BindingType::NONE;
                         keySelected = false;
+                        keyAlreadyBound = { utils::keys::DeviceType::NONE, 0 };
                         utils::keys::SaveToConfigFile();
                         ImGui::CloseCurrentPopup();
                     }
