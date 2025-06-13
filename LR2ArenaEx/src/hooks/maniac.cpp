@@ -10,6 +10,7 @@
 #include "fmod.h"
 
 void hooks::maniac::SaveToConfigFile() {
+	auto itemKeyBind = utils::keys::bindings[utils::keys::BindingType::ITEM_TRIGGER].key;
 	config::SetConfigValue("controller_type", std::to_string(static_cast<unsigned int>(itemKeyBind.type)));
 	config::SetConfigValue("item_keybind", std::to_string(itemKeyBind.value));
 	config::SaveConfig();
@@ -44,7 +45,7 @@ void hooks::maniac::LoadConfig(std::string type, std::string value) {
 			throw std::invalid_argument("Invalid device type");
 		}
 
-		itemKeyBind = utils::keys::Key(t, intVal);
+		utils::keys::bindings[utils::keys::BindingType::ITEM_TRIGGER].key = utils::keys::Key(t, intVal);
 	}
 	catch (std::exception e) {
 		std::cout << "[!] Error parsing config file for key bindings, falling back to default" << std::endl;

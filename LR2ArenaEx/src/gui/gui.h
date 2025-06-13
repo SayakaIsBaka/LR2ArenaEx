@@ -10,15 +10,13 @@ namespace gui {
 	inline bool showMenu = false;
 	inline bool muteGameInputs = true;
 
-	inline bool waitingForKeyPress = false;
+	inline utils::keys::BindingType waitingForKeyPress = utils::keys::BindingType::NONE;
 	inline bool keySelected = false;
 
 	inline std::unordered_map<overlay::LR2_TYPE, ImVec2> fileDialogDim = {
 		{overlay::LR2_TYPE::LR2_HD, ImVec2(700, 500)},
 		{overlay::LR2_TYPE::LR2_SD, ImVec2(500, 300)},
 	};
-
-	inline utils::keys::Key menuKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_INSERT); // Default binding
 
 	void Render();
 }

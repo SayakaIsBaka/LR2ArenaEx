@@ -82,7 +82,7 @@ void InitImGui(IDirect3DDevice9* pDevice) {
 	ImPlot::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	int fontSize = overlay::lr2type == overlay::LR2_TYPE::LR2_HD ? 16 : 12;
 	SetupFonts(io, fontSize);
 

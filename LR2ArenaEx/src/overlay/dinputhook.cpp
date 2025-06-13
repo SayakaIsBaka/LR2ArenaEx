@@ -38,11 +38,11 @@ HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPV
 	HRESULT result = overlay::dinputhook::oGetDeviceState(pThis, cbData, lpvData);
 	if (result == DI_OK) {
 		if (hooks::maniac::itemModeEnabled && client::state.peers[client::state.remoteId].ready) {
-			CheckKeyAndProcess(cbData, lpvData, hooks::maniac::itemKeyBind, hooks::maniac::UseItem);
+			CheckKeyAndProcess(cbData, lpvData, utils::keys::bindings[utils::keys::BindingType::ITEM_TRIGGER].key, hooks::maniac::UseItem);
 		}
-		CheckKeyAndProcess(cbData, lpvData, gui::menuKeyBind, [] { gui::showMenu = !gui::showMenu; });
-		CheckKeyAndProcess(cbData, lpvData, gui::graph::graphKeyBind, [] { gui::graph::showGraph = !gui::graph::showGraph; });
-		if (gui::waitingForKeyPress) {
+		CheckKeyAndProcess(cbData, lpvData, utils::keys::bindings[utils::keys::BindingType::MENU_TOGGLE].key, [] { gui::showMenu = !gui::showMenu; });
+		CheckKeyAndProcess(cbData, lpvData, utils::keys::bindings[utils::keys::BindingType::GRAPH_TOGGLE].key, [] { gui::graph::showGraph = !gui::graph::showGraph; });
+		if (gui::waitingForKeyPress != utils::keys::BindingType::NONE) {
 			utils::keys::DeviceType type = utils::keys::DeviceType::NONE;
 			if (cbData == sizeof(DIJOYSTATE)) // Controller device
 				type = utils::keys::DeviceType::CONTROLLER;
@@ -51,7 +51,7 @@ HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPV
 			if (type != utils::keys::DeviceType::NONE) {
 				auto parsedKey = utils::keys::ParseKey(cbData, lpvData, type);
 				if (parsedKey.type != utils::keys::DeviceType::NONE) {
-					hooks::maniac::itemKeyBind = parsedKey;
+					utils::keys::bindings[gui::waitingForKeyPress].key = parsedKey;
 					gui::keySelected = true;
 				}
 			}

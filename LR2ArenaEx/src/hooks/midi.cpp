@@ -17,14 +17,14 @@ void CheckKeyAndProcess(DWORD msg, utils::keys::Key key, std::function<void()> o
 
 DWORD __cdecl hkParseMidiMessage(DWORD msg) {
 	if (hooks::maniac::itemModeEnabled && client::state.peers[client::state.remoteId].ready) {
-		CheckKeyAndProcess(msg, hooks::maniac::itemKeyBind, hooks::maniac::UseItem);
+		CheckKeyAndProcess(msg, utils::keys::bindings[utils::keys::BindingType::ITEM_TRIGGER].key, hooks::maniac::UseItem);
 	}
-	CheckKeyAndProcess(msg, gui::menuKeyBind, [] { gui::showMenu = !gui::showMenu; });
-	CheckKeyAndProcess(msg, gui::graph::graphKeyBind, [] { gui::graph::showGraph = !gui::graph::showGraph; });
-	if (gui::waitingForKeyPress) {
+	CheckKeyAndProcess(msg, utils::keys::bindings[utils::keys::BindingType::MENU_TOGGLE].key, [] { gui::showMenu = !gui::showMenu; });
+	CheckKeyAndProcess(msg, utils::keys::bindings[utils::keys::BindingType::GRAPH_TOGGLE].key, [] { gui::graph::showGraph = !gui::graph::showGraph; });
+	if (gui::waitingForKeyPress != utils::keys::BindingType::NONE) {
 		auto parsedKey = utils::keys::ParseKey(0, (uintptr_t*)msg, utils::keys::DeviceType::MIDI);
 		if (parsedKey.type != utils::keys::DeviceType::NONE) {
-			hooks::maniac::itemKeyBind = parsedKey;
+			utils::keys::bindings[gui::waitingForKeyPress].key = parsedKey;
 			gui::keySelected = true;
 		}
 	}

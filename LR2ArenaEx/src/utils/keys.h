@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <dinput.h>
 
 namespace utils {
 	namespace keys {
@@ -25,6 +26,38 @@ namespace utils {
 			};
 
 			Key() {};
+		};
+
+		enum class BindingType : unsigned int {
+			NONE = 0,
+			ITEM_TRIGGER,
+			MENU_TOGGLE,
+			GRAPH_TOGGLE
+		};
+
+		struct Binding {
+			std::string id;
+			std::string name;
+			Key key;
+		};
+
+		// Default bindings
+		inline std::unordered_map<BindingType, Binding> bindings = {
+			{BindingType::ITEM_TRIGGER, {
+				"itemTrigger",
+				"Item trigger",
+				{ utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE }
+			}},
+			{BindingType::MENU_TOGGLE, {
+				"menuToggle",
+				"Menu toggle",
+				{ utils::keys::DeviceType::KEYBOARD, DIK_INSERT }
+			}},
+			{BindingType::GRAPH_TOGGLE, {
+				"graphToggle",
+				"Graph toggle",
+				{ utils::keys::DeviceType::KEYBOARD, DIK_PRIOR }
+			}}
 		};
 
 		inline const std::unordered_map<unsigned long, std::string> keyToString = {

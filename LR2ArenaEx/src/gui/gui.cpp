@@ -67,29 +67,6 @@ void gui::Render() {
                 ImGui::Checkbox("Disable game inputs when overlay is shown", &gui::muteGameInputs);
                 ImGui::SameLine(); widgets::HelpMarker("Does not affect the graph display in-game");
 
-                ImGui::Text("Item send key: %s", utils::keys::toString(hooks::maniac::itemKeyBind).c_str());
-                ImGui::SameLine();
-                if (ImGui::Button("Bind"))
-                    ImGui::OpenPopup("Bind item key");
-
-                ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::internal_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::internal_resolution)[1] / 2.0f);
-                ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-                if (ImGui::BeginPopupModal("Bind item key", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-                {
-                    waitingForKeyPress = true;
-                    ImGui::Text("Press any button...");
-                    ImGui::Separator();
-
-                    if (keySelected || ImGui::Button("Cancel")) {
-                        waitingForKeyPress = false;
-                        keySelected = false;
-                        hooks::maniac::SaveToConfigFile();
-                        ImGui::CloseCurrentPopup();
-                    }
-                    ImGui::EndPopup();
-                }
-
                 static int volumeTmp = hooks::fmod::volume;
                 ImGui::SliderInt("Item sounds volume", &volumeTmp, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
                 if (ImGui::IsItemDeactivated() && volumeTmp != hooks::fmod::volume) { // Only update when the slider is not being dragged anymore
@@ -133,6 +110,51 @@ void gui::Render() {
                     if (ImGui::Button("Reset all SFXs")) {
                         hooks::fmod::ResetAllCustomSounds();
                     }
+                }
+
+                if (ImGui::CollapsingHeader("Bindings settings")) {
+                    if (ImGui::BeginTable("BindingsTable", 3,
+                        ImGuiTableFlags_ScrollX | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH,
+                        ImVec2(ImGui::GetFontSize() * 25.0f, 0))) {
+                        ImGui::TableSetupScrollFreeze(1, 0);
+                        ImGui::TableSetupColumn("Name");
+                        ImGui::TableSetupColumn("Key");
+                        ImGui::TableSetupColumn("");
+                        ImGui::TableHeadersRow();
+                        for (const auto& [key, val] : utils::keys::bindings) {
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
+                            ImGui::Text("%s", val.name.c_str());
+                            ImGui::TableNextColumn();
+                            ImGui::Text("%s", utils::keys::toString(val.key).c_str());
+                            ImGui::TableNextColumn();
+                            if (ImGui::Button(std::string("Bind##" + val.id).c_str())) {
+                                waitingForKeyPress = key;
+                            }
+                        }
+                        ImGui::EndTable();
+                    }
+                }
+
+                if (waitingForKeyPress != utils::keys::BindingType::NONE)
+                    ImGui::OpenPopup("Bind key");
+
+                ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::internal_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::internal_resolution)[1] / 2.0f);
+                ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                if (ImGui::BeginPopupModal("Bind key", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+                {
+                    ImGui::Text("Binding key for: %s", utils::keys::bindings[waitingForKeyPress].name.c_str());
+                    ImGui::Text("Press any button...");
+                    ImGui::Separator();
+
+                    if (keySelected || ImGui::Button("Cancel")) {
+                        waitingForKeyPress = utils::keys::BindingType::NONE;
+                        keySelected = false;
+                        hooks::maniac::SaveToConfigFile();
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::EndPopup();
                 }
 
                 ImGui::EndTabItem();

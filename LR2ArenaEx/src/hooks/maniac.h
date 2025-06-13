@@ -2,7 +2,6 @@
 
 #include <network/structs.h>
 #include <utils/keys.h>
-#include <dinput.h>
 #include <vector>
 #include <fonts/IconsFontAwesome6.h>
 #include <random>
@@ -43,7 +42,6 @@ namespace hooks {
 		inline float thresholdMult = 0.10f; // Item threshold (given as a percentage of total notes)
 		inline bool settingsRemoteUpdated = false; // Hack to update temp variables on GUI
 		inline network::CurrentItem currentItem;
-		inline utils::keys::Key itemKeyBind(utils::keys::DeviceType::KEYBOARD, DIK_BACKSPACE); // Default binding
 
 		inline std::random_device dev;
 		inline std::mt19937 rng;
