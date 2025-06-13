@@ -151,7 +151,7 @@ void gui::Render() {
                     if (keySelected || ImGui::Button("Cancel")) {
                         waitingForKeyPress = utils::keys::BindingType::NONE;
                         keySelected = false;
-                        hooks::maniac::SaveToConfigFile();
+                        utils::keys::SaveToConfigFile();
                         ImGui::CloseCurrentPopup();
                     }
                     ImGui::EndPopup();

@@ -21,10 +21,8 @@ void config::LoadConfig() {
 	if (!host.empty() && host.size() < 128)
 		strcpy_s(client::host, 128, host.c_str());
 
-	auto controllerType = ini.get("config").get("controller_type");
-	auto itemKeybind = ini.get("config").get("item_keybind");
-	if (!controllerType.empty() && !itemKeybind.empty())
-		hooks::maniac::LoadConfig(controllerType, itemKeybind);
+	auto bindingsConfig = ini.get("bindings");
+	utils::keys::LoadConfig(bindingsConfig);
 
 	auto itemVolume = ini.get("config").get("item_sound_volume");
 	auto sfxConfig = ini.get("sfx");

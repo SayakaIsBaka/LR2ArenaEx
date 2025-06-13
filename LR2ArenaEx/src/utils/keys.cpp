@@ -61,3 +61,53 @@ std::string utils::keys::toString(utils::keys::Key key) {
 	}
 	return "";
 }
+
+void utils::keys::SaveToConfigFile() {
+	for (const auto& [key, val] : bindings) {
+		config::SetConfigValue(val.id + "_controller_type", std::to_string(static_cast<unsigned int>(val.key.type)), "bindings");
+		config::SetConfigValue(val.id + "_keybind", std::to_string(val.key.value), "bindings");
+	}
+	config::SaveConfig();
+}
+
+void utils::keys::LoadConfig(mINI::INIMap<std::string> bindingsConfig) {
+	for (auto& [key, val] : bindings) {
+		try {
+			auto type = bindingsConfig.get(val.id + "_controller_type");
+			auto value = bindingsConfig.get(val.id + "_keybind");
+			if (!type.empty() && !value.empty()) {
+				int intType = std::stoi(type);
+				int intVal = std::stoi(value);
+				utils::keys::DeviceType t;
+
+				if (intVal < 0)
+					throw std::invalid_argument("Invalid value");
+
+				switch (intType) {
+				case 2:
+					t = utils::keys::DeviceType::KEYBOARD;
+					if (intVal >= 0xEE)
+						throw std::invalid_argument("Invalid value");
+					break;
+				case 3:
+					t = utils::keys::DeviceType::CONTROLLER;
+					if (intVal >= 32)
+						throw std::invalid_argument("Invalid value");
+					break;
+				case 4:
+					t = utils::keys::DeviceType::MIDI;
+					if (intVal >= 128)
+						throw std::invalid_argument("Invalid value");
+					break;
+				default:
+					throw std::invalid_argument("Invalid device type");
+				}
+
+				val.key = utils::keys::Key(t, intVal);
+			}
+		}
+		catch (std::exception e) {
+			std::cout << "[!] Error parsing config file for " << val.name << ", falling back to default" << std::endl;
+		}
+	}
+}

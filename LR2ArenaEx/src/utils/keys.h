@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <dinput.h>
+#include <config/config.h>
 
 namespace utils {
 	namespace keys {
@@ -211,6 +212,8 @@ namespace utils {
 
 		utils::keys::Key ParseKey(unsigned long cbData, void* lpvData, DeviceType type);
 		std::string toString(utils::keys::Key key);
+		void SaveToConfigFile();
+		void LoadConfig(mINI::INIMap<std::string> bindingsConfig);
 	}
 }
 

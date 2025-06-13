@@ -49,8 +49,6 @@ namespace hooks {
 
 		inline std::unordered_map<network::CurrentItem, int> activeItems; // contains remaining time in ms
 
-		void SaveToConfigFile();
-		void LoadConfig(std::string type, std::string value);
 		void ResetState();
 		void UseItem();
 		void Setup();

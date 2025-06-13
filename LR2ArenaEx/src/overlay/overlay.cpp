@@ -32,7 +32,8 @@ DWORD WINAPI overlay::Setup(HMODULE hModule)
 	hooks::SetupHooks();
 	config::LoadConfig();
 
-	ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "LR2ArenaEx successfully loaded; press [Ins] to show the overlay!" });
+	ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "LR2ArenaEx successfully loaded; press %s to show the overlay!",
+		utils::keys::toString(utils::keys::bindings[utils::keys::BindingType::MENU_TOGGLE].key).c_str() });
 
 #ifdef DEBUG_CONSOLE_ENABLED
 	while (true)
