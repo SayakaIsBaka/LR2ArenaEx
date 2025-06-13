@@ -7,9 +7,9 @@
 #include <hooks/maniac.h>
 #include <client/client.h>
 
-void CheckKeyAndProcess(DWORD cbData, LPVOID lpvData, utils::keys::Key key, std::function<void()> onMatch) {
-	constexpr int debounceRate = 50;
+constexpr int debounceRate = 50;
 
+void CheckKeyAndProcess(DWORD cbData, LPVOID lpvData, utils::keys::Key key, std::function<void()> onMatch) {
 	if (cbData == sizeof(DIJOYSTATE) && key.type == utils::keys::DeviceType::CONTROLLER) {
 		auto arr = ((LPDIJOYSTATE)lpvData)->rgbButtons;
 		if (arr[key.value]) {
@@ -52,6 +52,7 @@ HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPV
 				auto parsedKey = utils::keys::ParseKey(cbData, lpvData, type);
 				if (parsedKey.type != utils::keys::DeviceType::NONE) {
 					utils::keys::bindings[gui::waitingForKeyPress].key = parsedKey;
+					overlay::dinputhook::heldKeys[parsedKey] = debounceRate;
 					gui::keySelected = true;
 				}
 			}
