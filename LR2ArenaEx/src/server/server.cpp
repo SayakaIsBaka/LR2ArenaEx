@@ -258,7 +258,7 @@ void server::OnClientMessageReceived(std::shared_ptr<ix::ConnectionState> connec
 
 bool server::Start(const char* host, unsigned short port) {
     // Hopefully this is enough to avoid a memleak because delete on a regular pointer crashes the thing
-    server = std::make_shared<ix::WebSocketServer>(port, host);
+    server = std::make_shared<ix::WebSocketServer>(port, host, ix::SocketServer::kDefaultTcpBacklog, ix::SocketServer::kDefaultMaxConnections, ix::WebSocketServer::kDefaultHandShakeTimeoutSecs, ix::SocketServer::kDefaultAddressFamily, 15);
     server->setOnClientMessageCallback(OnClientMessageReceived);
     auto success = server->listen();
 

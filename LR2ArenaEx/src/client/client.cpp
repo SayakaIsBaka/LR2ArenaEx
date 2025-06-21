@@ -16,9 +16,10 @@
 
 void client::Send(network::ClientToServer id, std::vector<char> data) {
 	data.insert(data.begin(), static_cast<char>(id));
-
 	if (client.getReadyState() == ix::ReadyState::Open && connected) {
-		client.sendBinary(data);
+		auto result = client.sendBinary(data);
+		if (result.success == false) // Disconnected, probably timeout or something
+			Destroy();
 	}
 }
 
@@ -200,6 +201,9 @@ void client::OnMessageReceived(const ix::WebSocketMessagePtr& msg) {
 		std::cout << "[!] Connection to " << host << " failed" << std::endl;
 		ImGui::InsertNotification({ ImGuiToastType::Error, 3000, "Connection to %s failed", host });
 		Destroy();
+	}
+	else if (msg->type == ix::WebSocketMessageType::Ping) {
+		// Keep-alive received from server, do nothing
 	}
 	else {
 		std::cout << "[!] Unsupported WebSocket message type received: " << (int)(msg->type) << std::endl;
