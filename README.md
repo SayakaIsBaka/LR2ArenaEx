@@ -49,6 +49,6 @@ A small wrapper around LR2ArenaEx's embedded server is available, allowing to ru
 ## Known issues
 
 - IME is not supported on the overlay
-- LR2FHD is not supported
+- LR2ArenaEx has been reported to be working with LR2FHD but has not been thoroughly tested with it; as such, bugs may occur
 - LR2ArenaEx does not work if LR2 is ran as admin
 - Cleanup is not properly performed when LR2 exits (atexit is not called)
