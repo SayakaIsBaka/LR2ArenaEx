@@ -28,6 +28,8 @@ void CheckKeyAndProcess(DWORD cbData, LPVOID lpvData, utils::keys::Key key, std:
 		}
 	}
 	for (auto& [key, value] : overlay::dinputhook::heldKeys) {
+		if (overlay::dinputhook::heldKeys.empty()) // Happens sometimes for some reason, wrapping operations with a mutex doesn't fix it
+			return;
 		value--;
 		if (value <= 0)
 			overlay::dinputhook::heldKeys.erase(key);
