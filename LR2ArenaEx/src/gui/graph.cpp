@@ -74,7 +74,8 @@ void gui::graph::Render() {
 	{
         items::Render();
         if (client::connected && client::state.peers.size() > 0) {
-            ImGui::BeginChild("GraphDisp", ImVec2(0, 0), ImGuiChildFlags_ResizeX | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
+            ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(gui::graph::graphDim[overlay::lr2type].x * 2.0f, FLT_MAX));
+            ImGui::BeginChild("GraphDisp", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY, ImGuiWindowFlags_HorizontalScrollbar);
             {
                 std::vector<unsigned int> values; // It's basically a diagonal matrix because I'm abusing PlotBarGroups to show different colors
                 std::vector<const char*> labels;
