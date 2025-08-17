@@ -279,6 +279,7 @@
     <ClInclude Include="src\gui\itemsettings.h" />
     <ClInclude Include="src\gui\mainwindow.h" />
     <ClInclude Include="src\gui\widgets.h" />
+    <ClInclude Include="src\hooks\cstr.h" />
     <ClInclude Include="src\hooks\fmod.h" />
     <ClInclude Include="src\hooks\hooks.h" />
     <ClInclude Include="src\hooks\loadingdone.h" />

@@ -342,6 +342,9 @@
     <ClInclude Include="src\hooks\selectscene.h">
       <Filter>Source Files\hooks</Filter>
     </ClInclude>
+    <ClInclude Include="src\hooks\cstr.h">
+      <Filter>Source Files\hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
