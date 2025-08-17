@@ -101,7 +101,7 @@ void gui::main_window::Render() {
         ImGui::BeginChild("Main view", mainViewDim[overlay::lr2type], ImGuiChildFlags_AutoResizeX);
 
         if (ImGui::Button(ICON_FA_LINK)) {
-            ImGui::SetClipboardText(("www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + client::state.selectedSongRemote.hash).c_str());
+            ImGui::SetClipboardText(("http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + client::state.selectedSongRemote.hash).c_str());
             ImGui::InsertNotification({ ImGuiToastType::Info, 3000, "Copied LR2IR link to clipboard!" });
         }
         gui::widgets::Tooltip("Copy LR2IR link to clipboard");
