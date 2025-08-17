@@ -5,6 +5,7 @@
 #include <hooks/loadingdone.h>
 #include <hooks/random.h>
 #include <hooks/maniac.h>
+#include <hooks/selectscene.h>
 #include <network/structs.h>
 #include <utils/misc.h>
 #include <gui/mainwindow.h>
@@ -87,6 +88,8 @@ void client::UpdateSelectedSong(std::vector<char> data) {
 		auto p = std::filesystem::u8path(path);
 		std::filesystem::path relativePath = p.parent_path().filename() / p.filename();
 		state.selectedSongRemote.path = relativePath.u8string();
+		if (!(state.host == state.remoteId))
+			hooks::select_scene::SearchSongByHash(selectedBms.hash); // Perform programmatic search if not host
 	}
 }
 
