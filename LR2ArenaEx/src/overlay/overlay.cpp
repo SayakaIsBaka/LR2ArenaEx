@@ -9,7 +9,11 @@
 #include "dx9hook.h"
 #include "dinputhook.h"
 
-#define DEBUG_CONSOLE_ENABLED
+#ifndef _DEBUG
+#define DEBUG_CONSOLE_ENABLED 0
+#else
+#define DEBUG_CONSOLE_ENABLED 1
+#endif
 
 DWORD WINAPI overlay::Setup(HMODULE hModule)
 {
