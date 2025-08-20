@@ -345,9 +345,6 @@
     <ClInclude Include="src\hooks\cstr.h">
       <Filter>Source Files\hooks</Filter>
     </ClInclude>
-    <ClInclude Include="src\hooks\currentnotes.h">
-      <Filter>Source Files\hooks</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\ImGui\imgui.cpp">
@@ -582,9 +579,6 @@
       <Filter>Header Files\ixwebsocket</Filter>
     </ClCompile>
     <ClCompile Include="src\hooks\selectscene.cpp">
-      <Filter>Source Files\hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="src\hooks\currentnotes.cpp">
       <Filter>Source Files\hooks</Filter>
     </ClCompile>
   </ItemGroup>

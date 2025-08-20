@@ -5,7 +5,6 @@
 #include <client/client.h>
 #include <utils/misc.h>
 #include <hooks/maxscore.h>
-#include <hooks/currentnotes.h>
 #include <vector>
 #include <string>
 
@@ -109,7 +108,7 @@ void gui::graph::Render() {
                 for (const auto& [key, value] : client::state.peers) {
                     ImGui::BulletText("%s: ", value.username.c_str());
                     ImGui::SameLine();
-                    ImGui::Text("%d (%.2f%%)", utils::CalculateExScore(value.score), utils::CalculateRate(value.score, hooks::current_notes::currentNotes * 2));
+                    ImGui::Text("%d (%.2f%%)", utils::CalculateExScore(value.score), utils::CalculateRate(value.score));
 
                     auto opt = utils::GetOptionName(value.option);
                     auto gauge = utils::GetGaugeName(value.gauge);
