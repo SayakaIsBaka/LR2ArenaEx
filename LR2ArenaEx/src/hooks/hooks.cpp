@@ -9,6 +9,7 @@
 #include "loadingdone.h"
 #include "returnmenu.h"
 #include "maxscore.h"
+#include "currentnotes.h"
 #include "midi.h"
 #include "maniac.h"
 #include "fmod.h"
@@ -21,6 +22,7 @@ bool hooks::SetupHooks() { // Pacemaker hook is missing from here as we only hoo
 	hooks::loading_done::Setup();
 	hooks::return_menu::Setup();
 	hooks::max_score::Setup();
+	hooks::current_notes::Setup();
 	hooks::midi::Setup();
 	hooks::maniac::Setup();
 	hooks::fmod::Setup();

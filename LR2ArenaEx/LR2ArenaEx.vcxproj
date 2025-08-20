@@ -280,6 +280,7 @@
     <ClInclude Include="src\gui\mainwindow.h" />
     <ClInclude Include="src\gui\widgets.h" />
     <ClInclude Include="src\hooks\cstr.h" />
+    <ClInclude Include="src\hooks\currentnotes.h" />
     <ClInclude Include="src\hooks\fmod.h" />
     <ClInclude Include="src\hooks\hooks.h" />
     <ClInclude Include="src\hooks\loadingdone.h" />
@@ -372,6 +373,7 @@
     <ClCompile Include="src\gui\itemsettings.cpp" />
     <ClCompile Include="src\gui\mainwindow.cpp" />
     <ClCompile Include="src\gui\widgets.cpp" />
+    <ClCompile Include="src\hooks\currentnotes.cpp" />
     <ClCompile Include="src\hooks\fmod.cpp" />
     <ClCompile Include="src\hooks\hooks.cpp" />
     <ClCompile Include="src\hooks\loadingdone.cpp" />
