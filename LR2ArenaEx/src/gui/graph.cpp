@@ -108,6 +108,9 @@ void gui::graph::Render() {
                 for (const auto& [key, value] : client::state.peers) {
                     ImGui::BulletText("%s: ", value.username.c_str());
                     ImGui::SameLine();
+                    ImVec2 oldCursorPos = ImGui::GetCursorPos();
+                    ImGui::Dummy(ImGui::CalcTextSize("9999 (100.00%)"));
+                    ImGui::SetCursorPos(oldCursorPos);
                     ImGui::Text("%d (%.2f%%)", utils::CalculateExScore(value.score), utils::CalculateRate(value.score, hooks::max_score::maxScore));
 
                     auto opt = utils::GetOptionName(value.option);
@@ -137,16 +140,32 @@ void gui::graph::Render() {
                         ImGui::TableNextColumn();
                         ImGui::Text("PR  "); // Ugly way to do padding aaaaaaa
 
+                        ImVec2 countSize = ImGui::CalcTextSize("9999");
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
+                        oldCursorPos = ImGui::GetCursorPos();
+                        ImGui::Dummy(countSize);
+                        ImGui::SetCursorPos(oldCursorPos);
                         ImGui::TextColored(ImVec4(0.765f, 0.976f, 0.824f, 1.0f), "%d", value.score.p_great);
                         ImGui::TableNextColumn();
+                        oldCursorPos = ImGui::GetCursorPos();
+                        ImGui::Dummy(countSize);
+                        ImGui::SetCursorPos(oldCursorPos);
                         ImGui::TextColored(ImVec4(1, 0.824f, 0, 1.0f), "%d", value.score.great);
                         ImGui::TableNextColumn();
+                        oldCursorPos = ImGui::GetCursorPos();
+                        ImGui::Dummy(countSize);
+                        ImGui::SetCursorPos(oldCursorPos);
                         ImGui::TextColored(ImVec4(1, 0.659f, 0, 1.0f), "%d", value.score.good);
                         ImGui::TableNextColumn();
+                        oldCursorPos = ImGui::GetCursorPos();
+                        ImGui::Dummy(countSize);
+                        ImGui::SetCursorPos(oldCursorPos);
                         ImGui::TextColored(ImVec4(1, 0.412f, 0, 1.0f), "%d", value.score.bad);
                         ImGui::TableNextColumn();
+                        oldCursorPos = ImGui::GetCursorPos();
+                        ImGui::Dummy(countSize);
+                        ImGui::SetCursorPos(oldCursorPos);
                         ImGui::TextColored(ImVec4(1, 0.129f, 0, 1.0f), "%d", value.score.poor);
 
                         ImGui::EndTable();
