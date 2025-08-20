@@ -15,6 +15,7 @@ namespace gui {
 		};
 
 		inline bool showGraph = false;
+		inline graph::graphType sortType(graph::graphType::SCORE);
 		inline std::unordered_map<overlay::LR2_TYPE, ImVec2> graphDim = {
 			{overlay::LR2_TYPE::LR2_HD, ImVec2(150, 400)},
 			{overlay::LR2_TYPE::LR2_SD, ImVec2(100, 200)},

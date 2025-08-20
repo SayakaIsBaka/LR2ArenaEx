@@ -7,11 +7,12 @@
 #include <hooks/maxscore.h>
 #include <vector>
 #include <string>
+#include <sstream>
 
-void PrepareData(std::vector<unsigned int> &values, std::vector<const char*> &labels, std::vector<double> &positions, gui::graph::graphType type) {
+void PrepareData(std::vector<unsigned int> &values, std::vector<const char*> &labels, std::vector<double> &positions, const std::vector<network::Peer> &peers, gui::graph::graphType type) {
     int i = 0;
 
-    for (const auto& [key, value] : client::state.peers) {
+    for (const auto& value : peers) {
         for (int j = 0; j < i; j++)
             values.push_back(0);
         if (type == gui::graph::graphType::SCORE) {
@@ -23,7 +24,7 @@ void PrepareData(std::vector<unsigned int> &values, std::vector<const char*> &la
         else if (type == gui::graph::graphType::MAX_COMBO) {
             values.push_back(value.score.max_combo);
         }
-        for (int j = i + 1; j < client::state.peers.size(); j++)
+        for (int j = i + 1; j < peers.size(); j++)
             values.push_back(0);
         labels.push_back(value.username.c_str());
         positions.push_back(i);
@@ -74,6 +75,21 @@ void gui::graph::Render() {
 	{
         items::Render();
         if (client::connected && client::state.peers.size() > 0) {
+            std::vector<network::Peer> sortedPeers;
+            sortedPeers.reserve(client::state.peers.size());
+            for (const auto& [key, value] : client::state.peers) {
+                sortedPeers.push_back(value);
+            }
+
+            std::sort(sortedPeers.begin(), sortedPeers.end(), [type(sortType)](network::Peer first, network::Peer second) {
+                switch (type) {
+                case gui::graph::graphType::SCORE: return utils::CalculateExScore(first.score) >= utils::CalculateExScore(second.score);
+                case gui::graph::graphType::BP: return first.score.bad + first.score.poor >= second.score.bad + second.score.poor;
+                case gui::graph::graphType::MAX_COMBO: return first.score.max_combo >= second.score.max_combo;
+                default: return true;
+                }
+            });
+
             ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(gui::graph::graphDim[overlay::lr2type].x * 2.0f, FLT_MAX));
             ImGui::BeginChild("GraphDisp", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY, ImGuiWindowFlags_HorizontalScrollbar);
             {
@@ -84,17 +100,20 @@ void gui::graph::Render() {
                 if (ImGui::BeginTabBar("##TabsGraph", ImGuiTabBarFlags_None))
                 {
                     if (ImGui::BeginTabItem("Score")) {
-                        PrepareData(values, labels, positions, graphType::SCORE);
+                        sortType = graphType::SCORE;
+                        PrepareData(values, labels, positions, sortedPeers, graphType::SCORE);
                         DisplayGraph(values, labels, positions, graphType::SCORE);
                         ImGui::EndTabItem();
                     }
                     if (ImGui::BeginTabItem("BP")) {
-                        PrepareData(values, labels, positions, graphType::BP);
+                        sortType = graphType::BP;
+                        PrepareData(values, labels, positions, sortedPeers, graphType::BP);
                         DisplayGraph(values, labels, positions, graphType::BP);
                         ImGui::EndTabItem();
                     }
                     if (ImGui::BeginTabItem("Max combo")) {
-                        PrepareData(values, labels, positions, graphType::MAX_COMBO);
+                        sortType = graphType::MAX_COMBO;
+                        PrepareData(values, labels, positions, sortedPeers, graphType::MAX_COMBO);
                         DisplayGraph(values, labels, positions, graphType::MAX_COMBO);
                         ImGui::EndTabItem();
                     }
@@ -105,7 +124,10 @@ void gui::graph::Render() {
             ImGui::SameLine();
             ImGui::BeginChild("ScoreDetails", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
             {
-                for (const auto& [key, value] : client::state.peers) {
+                int entryIdx = 0;
+                for (const auto& value : sortedPeers) {
+                    std::stringstream tableIdx("ScoreTable##");
+                    tableIdx << entryIdx;
                     ImGui::BulletText("%s: ", value.username.c_str());
                     ImGui::SameLine();
                     ImGui::Text("%d (%.2f%%)", utils::CalculateExScore(value.score), utils::CalculateRate(value.score, hooks::max_score::maxScore));
@@ -123,7 +145,7 @@ void gui::graph::Render() {
                     ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
                     ImGui::TextDisabled("%s", str.c_str());
 
-                    if (ImGui::BeginTable((key.host + std::to_string(key.port)).c_str(), 5))
+                    if (ImGui::BeginTable(tableIdx.str().c_str(), 5))
                     {
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
@@ -151,6 +173,7 @@ void gui::graph::Render() {
 
                         ImGui::EndTable();
                     }
+                    entryIdx++;
                 }
                 ImGui::EndChild();
             }
