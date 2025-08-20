@@ -16,7 +16,9 @@ void hkReturnMenu() {
 		return;
 	}
 	hooks::return_menu::is_returning_to_menu = true;
-	gui::graph::showGraph = false;
+	if (gui::graph::automaticGraph) {
+		gui::graph::showGraph = false;
+	}
 	hooks::maniac::ResetState();
 	client::Send(network::ClientToServer::CTS_CHART_CANCELLED, ""); // send escaped
 }

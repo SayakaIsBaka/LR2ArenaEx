@@ -7,7 +7,9 @@
 #include "selectscene.h"
 
 void hkSelectScene() {
-	gui::graph::showGraph = false;
+	if (gui::graph::automaticGraph) {
+		gui::graph::showGraph = false;
+	}
 }
 
 DWORD jmp_lr2body_43C510 = 0x43C510;
