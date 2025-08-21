@@ -1,6 +1,7 @@
 #include "gui.h"
 #include "widgets.h"
 #include "mainwindow.h"
+#include "graph.h"
 
 #include <server/server.h>
 #include <client/client.h>
@@ -8,6 +9,7 @@
 #include <hooks/fmod.h>
 #include <overlay/dx9hook.h>
 #include <ImGui/ImGuiFileDialog.h>
+#include <config/config.h>
 
 void gui::Render() {
 	if (ImGui::Begin("LR2ArenaEx", &showMenu, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus))
@@ -64,8 +66,16 @@ void gui::Render() {
             if (ImGui::BeginTabItem("Settings"))
             {
                 ImGui::SeparatorText("Settings");
-                ImGui::Checkbox("Disable game inputs when overlay is shown", &gui::muteGameInputs);
+                if (ImGui::Checkbox("Disable game inputs when overlay is shown", &gui::muteGameInputs)) {
+                    config::SetConfigValue("muteInputs", gui::muteGameInputs ? "true": "false");
+                    config::SaveConfig();
+                }
                 ImGui::SameLine(); widgets::HelpMarker("Does not affect the graph display in-game");
+
+                if (ImGui::Checkbox("Hide/show graph window automatically on scene transitions", &gui::graph::automaticGraph)) {
+                    config::SetConfigValue("automaticGraph", gui::graph::automaticGraph ? "true" : "false");
+                    config::SaveConfig();
+                }
 
                 static int volumeTmp = hooks::fmod::volume;
                 ImGui::SliderInt("Item sounds volume", &volumeTmp, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);

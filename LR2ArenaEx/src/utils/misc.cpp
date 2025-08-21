@@ -136,9 +136,9 @@ std::string utils::GetGaugeName(unsigned int gauge) {
 	}
 }
 
-float utils::CalculateRate(network::Score score, unsigned int maxScore) {
-	if (maxScore == 0)
-		return 0.0f;
-	auto percentage (((float)CalculateExScore(score) / (float)maxScore) * 100.0f);
+float utils::CalculateRate(network::Score score) {
+	if (score.current_notes == 0)
+		return 100.0f;
+	auto percentage (((float)CalculateExScore(score) / ((float)score.current_notes * 2)) * 100.0f);
 	return floorf(percentage * 100) / 100; // Round down
 }
