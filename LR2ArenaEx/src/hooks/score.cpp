@@ -36,6 +36,7 @@ void hkScore(unsigned char* memory) {
 		int great = ptr[4];
 		int p_great = ptr[5];
 		int score = ptr[45];
+		int current_notes = ptr[50];
 		//int score1 = ptr[46];
 		//fprintf(stdout, "max_combo:%d\n", max_combo);
 
@@ -46,7 +47,8 @@ void hkScore(unsigned char* memory) {
 			great,
 			p_great,
 			max_combo,
-			score
+			score,
+			current_notes
 		};
 		hooks::score::score_queue.enqueue(score_event);
 	}
