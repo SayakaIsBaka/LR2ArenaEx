@@ -74,7 +74,10 @@ void hkSelectBms(const char** buffer, unsigned char* memory) {
 		if (!(client::state.host == client::state.remoteId) && bmsInfo.hash != client::state.selectedSongRemote.hash)
 			gui::main_window::AddToLog("[!] You are not the host; please go back to the main menu and select the same song as the host!");
 
-		gui::graph::showGraph = true; // Show graph on song select
+		if (gui::graph::automaticGraph) {
+			gui::graph::showGraph = true; // Show graph on song select
+		}
+
 		hooks::return_menu::is_returning_to_menu = false;
 		hooks::maniac::ResetState();
 	}
