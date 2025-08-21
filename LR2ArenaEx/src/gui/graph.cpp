@@ -111,7 +111,7 @@ void gui::graph::Render() {
                     ImVec2 oldCursorPos = ImGui::GetCursorPos();
                     ImGui::Dummy(ImGui::CalcTextSize("9999 (100.00%)"));
                     ImGui::SetCursorPos(oldCursorPos);
-                    ImGui::Text("%d (%.2f%%)", utils::CalculateExScore(value.score), utils::CalculateRate(value.score, hooks::max_score::maxScore));
+                    ImGui::Text("%d (%.2f%%)", utils::CalculateExScore(value.score), utils::CalculateRate(value.score));
 
                     auto opt = utils::GetOptionName(value.option);
                     auto gauge = utils::GetGaugeName(value.gauge);

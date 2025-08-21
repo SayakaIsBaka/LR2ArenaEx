@@ -40,8 +40,9 @@ namespace network {
 		int p_great;
 		int max_combo;
 		int score;
+		int current_notes;
 
-		MSGPACK_DEFINE(poor, bad, good, great, p_great, max_combo, score);
+		MSGPACK_DEFINE(poor, bad, good, great, p_great, max_combo, score, current_notes);
 	};
 
 	struct Peer {
