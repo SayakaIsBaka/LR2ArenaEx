@@ -27,23 +27,22 @@ void hkLoadingDone() {
 	}
 }
 
-DWORD jmp_lr2body_40848D = 0x40848D;
+DWORD jmp_lr2body_42CC4A = 0x42CC4A;
+int(__cdecl* SetTimeLapse)(int, void*) = (int(__cdecl*)(int, void*))0x4B6B80;
 __declspec(naked) unsigned int trampLoadingDone() {
 
 	__asm {
-		// hook [esi+97BAAh] = loading done
 		pushfd
 		pushad
 		call hkLoadingDone
 		popad
 		popfd
 		// end hook
-		mov byte ptr[esi + 97BAAh], 1
-		add esp, 4
-		jmp jmp_lr2body_40848D
+		call SetTimeLapse
+		jmp jmp_lr2body_42CC4A
 	}
 }
 
 void hooks::loading_done::Setup() {
-	mem::HookFn((char*)0x408486, (char*)trampLoadingDone, 7);
+	mem::Hook((char*)0x42CC45, (char*)trampLoadingDone, 5);
 }
