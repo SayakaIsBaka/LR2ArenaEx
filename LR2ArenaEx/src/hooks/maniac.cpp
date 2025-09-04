@@ -7,8 +7,11 @@
 #include "maniac.h"
 #include "maxscore.h"
 #include "fmod.h"
+#include "selectscene.h"
 
 void ApplyItemEffect(network::CurrentItem item) {
+	if (hooks::select_scene::game == NULL) // Failsafe (just in case)
+		return;
 	auto i = hooks::maniac::items[item.rolledItemId];
 	switch (item.level) {
 	case 1:
@@ -26,6 +29,8 @@ void ApplyItemEffect(network::CurrentItem item) {
 }
 
 void ResetItemEffect(network::CurrentItem item) {
+	if (hooks::select_scene::game == NULL) // Failsafe (just in case)
+		return;
 	auto i = hooks::maniac::items[item.rolledItemId];
 	auto numMatchItemsType = std::count_if(hooks::maniac::activeItems.begin(), hooks::maniac::activeItems.end(),
 		[&item](std::pair<network::CurrentItem, int> const& x) { return x.first.rolledItemId == item.rolledItemId; });
