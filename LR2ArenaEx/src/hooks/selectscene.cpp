@@ -9,13 +9,6 @@
 #include "selectscene.h"
 
 void hkSelectScene() {
-	static bool showBindNotif = true;
-	if (showBindNotif) {
-		ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "LR2ArenaEx successfully loaded; press %s to show the overlay!",
-		utils::keys::toString(utils::keys::bindings[utils::keys::BindingType::MENU_TOGGLE].key).c_str() });
-		showBindNotif = false;
-	}
-
 	if (gui::graph::automaticGraph) {
 		gui::graph::showGraph = false;
 	}
@@ -36,6 +29,13 @@ __declspec(naked) unsigned int trampSelectScene() {
 }
 
 int __cdecl hkProcSelect(void* game, void* sql) {
+	static bool showBindNotif = true;
+	if (showBindNotif) {
+		ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "LR2ArenaEx successfully loaded; press %s to show the overlay!",
+		utils::keys::toString(utils::keys::bindings[utils::keys::BindingType::MENU_TOGGLE].key).c_str() });
+		showBindNotif = false;
+	}
+
 	if (hooks::select_scene::game == NULL)
 		hooks::select_scene::game = game;
 	return hooks::select_scene::oProcSelect(game, sql);
