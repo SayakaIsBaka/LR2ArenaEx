@@ -2,6 +2,7 @@
 #include <config/config.h>
 #include <iostream>
 #include <ImGui/ImGuiNotify.hpp>
+#include <MinHook.h>
 
 #include "fmod.h"
 
@@ -149,7 +150,18 @@ int __stdcall hkFmodSystemUpdate(void *system) {
 }
 
 void hooks::fmod::Setup() {
-	oFmodSystemUpdate = (FMOD_System_Update)mem::TrampHook((char*)0x4C625E, (char*)hkFmodSystemUpdate, 6);
+	oFmodSystemUpdate = (FMOD_System_Update)0x4C625E;
+	if (MH_CreateHookEx((LPVOID)oFmodSystemUpdate, &hkFmodSystemUpdate, &oFmodSystemUpdate) != MH_OK)
+	{
+		std::cout << "[!] Error hooking FmodSystemUpdate" << std::endl;
+		return;
+	}
+
+	if (MH_QueueEnableHook(MH_ALL_HOOKS) || MH_ApplyQueued() != MH_OK)
+	{
+		std::cout << "[!] Error enabling FmodSystemUpdate hook" << std::endl;
+		return;
+	}
 }
 
 void hooks::fmod::Destroy() {

@@ -2,6 +2,7 @@
 #include <gui/graph.h>
 #include <iostream>
 #include <sqlite3.h>
+#include <MinHook.h>
 
 #include "cstr.h"
 #include "selectscene.h"
@@ -70,5 +71,17 @@ void hooks::select_scene::SearchSongByHash(std::string hash) {
 
 void hooks::select_scene::Setup() {
 	mem::HookFn((char*)0x432006, (char*)trampSelectScene, 5);
-	oProcSelect = (ProcSelect)mem::TrampHook((char*)0x4281A0, (char*)hkProcSelect, 6);
+
+	oProcSelect = (ProcSelect)0x4281A0;
+	if (MH_CreateHookEx((LPVOID)oProcSelect, &hkProcSelect, &oProcSelect) != MH_OK)
+	{
+		std::cout << "[!] Error hooking ProcSelect" << std::endl;
+		return;
+	}
+
+	if (MH_QueueEnableHook(MH_ALL_HOOKS) || MH_ApplyQueued() != MH_OK)
+	{
+		std::cout << "[!] Error enabling ProcSelect hook" << std::endl;
+		return;
+	}
 }

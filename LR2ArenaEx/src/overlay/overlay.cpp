@@ -4,6 +4,7 @@
 #include <hooks/hooks.h>
 #include <config/config.h>
 #include <ImGui/ImGuiNotify.hpp>
+#include <MinHook.h>
 
 #include "overlay.h"
 #include "dx9hook.h"
@@ -30,6 +31,8 @@ DWORD WINAPI overlay::Setup(HMODULE hModule)
 		moduleBase = (uintptr_t)GetModuleHandle("LR2body.exe");
 		lr2type = LR2_TYPE::LR2_SD;
 	}
+
+	MH_Initialize();
 
 	dx9hook::HookDX9();
 	dinputhook::HookDinput(hModule);

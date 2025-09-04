@@ -12,6 +12,8 @@
 #include <fonts/noto_medium.hpp>
 #include <fonts/fa_solid_900.hpp>
 #include <fonts/IconsFontAwesome6.h>
+#include <MinHook.h>
+#include <optional>
 
 #include "dx9hook.h"
 #include "overlay.h"
@@ -169,22 +171,131 @@ int __cdecl hkShowCursor(int enabled) {
 	return overlay::dx9hook::oShowCursor(enabled);
 }
 
+struct DxFuncs {
+	overlay::dx9hook::EndScene endScene = nullptr;
+	overlay::dx9hook::ResetScene resetScene = nullptr;
+};
+static std::optional<DxFuncs> GetDX9Pointers() {
+	WNDCLASSEX windowClass;
+	windowClass.cbSize = sizeof(WNDCLASSEX);
+	windowClass.style = CS_HREDRAW | CS_VREDRAW;
+	windowClass.lpfnWndProc = DefWindowProc;
+	windowClass.cbClsExtra = 0;
+	windowClass.cbWndExtra = 0;
+	windowClass.hInstance = GetModuleHandle(NULL);
+	windowClass.hIcon = NULL;
+	windowClass.hCursor = NULL;
+	windowClass.hbrBackground = NULL;
+	windowClass.lpszMenuName = NULL;
+	windowClass.lpszClassName = "dxWindow";
+	windowClass.hIconSm = NULL;
+
+	::RegisterClassEx(&windowClass);
+
+	HWND window = ::CreateWindow(windowClass.lpszClassName, "LR2ArenaEx DirectX Window", WS_OVERLAPPEDWINDOW, 0, 0, 100, 100, NULL, NULL, windowClass.hInstance, NULL);
+
+	HMODULE libD3D9;
+	if ((libD3D9 = ::GetModuleHandle("d3d9.dll")) == NULL)
+	{
+		::DestroyWindow(window);
+		::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
+		return std::nullopt;
+	}
+
+	void* Direct3DCreate9;
+	if ((Direct3DCreate9 = ::GetProcAddress(libD3D9, "Direct3DCreate9")) == NULL)
+	{
+		::DestroyWindow(window);
+		::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
+		return std::nullopt;
+	}
+
+	LPDIRECT3D9 direct3D9;
+	if ((direct3D9 = ((LPDIRECT3D9(__stdcall*)(uint32_t))(Direct3DCreate9))(D3D_SDK_VERSION)) == NULL)
+	{
+		::DestroyWindow(window);
+		::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
+		return std::nullopt;
+	}
+
+	D3DPRESENT_PARAMETERS params;
+	params.BackBufferWidth = 0;
+	params.BackBufferHeight = 0;
+	params.BackBufferFormat = D3DFMT_UNKNOWN;
+	params.BackBufferCount = 0;
+	params.MultiSampleType = D3DMULTISAMPLE_NONE;
+	params.MultiSampleQuality = NULL;
+	params.SwapEffect = D3DSWAPEFFECT_DISCARD;
+	params.hDeviceWindow = window;
+	params.Windowed = 1;
+	params.EnableAutoDepthStencil = 0;
+	params.AutoDepthStencilFormat = D3DFMT_UNKNOWN;
+	params.Flags = NULL;
+	params.FullScreen_RefreshRateInHz = 0;
+	params.PresentationInterval = 0;
+
+	LPDIRECT3DDEVICE9 device;
+	if (direct3D9->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_NULLREF, window, D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_DISABLE_DRIVER_MANAGEMENT, &params, &device) < 0)
+	{
+		direct3D9->Release();
+		::DestroyWindow(window);
+		::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
+		return std::nullopt;
+	}
+
+	std::cout << "[i] D3D device pointer: " << (int*)device << std::endl;
+
+	DxFuncs funcs{};
+
+	funcs.endScene = (decltype(funcs.endScene))(*(char***)device)[42];
+	std::cout << "[i] EndScene pointer: " << std::hex << (*(int**)device)[42] << std::endl;
+
+	funcs.resetScene = (decltype(funcs.resetScene))(*(char***)device)[16];
+	std::cout << "[i] ResetScene pointer: " << std::hex << (*(int**)device)[16] << std::endl;
+
+	device->Release();
+	device = NULL;
+
+	direct3D9->Release();
+	direct3D9 = NULL;
+
+	::DestroyWindow(window);
+	::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
+
+	return funcs;
+}
+
 void overlay::dx9hook::HookDX9() {
-	char* d3dPointer = mem::ScanModIn(d3dPattern, d3dMask, d3dName, true);
-	if (!d3dPointer) {
-		std::cout << "[!] d3d9.dll not found, aborting..." << std::endl;
+	auto dx9Funcs = GetDX9Pointers();
+	if (!dx9Funcs) {
+		std::cout << "[!] Error getting DX9 pointers" << std::endl;
 		return;
 	}
-	std::cout << "[i] D3D pointer: " << (int*)d3dPointer << std::endl;
+	oEndScene = dx9Funcs->endScene;
+	oResetScene = dx9Funcs->resetScene;
 
-	uintptr_t d3dDeviceAddr = mem::FindDMAAddy((uintptr_t)d3dPointer + 0x4, { 0x0 });
-	std::cout << "[i] D3D device pointer: " << (int*)d3dDeviceAddr << std::endl;
+	if (MH_CreateHookEx((LPVOID)oEndScene, &hkEndScene, &oEndScene) != MH_OK)
+	{
+		std::cout << "[!] Error hooking EndScene" << std::endl;
+		return;
+	}
 
-	oEndScene = (EndScene)mem::TrampHook(((char**)d3dDeviceAddr)[42], (char*)hkEndScene, 7);
-	std::cout << "[i] EndScene pointer: " << std::hex << ((int*)d3dDeviceAddr)[42] << std::endl;
+	if (MH_CreateHookEx((LPVOID)oResetScene, &hkResetScene, &oResetScene) != MH_OK)
+	{
+		std::cout << "[!] Error hooking ResetScene" << std::endl;
+		return;
+	}
 
-	oResetScene = (ResetScene)mem::TrampHook(((char**)d3dDeviceAddr)[16], (char*)hkResetScene, 7);
-	std::cout << "[i] ResetScene pointer: " << std::hex << ((int*)d3dDeviceAddr)[16] << std::endl;
+	oShowCursor = (ShowCursor)0x4D09E0;
+	if (MH_CreateHookEx((LPVOID)oShowCursor, &hkShowCursor, &oShowCursor) != MH_OK) // Hook hide mouse cursor
+	{
+		std::cout << "[!] Error hooking ShowCursor" << std::endl;
+		return;
+	}
 
-	oShowCursor = (ShowCursor)mem::TrampHook((char*)0x4D09E0, (char*)hkShowCursor, 6); // Hook hide mouse cursor
+	if (MH_QueueEnableHook(MH_ALL_HOOKS) || MH_ApplyQueued() != MH_OK)
+	{
+		std::cout << "[!] Error enabling DX9 hooks" << std::endl;
+		return;
+	}
 }
