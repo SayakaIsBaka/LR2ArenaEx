@@ -26,11 +26,10 @@ DWORD WINAPI overlay::Setup(HMODULE hModule)
 
 	std::cout << "--- LR2ArenaEx debugging console ---" << std::endl << std::endl;
 #endif
-	if ((moduleBase = (uintptr_t)GetModuleHandle("LRHbody.exe")) == 0)
-	{
-		moduleBase = (uintptr_t)GetModuleHandle("LR2body.exe");
-		lr2type = LR2_TYPE::LR2_SD;
-	}
+	moduleBase = (uintptr_t)GetModuleHandle(NULL);
+	lr2res.x = *(unsigned int*)0x4307AD;
+	lr2res.y = *(unsigned int*)0x4307A8;
+	lr2type = lr2res.y >= 720 ? LR2_TYPE::LR2_HD : LR2_TYPE::LR2_SD;
 
 	MH_Initialize();
 
