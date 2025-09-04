@@ -29,7 +29,7 @@ DWORD WINAPI overlay::Setup(HMODULE hModule)
 	moduleBase = (uintptr_t)GetModuleHandle(NULL);
 	lr2res.x = *(unsigned int*)0x4307AD;
 	lr2res.y = *(unsigned int*)0x4307A8;
-	lr2type = lr2res.x >= 1280 ? LR2_TYPE::LR2_HD : LR2_TYPE::LR2_SD;
+	lr2type = lr2res.y >= 720 ? LR2_TYPE::LR2_HD : LR2_TYPE::LR2_SD;
 
 	MH_Initialize();
 
