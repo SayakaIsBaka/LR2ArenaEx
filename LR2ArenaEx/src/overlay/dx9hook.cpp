@@ -20,6 +20,19 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+bool ShouldMuteMessage(UINT uMsg) {
+	const UINT toMute[] = {
+		WM_MOUSEHWHEEL,
+		WM_MOUSEWHEEL,
+		WM_SETCURSOR
+	};
+	for (const UINT m : toMute) {
+		if (uMsg == m)
+			return true;
+	}
+	return false;
+}
+
 LRESULT __stdcall hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	// Fix mouse scaling for non-standard resolutions, taken from https://github.com/tenaibms/LR2OOL/blob/master/src/graphics/gui.cpp
 	LPARAM imgui_lParam = lParam;
@@ -41,7 +54,7 @@ LRESULT __stdcall hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	if (gui::showMenu || gui::graph::showGraph)
 	{
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, imgui_lParam);
-		if (gui::showMenu && gui::muteGameInputs)
+		if (gui::showMenu && gui::muteGameInputs && ShouldMuteMessage(uMsg))
 			return true;
 	}
 	return CallWindowProc(overlay::dx9hook::oWndProcHandler, hWnd, uMsg, wParam, lParam);
