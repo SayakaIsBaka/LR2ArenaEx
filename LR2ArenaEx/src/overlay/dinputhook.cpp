@@ -6,6 +6,7 @@
 #include <gui/graph.h>
 #include <hooks/maniac.h>
 #include <client/client.h>
+#include <MinHook.h>
 
 constexpr int debounceRate = 50;
 
@@ -99,7 +100,18 @@ BOOL overlay::dinputhook::HookDinput(HMODULE hModule) {
 	std::cout << "[i] DInput device pointer: " << std::hex << lpdiMouse << std::endl;
 	std::cout << "[i] DInput vTable pointer: " << std::hex << vTable << std::endl;
 	std::cout << "[i] GetDeviceState pointer: " << std::hex << ((int*)vTable)[9] << std::endl;
-	oGetDeviceState = (GetDeviceState)mem::TrampHook(((char**)vTable)[9], (char*)hkGetDeviceState, 7);
+	oGetDeviceState = (GetDeviceState)((char**)vTable)[9];
+	if (MH_CreateHookEx((LPVOID)oGetDeviceState, &hkGetDeviceState, &oGetDeviceState) != MH_OK)
+	{
+		std::cout << "[!] Error hooking GetDeviceState" << std::endl;
+		return false;
+	}
+
+	if (MH_QueueEnableHook(MH_ALL_HOOKS) || MH_ApplyQueued() != MH_OK)
+	{
+		std::cout << ("[!] Error enabling dinput hooks") << std::endl;
+		return false;
+	}
 
 	lpdiMouse->Release();
 	pDirectInput->Release();

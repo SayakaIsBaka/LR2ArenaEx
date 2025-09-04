@@ -4,6 +4,7 @@
 #include <gui/graph.h>
 #include <iostream>
 #include <client/client.h>
+#include <MinHook.h>
 
 #include "midi.h"
 #include "maniac.h"
@@ -40,5 +41,16 @@ DWORD __cdecl hkParseMidiMessage(DWORD msg) {
 }
 
 void hooks::midi::Setup() {
-	oParseMidiMessage = (ParseMidiMessage)mem::TrampHook((char*)0x4BD740, (char*)hkParseMidiMessage, 6);
+	oParseMidiMessage = (ParseMidiMessage)0x4BD740;
+	if (MH_CreateHookEx((LPVOID)oParseMidiMessage, &hkParseMidiMessage, &oParseMidiMessage) != MH_OK)
+	{
+		std::cout << "[!] Error hooking ParseMidiMessage" << std::endl;
+		return;
+	}
+
+	if (MH_QueueEnableHook(MH_ALL_HOOKS) || MH_ApplyQueued() != MH_OK)
+	{
+		std::cout << "[!] Error enabling ParseMidiMessage hook" << std::endl;
+		return;
+	}
 }
