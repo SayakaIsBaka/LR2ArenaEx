@@ -3,11 +3,19 @@
 #include <iostream>
 #include <sqlite3.h>
 #include <MinHook.h>
+#include <ImGui/ImGuiNotify.hpp>
 
 #include "cstr.h"
 #include "selectscene.h"
 
 void hkSelectScene() {
+	static bool showBindNotif = true;
+	if (showBindNotif) {
+		ImGui::InsertNotification({ ImGuiToastType::Success, 3000, "LR2ArenaEx successfully loaded; press %s to show the overlay!",
+		utils::keys::toString(utils::keys::bindings[utils::keys::BindingType::MENU_TOGGLE].key).c_str() });
+		showBindNotif = false;
+	}
+
 	if (gui::graph::automaticGraph) {
 		gui::graph::showGraph = false;
 	}
