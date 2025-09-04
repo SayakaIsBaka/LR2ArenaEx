@@ -29,6 +29,10 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 	case DLL_PROCESS_DETACH:
+		// Do not uninit on load (lpReserved is 0 when DLL is called using LoadLibrary / FreeLibrary)
+		if (lpReserved == nullptr) {
+			break;
+		}
 		ix::uninitNetSystem();
 		break;
 	}
