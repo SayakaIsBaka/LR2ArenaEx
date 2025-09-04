@@ -15,7 +15,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	case DLL_PROCESS_ATTACH:
 	{
 		ix::initNetSystem();
-		atexit([] { ix::uninitNetSystem(); });
 
 		auto* hThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)overlay::Setup, hModule, 0, nullptr);
 		if (hThread == nullptr)
@@ -30,6 +29,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 	case DLL_PROCESS_DETACH:
+		ix::uninitNetSystem();
 		break;
 	}
 	return TRUE;

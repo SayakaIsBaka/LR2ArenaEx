@@ -42,7 +42,7 @@ A small wrapper around LR2ArenaEx's embedded server is available, allowing to ru
 ## Special thanks
 
 - All people credited in the original [LR2Arena](https://github.com/SayakaIsBaka/LR2Arena) project
-- [MatVeiQaaa](https://github.com/MatVeiQaaa) for providing the base for the DirectX 9 hook
+- [MatVeiQaaa](https://github.com/MatVeiQaaa) for providing the base for the DirectX 9 hook and for their numerous contributions to this project
 - [tenaibms](https://github.com/tenaibms) for their [LR2OOL](https://github.com/tenaibms/LR2OOL) project which gave me a few leads on how to fix some issues (especially regarding cursor / mouse input management)
 - AYhaz and Shalink for helping with testing
 
@@ -51,4 +51,3 @@ A small wrapper around LR2ArenaEx's embedded server is available, allowing to ru
 - IME is not supported on the overlay
 - LR2ArenaEx has been reported to be working with LR2FHD but has not been thoroughly tested with it; as such, bugs may occur
 - LR2ArenaEx does not work if LR2 is ran as admin
-- Cleanup is not properly performed when LR2 exits (atexit is not called)
