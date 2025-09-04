@@ -1,5 +1,6 @@
 #include <utils/mem.h>
 #include <gui/graph.h>
+#include <hooks/maniac.h>
 #include <iostream>
 #include <sqlite3.h>
 #include <MinHook.h>
@@ -36,8 +37,13 @@ int __cdecl hkProcSelect(void* game, void* sql) {
 		showBindNotif = false;
 	}
 
-	if (hooks::select_scene::game == NULL)
+	if (hooks::select_scene::game == NULL) {
 		hooks::select_scene::game = game;
+		for (auto& item : hooks::maniac::items) {
+			item.address = (unsigned int*)((uintptr_t)game + (uintptr_t)item.address);
+		}
+	}
+
 	return hooks::select_scene::oProcSelect(game, sql);
 }
 
