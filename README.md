@@ -1,5 +1,39 @@
 # LR2ArenaEx
 
+## Hosting the standalone server
+
+> [!WARNING]
+> If running via a reverse proxy ensure that you do not redirect via SSL or upgrade from `ws://` to `wss://`. Similarly, be aware that a lot of clients hardcode `:2222` as a port for the server, and other ports will likely fail!
+
+### Example Traefik config
+```yml
+# config.yml
+providers:
+  file:
+    directory: ./dynamic-config
+    watch: true
+
+entrypoints:
+  websocket:
+    address: ":2222"
+```
+```yml
+# dynamic-config/lr2arenaex.yml
+http:
+  routers:
+    lr2arenaex:
+      rule: Host(`lr2arenaex.pfy.ch`)
+      service: lr2arenaex
+      entrypoints: websocket
+
+  services:
+    lr2arenaex:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "http://<service-ip>:<service-port>"
+```
+
 ## Quick start
 
 - Download the latest release [here](https://github.com/SayakaIsBaka/LR2ArenaEx/releases) and extract it somewhere
