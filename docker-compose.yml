@@ -1,0 +1,5 @@
+services:
+  LR2ArenaEx:
+    image: git.pfy.ch/pfych/LR2ArenaEx:latest
+    ports:
+      - "3333:2222" # Map host port 3333 to container port 2222 (LR2ArenaEx default)
