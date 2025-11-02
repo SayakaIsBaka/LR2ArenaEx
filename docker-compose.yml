@@ -1,5 +1,7 @@
 services:
   LR2ArenaEx:
     image: git.pfy.ch/pfych/lr2arenaex:latest
+    environment:
+      - ROTATE=true # Remove entirely to disable automatic host rotation
     ports:
       - "3333:2222" # Map host port 3333 to container port 2222 (LR2ArenaEx default)
