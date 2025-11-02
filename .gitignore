@@ -396,6 +396,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+.idea/
 
 # Do not apply gitignore to the include folder
 !LR2ArenaEx/include/**

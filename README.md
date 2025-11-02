@@ -44,6 +44,7 @@ A small wrapper around LR2ArenaEx's embedded server is available, allowing to ru
 - All people credited in the original [LR2Arena](https://github.com/SayakaIsBaka/LR2Arena) project
 - [MatVeiQaaa](https://github.com/MatVeiQaaa) for providing the base for the DirectX 9 hook and for their numerous contributions to this project
 - [tenaibms](https://github.com/tenaibms) for their [LR2OOL](https://github.com/tenaibms/LR2OOL) project which gave me a few leads on how to fix some issues (especially regarding cursor / mouse input management)
+- [Pfych](https://pfy.ch) for containerizing the standalone server
 - AYhaz and Shalink for helping with testing
 
 ## Known issues
