@@ -30,6 +30,7 @@ void sighandler(int signum)
 int main(int argc, char *argv[]) {
     argparse::ArgumentParser program("lr2arenaex-server");
 
+    char const* rotateEnv = getenv("ROTATE");
     program.add_argument("-r", "--rotate")
         .help("enable host auto-rotation")
         .flag();
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
 
     ix::initNetSystem();
 
-    if (program["--rotate"] == true) {
+    if (program["--rotate"] == true || rotateEnv != NULL) {
         server::autoRotateHost = true;
         std::cout << "[+] Host auto-rotation enabled" << std::endl;
     }
