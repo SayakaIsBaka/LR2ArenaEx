@@ -7,7 +7,7 @@
 #include "widgets.h"
 
 void gui::item_settings::Render() {
-    ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::internal_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::internal_resolution)[1] / 2.0f);
+    ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::canvas_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::canvas_resolution)[1] / 2.0f);
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("Item settings", NULL, ImGuiWindowFlags_AlwaysAutoResize))

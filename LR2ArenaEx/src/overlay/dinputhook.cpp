@@ -68,6 +68,7 @@ HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPV
 			if (cbData == sizeof(DIMOUSESTATE2)) { // Mouse device
 				((LPDIMOUSESTATE2)lpvData)->rgbButtons[0] = 0;
 				((LPDIMOUSESTATE2)lpvData)->rgbButtons[1] = 0;
+				((LPDIMOUSESTATE2)lpvData)->lZ = 0;
 			}
 			else if (cbData == 256) { // Keyboard device
 				memset(lpvData, 0, 256);
@@ -81,26 +82,82 @@ HRESULT __stdcall hkGetDeviceState(IDirectInputDevice7* pThis, DWORD cbData, LPV
 	return result;
 }
 
-BOOL overlay::dinputhook::HookDinput(HMODULE hModule) {
-	IDirectInput7* pDirectInput = NULL;
-	if (DirectInputCreateEx(hModule, DIRECTINPUT_VERSION, IID_IDirectInput7A, (LPVOID*)&pDirectInput, NULL) != DI_OK) {
-		std::cout << "[i] DirectInputCreateEx failed" << std::endl;
-		return false;
+static overlay::dinputhook::GetDeviceState GetDeviceStatePtr7(HMODULE hModule) {
+	IDirectInput7A* pDirectInput = NULL;
+	typedef HRESULT(__stdcall* tDirectInputCreateEx)(HINSTANCE hinst,
+		DWORD dwVersion,
+		REFIID riidltf,
+		LPVOID* ppvOut,
+		LPUNKNOWN punkOuter);
+	tDirectInputCreateEx DirectInputCreateEx = (tDirectInputCreateEx)GetProcAddress(hModule, "DirectInputCreateEx");
+	if (DirectInputCreateEx == nullptr) {
+		std::cout << "[!] DirectInputCreateEx not present in dinput.dll" << std::endl;
+		return nullptr;
+	}
+	GUID IID_IDirectInput7A = { 0x9A4CB684,0x236D,0x11D3,0x8E,0x9D,0x00,0xC0,0x4F,0x68,0x44,0xAE };
+	if (DirectInputCreateEx(GetModuleHandle(NULL), 0x0700, IID_IDirectInput7A, (LPVOID*)&pDirectInput, NULL) != DI_OK) {
+		std::cout << "[!] DirectInputCreateEx failed" << std::endl;
+		return nullptr;
 	}
 
-	LPDIRECTINPUTDEVICE7 lpdiMouse;
+	LPDIRECTINPUTDEVICE7A lpdiMouse;
+	GUID GUID_SysMouse = { 0x6F1D2B60, 0xD5A0, 0x11CF, 0xBF, 0xC7, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00 };
+	GUID IID_IDirectInputDevice7A = { 0x57D7C6BC,0x2356,0x11D3,0x8E,0x9D,0x00,0xC0,0x4F,0x68,0x44,0xAE };
 	if (pDirectInput->CreateDeviceEx(GUID_SysMouse, IID_IDirectInputDevice7A, (LPVOID*)&lpdiMouse, NULL) != DI_OK) {
 		pDirectInput->Release();
-		std::cout << "[!] Error creating DirectInput device" << std::endl;
-		return false;
+		std::cout << "[!] Error creating DirectInput7 device" << std::endl;
+		return nullptr;
 	}
 
-	uintptr_t vTable = mem::FindDMAAddy((uintptr_t)lpdiMouse, { 0x0 });
+	void** vTable = reinterpret_cast<void**>(mem::FindDMAAddy((uintptr_t)lpdiMouse, { 0x0 }));
 
-	std::cout << "[i] DInput device pointer: " << std::hex << lpdiMouse << std::endl;
-	std::cout << "[i] DInput vTable pointer: " << std::hex << vTable << std::endl;
-	std::cout << "[i] GetDeviceState pointer: " << std::hex << ((int*)vTable)[9] << std::endl;
-	oGetDeviceState = (GetDeviceState)((char**)vTable)[9];
+	lpdiMouse->Release();
+	pDirectInput->Release();
+
+	return reinterpret_cast<overlay::dinputhook::GetDeviceState>(vTable[9]);
+}
+
+static overlay::dinputhook::GetDeviceState GetDeviceStatePtr8(HMODULE hModule) {
+	IDirectInput8A* pDirectInput = NULL;
+	decltype(DirectInput8Create)* DirectInput8Create = reinterpret_cast<decltype(DirectInput8Create)>(GetProcAddress(hModule, "DirectInput8Create"));
+	if (DirectInput8Create == nullptr) {
+		std::cout << "[!] DirectInput8Create not present in dinput8.dll" << std::endl;
+		return nullptr;
+	}
+	GUID IID_IDirectInput8A = { 0xBF798030,0x483A,0x4DA2,0xAA,0x99,0x5D,0x64,0xED,0x36,0x97,0x00 };
+	if (DirectInput8Create(GetModuleHandle(NULL), 0x0800, IID_IDirectInput8A, (LPVOID*)&pDirectInput, NULL) != DI_OK) {
+		std::cout << "[!] DirectInput8Create failed" << std::endl;
+		return nullptr;
+	}
+
+	LPDIRECTINPUTDEVICE8A lpdiMouse;
+	GUID GUID_SysMouse = { 0x6F1D2B60, 0xD5A0, 0x11CF, 0xBF, 0xC7, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00 };
+	if (pDirectInput->CreateDevice(GUID_SysMouse, &lpdiMouse, NULL) != DI_OK) {
+		pDirectInput->Release();
+		std::cout << "[!] Error creating DirectInput8 device" << std::endl;
+		return nullptr;
+	}
+
+	void** vTable = reinterpret_cast<void**>(mem::FindDMAAddy((uintptr_t)lpdiMouse, { 0x0 }));
+
+	lpdiMouse->Release();
+	pDirectInput->Release();
+
+	return reinterpret_cast<overlay::dinputhook::GetDeviceState>(vTable[9]);
+}
+
+BOOL overlay::dinputhook::HookDinput(HMODULE hModule) {
+	int ver = 0;
+	HMODULE dinputHandle7 = GetModuleHandle("dinput.dll");
+	if (dinputHandle7) ver = 7;
+	HMODULE dinputHandle8 = GetModuleHandle("dinput8.dll");
+	if (dinputHandle8) ver = 8;
+
+	switch (ver) {
+	case 7: oGetDeviceState = GetDeviceStatePtr7(dinputHandle7); break;
+	case 8: oGetDeviceState = GetDeviceStatePtr8(dinputHandle8); break;
+	default: std::cout << "[!] DirectInput not found" << std::endl; return false;
+	}
 	if (MH_CreateHookEx((LPVOID)oGetDeviceState, &hkGetDeviceState, &oGetDeviceState) != MH_OK)
 	{
 		std::cout << "[!] Error hooking GetDeviceState" << std::endl;
@@ -112,9 +169,6 @@ BOOL overlay::dinputhook::HookDinput(HMODULE hModule) {
 		std::cout << ("[!] Error enabling dinput hooks") << std::endl;
 		return false;
 	}
-
-	lpdiMouse->Release();
-	pDirectInput->Release();
 
 	return true;
 }

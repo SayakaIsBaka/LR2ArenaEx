@@ -148,7 +148,7 @@ void gui::Render() {
                 if (waitingForKeyPress != utils::keys::BindingType::NONE)
                     ImGui::OpenPopup("Bind key");
 
-                ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::internal_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::internal_resolution)[1] / 2.0f);
+                ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::canvas_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::canvas_resolution)[1] / 2.0f);
                 ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
                 if (ImGui::BeginPopupModal("Bind key", NULL, ImGuiWindowFlags_AlwaysAutoResize))
@@ -178,7 +178,7 @@ void gui::Render() {
         ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".ogg", ImVec4(1.0f, 1.0f, 1.0f, 0.9f), ICON_FA_MUSIC);
         ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".mp3", ImVec4(1.0f, 1.0f, 1.0f, 0.9f), ICON_FA_MUSIC);
 
-        ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::internal_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::internal_resolution)[1] / 2.0f);
+        ImVec2 center = ImVec2((float)((uintptr_t*)overlay::dx9hook::canvas_resolution)[0] / 2.0f, (float)((uintptr_t*)overlay::dx9hook::canvas_resolution)[1] / 2.0f);
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
         if (ImGuiFileDialog::Instance()->Display("ChooseAudioFileDlg", ImGuiWindowFlags_NoCollapse, fileDialogDim[overlay::lr2type])) {
