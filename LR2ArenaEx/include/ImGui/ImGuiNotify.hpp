@@ -494,7 +494,7 @@ namespace ImGui
     {
         //const ImVec2 mainWindowSize = GetMainViewport()->Size;
         // Use LR2's internal resolution as window size instead otherwise it gets rendered outside of the window
-        const ImVec2 mainWindowSize = ImVec2((float)((uintptr_t*)overlay::dx9hook::internal_resolution)[0], (float)((uintptr_t*)overlay::dx9hook::internal_resolution)[1]);
+        const ImVec2 mainWindowSize = ImVec2((float)((uintptr_t*)overlay::dx9hook::canvas_resolution)[0], (float)((uintptr_t*)overlay::dx9hook::canvas_resolution)[1]);
 
         float height = 0.f;
 

@@ -1,12 +1,10 @@
 #pragma once
 
 #include <framework.h>
-#define DIRECTINPUT_VERSION 0x0700 // DirectInput 7!!! (August 2007 SDK required)
+#define DIRECTINPUT_VERSION 0x0800 // DirectInput 7!!! (August 2007 SDK required)
 #include <dinput.h>
 #include <unordered_map>
 #include <utils/keys.h>
-#pragma comment(lib, "Dinput.lib")
-#pragma comment(lib, "Dxguid.lib")
 
 namespace overlay {
 	namespace dinputhook {
