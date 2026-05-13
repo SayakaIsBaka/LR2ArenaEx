@@ -89,7 +89,7 @@ void SetupFonts(ImGuiIO& io, int fontSize) {
 
 	ImVector<ImWchar> ranges;
 	ImFontGlyphRangesBuilder builder;
-	builder.AddText(u8"©¨ª«");
+	builder.AddText(u8"â†â†’â†‘â†“");
 	builder.AddRanges(io.Fonts->GetGlyphRangesJapanese());
 	builder.BuildRanges(&ranges);
 	io.Fonts->AddFontFromMemoryCompressedTTF(noto_compressed_data, noto_compressed_size, mainFontSize, 0, ranges.Data);
