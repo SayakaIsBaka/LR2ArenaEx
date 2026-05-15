@@ -118,14 +118,6 @@ void InitImGui(IDirect3DDevice9* pDevice) {
 	overlay::dx9hook::hWnd = window;
 	std::cout << "[i] Window address: " << window << std::endl;
 
-	IDirect3DSwapChain9* swapchain = nullptr;
-	pDevice->GetSwapChain(0, &swapchain);
-	LPVOID present = reinterpret_cast<overlay::dx9hook::Present>((*(VOID***)swapchain)[3]);
-	MH_CreateHookEx(present, &hkPresent, &overlay::dx9hook::oPresent);
-	if (auto res = MH_EnableHook(present); res != MH_OK) {
-		std::cout << "[i] minhooy acting up..." << std::endl;
-	}
-
 	D3DCAPS9 caps{};
 	pDevice->GetDeviceCaps(&caps);
 	overlay::dx9hook::rtMax = caps.NumSimultaneousRTs;
@@ -182,22 +174,64 @@ void RenderNotifications() {
 	ImGui::PopStyleColor(1);
 }
 
-static int sceneIdx = 0;
+struct SceneDesc {
+	struct int2 {
+		int x = 0;
+		int y = 0;
+
+		bool operator!=(const int2& other) const {
+			return x != other.x || y != other.y;
+		};
+		int2(int x, int y) : x(x), y(y) {};
+	};
+	int2 canvasSize;
+	int2 outputSize;
+	SceneDesc(int canvasX, int canvasY, int outputX, int outputY) :
+		canvasSize(canvasX, canvasY), outputSize(outputX, outputY) {
+	};
+};
+
+static int sceneIdx = -1;
+static int sceneTarget = -1;
+static std::vector<SceneDesc> scenes;
 HRESULT __stdcall hkPresent(LPDIRECT3DSWAPCHAIN9 pSwapchain, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion, DWORD dwFlags) {
-	sceneIdx = 0;
+	if (!scenes.empty()) {
+		int target = scenes.size() - 1;
+		if (scenes.size() > 1) {
+			if (scenes[target].canvasSize != scenes[target - 1].canvasSize) target--;
+		}
+		sceneTarget = target;
+		scenes.clear();
+	}
+	sceneIdx = -1;
 	return overlay::dx9hook::oPresent(pSwapchain, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion, dwFlags);
 }
 
 HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
-	int curSceneIdx = sceneIdx;
-	sceneIdx++;
-	if (curSceneIdx != 0) return overlay::dx9hook::oEndScene(pDevice);
-
 	if (!overlay::dx9hook::init) {
 		InitImGui(pDevice);
 	}
 
 	ResetImGui(pDevice);
+
+	D3DSURFACE_DESC canvas{};
+	{
+		IDirect3DSurface9* rt{};
+		pDevice->GetRenderTarget(0, &rt);
+		rt->GetDesc(&canvas);
+		rt->Release();
+	}
+	D3DSURFACE_DESC output{};
+	{
+		IDirect3DSurface9* backbuffer{};
+		pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer);
+		backbuffer->GetDesc(&output);
+		backbuffer->Release();
+	}
+	scenes.emplace_back(canvas.Width, canvas.Height, output.Width, output.Height);
+
+	sceneIdx++;
+	if (sceneIdx != sceneTarget) return overlay::dx9hook::oEndScene(pDevice);
 
 	auto is_minimized = [](IDirect3DDevice9* pDevice) {
 		D3DDEVICE_CREATION_PARAMETERS params{};
@@ -206,23 +240,6 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 		return IsIconic(params.hFocusWindow) == TRUE ? true : false;
 	};
 	if (is_minimized(pDevice)) return overlay::dx9hook::oEndScene(pDevice);
-
-	std::vector<IDirect3DSurface9*> rts{};
-	rts.reserve(overlay::dx9hook::rtMax);
-	for (int i = 0; i < rts.capacity(); i++) {
-		IDirect3DSurface9* rt{};
-		pDevice->GetRenderTarget(i, &rt);
-		rts.push_back(rt);
-		if (i != 0) pDevice->SetRenderTarget(i, NULL);
-	}
-	D3DSURFACE_DESC canvas{};
-	rts[0]->GetDesc(&canvas);
-
-	D3DSURFACE_DESC output{};
-	IDirect3DSurface9* backbuffer{};
-	pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer);
-	backbuffer->GetDesc(&output);
-	backbuffer->Release();
 
 	overlay::dx9hook::canvas_resolution[0] = canvas.Width;
 	overlay::dx9hook::canvas_resolution[1] = canvas.Height;
@@ -249,21 +266,25 @@ HRESULT __stdcall hkEndScene(IDirect3DDevice9* pDevice) {
 	ImGui::Render();
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
-	for (int i = 0; i < rts.size(); i++) {
-		auto& rt = rts[i];
-		pDevice->SetRenderTarget(i, rt);
-		if (rt) rt->Release();
-	}
-
 	return overlay::dx9hook::oEndScene(pDevice);
 }
 
-HRESULT __stdcall hkResetScene(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pParams) {
+HRESULT __stdcall hkReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pParams) {
 	if (pDevice == NULL) {
-		return overlay::dx9hook::oResetScene(pDevice, pParams);
+		return overlay::dx9hook::oReset(pDevice, pParams);
 	}
 	ImGui_ImplDX9_InvalidateDeviceObjects();
-	auto res = overlay::dx9hook::oResetScene(pDevice, pParams);
+	auto res = overlay::dx9hook::oReset(pDevice, pParams);
+	ImGui_ImplDX9_CreateDeviceObjects();
+	return res;
+}
+
+HRESULT __stdcall hkResetEx(IDirect3DDevice9Ex* pDevice, D3DPRESENT_PARAMETERS* pParams, D3DDISPLAYMODEEX* pFullscreenDisplayMode) {
+	if (pDevice == NULL) {
+		return overlay::dx9hook::oResetEx(pDevice, pParams, pFullscreenDisplayMode);
+	}
+	ImGui_ImplDX9_InvalidateDeviceObjects();
+	auto res = overlay::dx9hook::oResetEx(pDevice, pParams, pFullscreenDisplayMode);
 	ImGui_ImplDX9_CreateDeviceObjects();
 	return res;
 }
@@ -276,8 +297,10 @@ int __cdecl hkShowCursor(int enabled) {
 }
 
 struct DxFuncs {
+	overlay::dx9hook::Reset reset = nullptr;
 	overlay::dx9hook::EndScene endScene = nullptr;
-	overlay::dx9hook::ResetScene resetScene = nullptr;
+	overlay::dx9hook::ResetEx resetEx = nullptr;
+	overlay::dx9hook::Present present = nullptr;
 };
 static std::optional<DxFuncs> GetDX9Pointers() {
 	HMODULE libD3D9;
@@ -303,62 +326,57 @@ static std::optional<DxFuncs> GetDX9Pointers() {
 
 	HWND window = ::CreateWindow(windowClass.lpszClassName, "LR2ArenaEx DirectX Window", WS_OVERLAPPEDWINDOW, 0, 0, 100, 100, NULL, NULL, windowClass.hInstance, NULL);
 
-	void* Direct3DCreate9;
-	if ((Direct3DCreate9 = ::GetProcAddress(libD3D9, "Direct3DCreate9")) == NULL)
-	{
-		::DestroyWindow(window);
-		::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
+	auto exit_fail = [window, windowClass]() {
+		DestroyWindow(window);
+		UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
 		return std::nullopt;
+	};
+
+	decltype(Direct3DCreate9Ex)* create_ex{};
+	D3DPRESENT_PARAMETERS pp{};
+	HRESULT hr{};
+
+	IDirect3DSwapChain9* swapchain{};
+	IDirect3DDevice9Ex* device{};
+	IDirect3D9Ex* d3d9ex{};
+
+	create_ex = (decltype(Direct3DCreate9Ex)*)GetProcAddress(libD3D9, "Direct3DCreate9Ex");
+	if (!create_ex) return exit_fail();
+	hr = create_ex(D3D_SDK_VERSION, &d3d9ex);
+	if (FAILED(hr)) return exit_fail();
+
+	pp.Windowed = 1;
+	pp.SwapEffect = D3DSWAPEFFECT_FLIP;
+	pp.BackBufferFormat = D3DFMT_A8R8G8B8;
+	pp.BackBufferCount = 1;
+	pp.hDeviceWindow = window;
+	pp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+
+	hr = d3d9ex->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, window,
+		D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_NOWINDOWCHANGES, &pp,
+		NULL, &device);
+	if (FAILED(hr)) return exit_fail();
+	d3d9ex->Release();
+
+	hr = device->GetSwapChain(0, &swapchain);
+	if (FAILED(hr)) {
+		device->Release();
+		return exit_fail();
 	}
-
-	LPDIRECT3D9 direct3D9;
-	if ((direct3D9 = ((LPDIRECT3D9(__stdcall*)(uint32_t))(Direct3DCreate9))(D3D_SDK_VERSION)) == NULL)
-	{
-		::DestroyWindow(window);
-		::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
-		return std::nullopt;
-	}
-
-	D3DPRESENT_PARAMETERS params;
-	params.BackBufferWidth = 0;
-	params.BackBufferHeight = 0;
-	params.BackBufferFormat = D3DFMT_UNKNOWN;
-	params.BackBufferCount = 0;
-	params.MultiSampleType = D3DMULTISAMPLE_NONE;
-	params.MultiSampleQuality = NULL;
-	params.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	params.hDeviceWindow = window;
-	params.Windowed = 1;
-	params.EnableAutoDepthStencil = 0;
-	params.AutoDepthStencilFormat = D3DFMT_UNKNOWN;
-	params.Flags = NULL;
-	params.FullScreen_RefreshRateInHz = 0;
-	params.PresentationInterval = 0;
-
-	LPDIRECT3DDEVICE9 device;
-	if (direct3D9->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_NULLREF, window, D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_DISABLE_DRIVER_MANAGEMENT, &params, &device) < 0)
-	{
-		direct3D9->Release();
-		::DestroyWindow(window);
-		::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
-		return std::nullopt;
-	}
-
-	std::cout << "[i] D3D device pointer: " << (int*)device << std::endl;
 
 	DxFuncs funcs{};
 
-	funcs.endScene = (decltype(funcs.endScene))(*(char***)device)[42];
-	std::cout << "[i] EndScene pointer: " << std::hex << (*(int**)device)[42] << std::endl;
+	funcs.reset = (decltype(funcs.reset))(*(uintptr_t***)device)[16];
+	std::cout << "[i] Reset pointer: " << std::hex << funcs.reset << std::endl;
 
-	funcs.resetScene = (decltype(funcs.resetScene))(*(char***)device)[16];
-	std::cout << "[i] ResetScene pointer: " << std::hex << (*(int**)device)[16] << std::endl;
+	funcs.endScene = (decltype(funcs.endScene))(*(uintptr_t***)device)[42];
+	std::cout << "[i] EndScene pointer: " << std::hex << funcs.endScene << std::endl;
 
-	device->Release();
-	device = NULL;
+	funcs.resetEx = (decltype(funcs.resetEx))(*(uintptr_t***)device)[132];
+	std::cout << "[i] ResetEx pointer: " << std::hex << funcs.resetEx << std::endl;
 
-	direct3D9->Release();
-	direct3D9 = NULL;
+	funcs.present = (decltype(funcs.present))(*(uintptr_t***)swapchain)[3];
+	std::cout << "[i] Present pointer: " << std::hex << funcs.present << std::endl;
 
 	::DestroyWindow(window);
 	::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
@@ -379,9 +397,21 @@ void overlay::dx9hook::HookDX9() {
 		return;
 	}
 
-	if (MH_CreateHookEx((LPVOID)dx9Funcs->resetScene, &hkResetScene, &oResetScene) != MH_OK)
+	if (MH_CreateHookEx((LPVOID)dx9Funcs->reset, &hkReset, &oReset) != MH_OK)
 	{
-		std::cout << "[!] Error hooking ResetScene" << std::endl;
+		std::cout << "[!] Error hooking Reset" << std::endl;
+		return;
+	}
+
+	if (MH_CreateHookEx((LPVOID)dx9Funcs->resetEx, &hkResetEx, &oResetEx) != MH_OK)
+	{
+		std::cout << "[!] Error hooking ResetEx" << std::endl;
+		return;
+	}
+
+	if (MH_CreateHookEx((LPVOID)dx9Funcs->present, &hkPresent, &oPresent) != MH_OK)
+	{
+		std::cout << "[!] Error hooking Present" << std::endl;
 		return;
 	}
 

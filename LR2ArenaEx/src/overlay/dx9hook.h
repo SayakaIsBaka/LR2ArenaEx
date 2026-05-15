@@ -13,8 +13,10 @@ namespace overlay {
 
 		typedef long(__stdcall* EndScene)(LPDIRECT3DDEVICE9);
 		inline EndScene oEndScene;
-		typedef long(__stdcall* ResetScene)(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS*);
-		inline ResetScene oResetScene;
+		typedef long(__stdcall* Reset)(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS*);
+		inline Reset oReset;
+		typedef long(__stdcall* ResetEx)(LPDIRECT3DDEVICE9EX, D3DPRESENT_PARAMETERS*, D3DDISPLAYMODEEX*);
+		inline ResetEx oResetEx;
 		typedef long(__stdcall* Present)(LPDIRECT3DSWAPCHAIN9, const RECT* pSourceRect, const RECT*, HWND, const RGNDATA*, DWORD);
 		inline Present oPresent;
 		inline HWND hWnd = NULL;
